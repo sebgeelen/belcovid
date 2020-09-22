@@ -2,9 +2,9 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import { ResizableArea } from 'react-resizable-area';
-import { getPolynomialRegressionPoints } from './helpers';
+import { getPolynomialRegressionPoints } from '../helpers';
 
-class PeopleInHospitalChart extends React.Component {
+export default class PeopleInHospitalChart extends React.Component {
     state = {};
     render() {
         let hospiData = this.props.data?.hospi || [];
@@ -65,5 +65,3 @@ class PeopleInHospitalChart extends React.Component {
         );
     }
 }
-
-export default PeopleInHospitalChart;

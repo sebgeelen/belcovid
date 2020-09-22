@@ -2,9 +2,9 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import { ResizableArea } from 'react-resizable-area';
-import { getPolynomialRegressionPoints } from './helpers';
+import { getPolynomialRegressionPoints } from '../helpers';
 
-class CasesByTestChart extends React.Component {
+export default class CasesByTestChart extends React.Component {
     state = {};
     render() {
         let casesData = this.props.data?.cases || [];
@@ -75,5 +75,3 @@ class CasesByTestChart extends React.Component {
         );
     }
 }
-
-export default CasesByTestChart;

@@ -1,11 +1,11 @@
 import React from 'react';
-import PeopleInHospitalChart from './PeopleInHospitalChart.js';
-import CasesByTestChart from './CasesByTestChart.js';
-import DataTable from './DataTable.js';
+import PeopleInHospitalChart from './components/PeopleInHospitalChart.js';
+import CasesByTestChart from './components/CasesByTestChart.js';
+import DataTable from './components/DataTable.js';
 import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES } from './helpers';
 import './App.css';
 
-class App extends React.Component {
+export default class App extends React.Component {
   state = {
     hospiWeeks: 3,
     caseByTestsMonths: 3,
@@ -63,5 +63,3 @@ class App extends React.Component {
     });
   }
 }
-
-export default App;

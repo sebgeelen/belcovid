@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getIsoDate, getDateFrom } from './helpers';
+import { AVAILABLE_BEDS, getIsoDate, getDateFrom } from '../helpers';
 import ReactTooltip from 'react-tooltip';
 
 const saturationTooltip = 'This is obviously a very naive calculation:<br>' +
