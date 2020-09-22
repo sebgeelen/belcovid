@@ -1,5 +1,6 @@
 import React from 'react';
 import { Chart } from 'react-charts';
+import { ResizableArea } from 'react-resizable-area';
 
 function PeopleInHospitalChart(props) {
     let hospiData = props.data?.hospi || [];
@@ -40,12 +41,18 @@ function PeopleInHospitalChart(props) {
         // A react-chart hyper-responsively and continuously fills the available
         // space of its parent element automatically
         <div
-        style={{
-            width: '90%',
-            height: '300px',
-        }}
+            style={{
+                width: '90%',
+                height: '300px',
+                paddingLeft: '50px',
+            }}
         >
-        <Chart data={data} series={series} axes={axes} tooltip primaryCursor secondaryCursor />
+            <ResizableArea
+                initHeight={{px: 0, percent: 100}}
+                initWidth={{px: 0, percent: 100}}
+            >
+                <Chart data={data} series={series} axes={axes} tooltip primaryCursor secondaryCursor />
+            </ResizableArea>
         </div>
     );
 }
