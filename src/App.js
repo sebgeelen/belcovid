@@ -18,8 +18,8 @@ class App extends React.Component {
         <h1>BelCovid</h1>
         <h2>Projected day of hospital saturation</h2>
         <p>{this.state.saturationDay}</p>
-        <h2>Patients at the hospital</h2>
-        <PeopleInHospitalChart data={this.state.data} />
+        <h2>Patients at the hospital (last three weeks)</h2>
+        <PeopleInHospitalChart data={this.state.data} start={new Date().setDate(new Date().getDate() - 22)} />
       </div>
     );
   }

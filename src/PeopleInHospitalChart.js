@@ -2,7 +2,10 @@ import React from 'react';
 import { Chart } from 'react-charts';
 
 function PeopleInHospitalChart(props) {
-    const hospiData = props.data?.hospi || [];
+    let hospiData = props.data?.hospi || [];
+    if (props.start) {
+        hospiData = hospiData.filter(item => new Date(item.DATE) > props.start);
+    }
     const dates = new Set(hospiData?.map(item => item.DATE));
     const points = [];
     for (const date of dates) {
