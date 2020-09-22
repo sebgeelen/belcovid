@@ -1,6 +1,8 @@
 import React from 'react';
 import { AVAILABLE_BEDS, getIsoDate, getDateFrom } from '../helpers';
 import ReactTooltip from 'react-tooltip';
+import { Table, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 const saturationTooltip = 'This is obviously a very naive calculation:<br>' +
     'If the number of patients at the hospital continues to rise<br>' +
@@ -14,22 +16,22 @@ export default class DataTable extends React.Component {
     render() {
         if (this.props.data) {
             return (
-                <table>
-                    <tbody>
-                        <tr>
-                            <th>Cases (weekly average)</th>
-                            <td>{Math.round(this._getAverageOver(this.props.data.cases, getDateFrom(new Date(), -8), new Date(), 'CASES'))}</td>
-                        </tr>
+                <Table>
+                    <Tbody>
+                        <Tr>
+                            <Th>Cases (weekly average)</Th>
+                            <Td>{Math.round(this._getAverageOver(this.props.data.cases, getDateFrom(new Date(), -8), new Date(), 'CASES'))}</Td>
+                        </Tr>
                         {
                             this.state.saturationDay &&
-                            <tr>
-                                <th>Projected day of hospital saturation<span data-tip={saturationTooltip} style={{color: 'red'}}>*</span></th>
-                                <td>{this.state.saturationDay}</td>
+                            <Tr>
+                                <Th>Projected day of hospital saturation<span data-tip={saturationTooltip} style={{color: 'red'}}>*</span></Th>
+                                <Td>{this.state.saturationDay}</Td>
                                 <ReactTooltip multiline/>
-                            </tr>
+                            </Tr>
                         }
-                    </tbody>
-                </table>
+                    </Tbody>
+                </Table>
             );
         } else {
             return <p>Loading...</p>;
