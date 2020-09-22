@@ -17,6 +17,7 @@
     "react-dom": "^16.13.1",
     "react-resizable-area": "^0.4.2",
     "react-scripts": "3.4.3",
+    "react-tooltip": "^4.2.10",
     "serve": "^11.3.2"
   },
   "scripts": {
