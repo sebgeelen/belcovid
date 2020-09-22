@@ -9,7 +9,10 @@ const LINK_CASES = 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.jso
 const AVAILABLE_BEDS = 61600;
 
 class App extends React.Component {
-  state = {};
+  state = {
+    hospiWeeks: 3,
+    caseByTestsMonths: 3,
+  };
   render() {
     return (
       <div>
@@ -19,12 +22,12 @@ class App extends React.Component {
           <p>{this.state.saturationDay}</p>
         </section>}
         {this.state.data && <section>
-          <h2>Patients at the hospital (last three weeks)</h2>
-          <PeopleInHospitalChart data={this.state.data} start={new Date().setDate(new Date().getDate() - 22)} />
+          <h2>Patients at the hospital (last <input type="number" value={this.state.hospiWeeks} onChange={this._onChangeHospiWeeks.bind(this)}></input> weeks)</h2>
+          <PeopleInHospitalChart data={this.state.data} start={new Date().setDate(new Date().getDate() - (this.state.hospiWeeks * 7) - 1)} />
         </section>}
         {this.state.data && <section>
-          <h2>Percentage of positive tests (last three months)</h2>
-          <CasesByTestChart data={this.state.data} start={new Date().setDate(new Date().getDate() - 94)} />
+          <h2>Percentage of positive tests (last <input type="number" value={this.state.caseByTestsMonths} onChange={this._onChangeCaseByTestMonths.bind(this)}></input> months)</h2>
+          <CasesByTestChart data={this.state.data} start={new Date().setDate(new Date().getDate() - (this.state.caseByTestsMonths * 31) - 1)} />
         </section>}
       </div>
     );
@@ -56,6 +59,18 @@ class App extends React.Component {
       data: { hospi, tests, cases },
     });
     this.getSaturationDay();
+  }
+  _onChangeHospiWeeks(e) {
+    const value = +e.target.value;
+    this.setState({
+      hospiWeeks: value > 0 ? value : 0 || 0,
+    });
+  }
+  _onChangeCaseByTestMonths(e) {
+    const value = +e.target.value;
+    this.setState({
+      caseByTestsMonths: value > 0 ? value : 0 || 0,
+    });
   }
 }
 
