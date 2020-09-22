@@ -16,7 +16,7 @@ export default class DataTable extends React.Component {
     render() {
         if (this.props.data) {
             return (
-                <Table>
+                <Table className="bordered">
                     <Tbody>
                         <Tr>
                             <Th>Cases (weekly average)</Th>
