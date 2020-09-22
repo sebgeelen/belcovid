@@ -52,6 +52,7 @@ class PeopleInHospitalChart extends React.Component {
                 <ResizableArea
                     initHeight={{px: 0, percent: 100}}
                     initWidth={{px: 0, percent: 100}}
+                    parentContainer={document.querySelector('.resizable-container')}
                 >
                     <Chart data={data()} series={series()} axes={axes()} tooltip primaryCursor secondaryCursor />
                 </ResizableArea>
