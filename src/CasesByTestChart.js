@@ -2,6 +2,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import { ResizableArea } from 'react-resizable-area';
+import { getPolynomialRegressionPoints } from './helpers';
 
 class CasesByTestChart extends React.Component {
     state = {};
@@ -33,6 +34,10 @@ class CasesByTestChart extends React.Component {
                 label: '% positive tests',
                 data: points,
             },
+            {
+                label: 'Trend line',
+                data: getPolynomialRegressionPoints(points),
+            }
             ], [points]
         );
         const series = memoize(
