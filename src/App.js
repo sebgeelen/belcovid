@@ -8,10 +8,7 @@ const LINK_CASES = 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.jso
 const AVAILABLE_BEDS = 61600;
 
 class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {};
-  }
+  state = {};
   render() {
     return (
       <div>
