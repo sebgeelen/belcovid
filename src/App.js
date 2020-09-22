@@ -1,5 +1,6 @@
 import React from 'react';
 import PeopleInHospitalChart from './PeopleInHospitalChart.js';
+import CasesByTestChart from './CasesByTestChart.js';
 import './App.css';
 
 const LINK_HOSPI = 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json';
@@ -13,10 +14,18 @@ class App extends React.Component {
     return (
       <div>
         <h1>BelCovid</h1>
-        <h2>Projected day of hospital saturation</h2>
-        <p>{this.state.saturationDay}</p>
-        <h2>Patients at the hospital (last three weeks)</h2>
-        <PeopleInHospitalChart data={this.state.data} start={new Date().setDate(new Date().getDate() - 22)} />
+        {this.state.saturationDay && <section>
+          <h2>Projected day of hospital saturation</h2>
+          <p>{this.state.saturationDay}</p>
+        </section>}
+        {this.state.data && <section>
+          <h2>Patients at the hospital (last three weeks)</h2>
+          <PeopleInHospitalChart data={this.state.data} start={new Date().setDate(new Date().getDate() - 22)} />
+        </section>}
+        {this.state.data && <section>
+          <h2>Percentage of positive tests (last three months)</h2>
+          <CasesByTestChart data={this.state.data} start={new Date().setDate(new Date().getDate() - 94)} />
+        </section>}
       </div>
     );
   }
