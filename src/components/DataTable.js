@@ -5,9 +5,13 @@ import { Table, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 const saturationTooltip = 'This is obviously a very naive calculation:<br>' +
-    'If the number of patients at the hospital continues to rise<br>' +
-    'at the pace it did between yesterday and today,<br>' +
-    'this is the day that hospitals would get overrun.';
+    'If the weekly average of patients at the hospital continues to rise' +
+    ' at the pace it did between yesterday and today,' +
+    ' this is the day that hospitals would get overrun.<br><br><br>' +
+    'current_patients * (1 + rise_percentage)^days_to_saturation = 52565<br>' +
+    '<=> days_to_saturation = log(52565 / current_patients) / log(1 + rise_percentage) <br>' +
+    '(where 52565 is the total number of hospital beds in Belgium, all' +
+    'categories together (source: healthybelgium.be, 2019)).';
 
 export default class DataTable extends React.Component {
     state = {
