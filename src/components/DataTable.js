@@ -16,22 +16,24 @@ export default class DataTable extends React.Component {
     render() {
         if (this.props.data) {
             return (
-                <Table className="bordered">
-                    <Tbody>
-                        <Tr>
-                            <Th>Cases (weekly average)</Th>
-                            <Td>{Math.round(getAverageOver(this.props.data.cases, new Date(), -8, 'CASES'))}</Td>
-                        </Tr>
-                        {
-                            this.state.saturationDay &&
+                <div>
+                    <Table className="bordered">
+                        <Tbody>
                             <Tr>
-                                <Th>Projected day of hospital saturation<span data-tip={saturationTooltip} style={{color: 'red'}}>*</span></Th>
-                                <Td>{this.state.saturationDay}</Td>
-                                <ReactTooltip multiline/>
+                                <Th>Cases (weekly average)</Th>
+                                <Td>{Math.round(getAverageOver(this.props.data.cases, new Date(), -8, 'CASES'))}</Td>
                             </Tr>
-                        }
-                    </Tbody>
-                </Table>
+                            {
+                                this.state.saturationDay &&
+                                <Tr>
+                                    <Th>Projected day of hospital saturation<span data-tip={saturationTooltip} style={{color: 'red'}}>*</span></Th>
+                                    <Td>{this.state.saturationDay}</Td>
+                                </Tr>
+                            }
+                        </Tbody>
+                    </Table>
+                    <ReactTooltip multiline/>
+                </div>
             );
         } else {
             return <p>Loading...</p>;
