@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getIsoDate, getDateFrom } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, sumByKeyAtDate, getAverageOver } from '../helpers';
 import ReactTooltip from 'react-tooltip';
 import { Table, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
@@ -11,7 +11,7 @@ const saturationTooltip = 'This is obviously a very naive calculation:<br>' +
 
 export default class DataTable extends React.Component {
     state = {
-        saturationDay: this.getSaturationDay().toDateString(),
+        saturationDay: this.getSaturationDay()?.toDateString(),
     }
     render() {
         if (this.props.data) {
@@ -20,7 +20,7 @@ export default class DataTable extends React.Component {
                     <Tbody>
                         <Tr>
                             <Th>Cases (weekly average)</Th>
-                            <Td>{Math.round(this._getAverageOver(this.props.data.cases, getDateFrom(new Date(), -8), new Date(), 'CASES'))}</Td>
+                            <Td>{Math.round(getAverageOver(this.props.data.cases, getDateFrom(new Date(), -8), new Date(), 'CASES'))}</Td>
                         </Tr>
                         {
                             this.state.saturationDay &&
@@ -41,8 +41,8 @@ export default class DataTable extends React.Component {
         const hospiData = this.props.data?.hospi;
         if (!hospiData) return;
 
-        const hospiDay1 = this._sumByKeyAtDate(hospiData, getDateFrom(new Date(), -2), 'TOTAL_IN');
-        const hospiDay2 = this._sumByKeyAtDate(hospiData, getDateFrom(new Date(), -1), 'TOTAL_IN');
+        const hospiDay1 = sumByKeyAtDate(hospiData, getDateFrom(new Date(), -2), 'TOTAL_IN');
+        const hospiDay2 = sumByKeyAtDate(hospiData, getDateFrom(new Date(), -1), 'TOTAL_IN');
         if (!hospiDay2 || hospiDay1 >= hospiDay2) return;
 
         const pcChange = (hospiDay2 - hospiDay1) / hospiDay1;
@@ -53,26 +53,6 @@ export default class DataTable extends React.Component {
     }
     getCasesOn(date) {
         const casesData = this.props.data?.cases;
-        return casesData && this._sumByKeyAtDate(casesData, date, 'CASES');
-    }
-
-    _filterByDate(data, date) {
-        return data.filter(item => item.DATE === getIsoDate(date));
-    }
-    _sumByKey(data, key) {
-        return data.map(item => item[key]).reduce((a, b) => a + b, 0);
-    }
-    _sumByKeyAtDate(data, date, key) {
-        const dataAtDate = this._filterByDate(data, date);
-        return this._sumByKey(dataAtDate, key);
-    }
-    _getAverageOver(data, startDate, endDate, key) {
-        let date = startDate;
-        const values = [this._sumByKeyAtDate(data, date, key)];
-        do {
-            date = getDateFrom(date, +1);
-            values.push(this._sumByKeyAtDate(data, date, key));
-        } while (date && getIsoDate(date) !== getIsoDate(endDate));
-        return (values.length && values.reduce((a, b) => a + b, 0) / values.length) || 0;
+        return casesData && sumByKeyAtDate(casesData, date, 'CASES');
     }
 }

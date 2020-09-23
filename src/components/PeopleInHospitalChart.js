@@ -2,7 +2,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import { ResizableArea } from 'react-resizable-area';
-import { getPolynomialRegressionPoints } from '../helpers';
+import { getAveragePoints, getPolynomialRegressionPoints } from '../helpers';
 
 export default class PeopleInHospitalChart extends React.Component {
     state = {};
@@ -21,13 +21,17 @@ export default class PeopleInHospitalChart extends React.Component {
         const data = memoize(
             () => [
             {
-                label: 'Number of people in the hospital',
-                data: points,
+                label: 'Number of patients in the hospital (weekly average)',
+                data: getAveragePoints(points, 7),
             },
             {
                 label: 'Trend line',
                 data: getPolynomialRegressionPoints(points, 3),
-            }
+            },
+            {
+                label: 'Number of patients in the hospital',
+                data: points,
+            },
             ], [points]
         );
         const series = memoize(

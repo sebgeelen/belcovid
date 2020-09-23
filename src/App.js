@@ -14,7 +14,7 @@ export default class App extends React.Component {
   };
   render() {
     return (
-      <div>
+      <div style={{ marginBottom: '40px' }}>
         <h1 style={{ textAlign: 'center' }}>BelCovid</h1>
 
         {!this.state.data && <p>Loading...</p>}
