@@ -7,12 +7,14 @@ import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, computeDaysBetwe
 import 'react-input-range/lib/css/index.css';
 import './App.css';
 import PatientsInICUChart from './components/PatientsInICUChart.js';
+import CasesByAgeChart from './components/CasesByAgeChart.js';
 
 export default class App extends React.Component {
   state = {
     hospiWeeks: 3,
     icuWeeks: 3,
     caseByTestsWeeks: 12,
+    casesByAgeWeeks: 3,
   };
   render() {
     return (
@@ -59,6 +61,18 @@ export default class App extends React.Component {
             onChange={value => this.setState({ caseByTestsWeeks: value })} />
           <CasesByTestChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.caseByTestsWeeks * 7))} />
         </section>}
+
+        {this.state.data &&
+        <section>
+          <h2>New cases, split by age (last {this.state.casesByAgeWeeks > 1 ? this.state.casesByAgeWeeks + ' weeks' : 'week'})</h2>
+          <InputRange
+            minValue={1}
+            maxValue={this.state.weeksSinceStart}
+            value={this.state.casesByAgeWeeks}
+            onChange={value => this.setState({ casesByAgeWeeks: value })} />
+          <CasesByAgeChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.casesByAgeWeeks * 7))} />
+        </section>}
+
         <footer>Made with ❤ by <a href="http://www.antoineguenet.com">Antoine Guenet</a> (2020) •
         All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
         Official national <a href="https://www.info-coronavirus.be/">information on Covid-19</a>.</footer>
