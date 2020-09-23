@@ -3,7 +3,7 @@ import PeopleInHospitalChart from './components/PeopleInHospitalChart.js';
 import CasesByTestChart from './components/CasesByTestChart.js';
 import DataTable from './components/DataTable.js';
 import InputRange from 'react-input-range';
-import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom } from './helpers';
+import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, computeDaysBetween } from './helpers';
 import 'react-input-range/lib/css/index.css';
 import './App.css';
 
@@ -61,14 +61,16 @@ export default class App extends React.Component {
     const hospi = await (await fetch(LINK_HOSPI)).json();
     const tests = await (await fetch(LINK_TOTAL_TESTS)).json();
     const cases = await (await fetch(LINK_CASES)).json();
-    const firstDay = cases.reduce((a, b) => {
-      return Date.parse(a.DATE) > Date.parse(b.DATE) ? b : a;
-    }).DATE;
-    const weeksSinceStart = Math.ceil((new Date().getTime() - new Date(firstDay).getTime()) / (1000 * 60 * 60 * 24 * 7));
+    const weeksSinceStart = Math.ceil(computeDaysBetween(new Date(), this._getFirstDay(cases)) / 7);
     this.setState({
       data: { hospi, tests, cases },
       weeksSinceStart
     });
+  }
+  _getFirstDay(data) {
+    return new Date(data.reduce((a, b) => {
+      return Date.parse(a.DATE) > Date.parse(b.DATE) ? b : a;
+    }).DATE);
   }
   _onChangeHospiRange(value) {
     this.setState({ hospiWeeks: value });
