@@ -3,7 +3,7 @@ import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../helpers';
 
-export default class PeopleInHospitalChart extends React.Component {
+export default class PatientsInHospitalChart extends React.Component {
     state = {};
     render() {
         let hospiData = this.props.data?.hospi || [];

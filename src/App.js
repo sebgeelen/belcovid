@@ -1,11 +1,12 @@
 import React from 'react';
-import PeopleInHospitalChart from './components/PeopleInHospitalChart.js';
+import PatientsInHospitalChart from './components/PatientsInHospitalChart.js';
 import CasesByTestChart from './components/CasesByTestChart.js';
 import DataTable from './components/DataTable.js';
 import InputRange from 'react-input-range';
 import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, computeDaysBetween } from './helpers';
 import 'react-input-range/lib/css/index.css';
 import './App.css';
+import PatientsInICUChart from './components/PatientsInICUChart.js';
 
 export default class App extends React.Component {
   state = {
@@ -33,7 +34,18 @@ export default class App extends React.Component {
             maxValue={this.state.weeksSinceStart}
             value={this.state.hospiWeeks}
             onChange={value => this.setState({ hospiWeeks: value })} />
-          <PeopleInHospitalChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.hospiWeeks * 7))} />
+          <PatientsInHospitalChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.hospiWeeks * 7))} />
+        </section>}
+
+        {this.state.data &&
+        <section>
+          <h2>Patients in intensive care (last {this.state.hospiWeeks > 1 ? this.state.hospiWeeks + ' weeks' : 'week'})</h2>
+          <InputRange
+            minValue={1}
+            maxValue={this.state.weeksSinceStart}
+            value={this.state.hospiWeeks}
+            onChange={value => this.setState({ hospiWeeks: value })} />
+          <PatientsInICUChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.hospiWeeks * 7))} />
         </section>}
 
         {this.state.data &&
