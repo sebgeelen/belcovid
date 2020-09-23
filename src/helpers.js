@@ -19,6 +19,7 @@ export function getIsoDate(date) {
     return date.toISOString().substring(0, 10);
 }
 export function getDateFrom(date, daysFromDate) {
+    date = new Date(date); // clone to avoid side effects
     const newDate = new Date(date.setDate(date.getDate() + daysFromDate));
     return newDate;
 }
@@ -32,13 +33,22 @@ export function sumByKeyAtDate(data, date, key) {
     const dataAtDate = filterByDate(data, date);
     return sumByKey(dataAtDate, key);
 }
-export function getAverageOver(data, startDate, endDate, key) {
+export function getAverageOver(data, startDate, endDateOrInterval, key) {
+    let endDate;
+    if (typeof endDateOrInterval === 'number') {
+        endDate = getDateFrom(startDate, endDateOrInterval);
+    } else {
+        endDate = endDateOrInterval;
+    }
+    if (endDate < startDate) {
+        endDate = [startDate, startDate = endDate][0]; // swap them
+    }
     let date = startDate;
     const values = [sumByKeyAtDate(data, date, key)];
     do {
         date = getDateFrom(date, +1);
         values.push(sumByKeyAtDate(data, date, key));
-    } while (date && getIsoDate(date) !== getIsoDate(endDate));
+    } while (date && getIsoDate(date) < getIsoDate(endDate));
     return (values.length && values.reduce((a, b) => a + b, 0) / values.length) || 0;
 }
 export function getAveragePoints(points, interval) {
