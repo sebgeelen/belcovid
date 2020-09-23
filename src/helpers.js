@@ -5,6 +5,8 @@ export const LINK_TOTAL_TESTS = 'https://epistat.sciensano.be/Data/COVID19BE_tes
 export const LINK_CASES = 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.json';
 export const AVAILABLE_BEDS = 52565;
 // source: https://www.healthybelgium.be/en/key-data-in-healthcare/general-hospitals/organisation-of-the-hospital-landscape/categorisation-of-hospital-activities/evolution-of-the-number-of-accredited-hospital-beds
+export const AVAILABLE_ICU_BEDS = 2650;
+// source: https://www.vrt.be/vrtnws/en/2020/03/22/health-minister-says-that-an-additional-759-intensive-care-beds/
 
 export function getPolynomialRegressionPoints(data, degree = 1) {
     const regression = PolynomialRegression.read(data, degree);
