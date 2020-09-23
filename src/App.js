@@ -11,6 +11,7 @@ import PatientsInICUChart from './components/PatientsInICUChart.js';
 export default class App extends React.Component {
   state = {
     hospiWeeks: 3,
+    icuWeeks: 3,
     caseByTestsWeeks: 12,
   };
   render() {
@@ -39,13 +40,13 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section>
-          <h2>Patients in intensive care (last {this.state.hospiWeeks > 1 ? this.state.hospiWeeks + ' weeks' : 'week'})</h2>
+          <h2>Patients in intensive care (last {this.state.icuWeeks > 1 ? this.state.icuWeeks + ' weeks' : 'week'})</h2>
           <InputRange
             minValue={1}
             maxValue={this.state.weeksSinceStart}
-            value={this.state.hospiWeeks}
-            onChange={value => this.setState({ hospiWeeks: value })} />
-          <PatientsInICUChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.hospiWeeks * 7))} />
+            value={this.state.icuWeeks}
+            onChange={value => this.setState({ icuWeeks: value })} />
+          <PatientsInICUChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.icuWeeks * 7))} />
         </section>}
 
         {this.state.data &&
