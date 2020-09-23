@@ -31,6 +31,17 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section>
+          <h2>New cases, by age group (last {this.state.casesByAgeWeeks > 1 ? this.state.casesByAgeWeeks + ' weeks' : 'week'})</h2>
+          <InputRange
+            minValue={1}
+            maxValue={this.state.weeksSinceStart}
+            value={this.state.casesByAgeWeeks}
+            onChange={value => this.setState({ casesByAgeWeeks: value })} />
+          <CasesByAgeChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.casesByAgeWeeks * 7))} />
+        </section>}
+
+        {this.state.data &&
+        <section>
           <h2>Patients at the hospital (last {this.state.hospiWeeks > 1 ? this.state.hospiWeeks + ' weeks' : 'week'})</h2>
           <InputRange
             minValue={1}
@@ -60,17 +71,6 @@ export default class App extends React.Component {
             value={this.state.caseByTestsWeeks}
             onChange={value => this.setState({ caseByTestsWeeks: value })} />
           <CasesByTestChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.caseByTestsWeeks * 7))} />
-        </section>}
-
-        {this.state.data &&
-        <section>
-          <h2>New cases, split by age (last {this.state.casesByAgeWeeks > 1 ? this.state.casesByAgeWeeks + ' weeks' : 'week'})</h2>
-          <InputRange
-            minValue={1}
-            maxValue={this.state.weeksSinceStart}
-            value={this.state.casesByAgeWeeks}
-            onChange={value => this.setState({ casesByAgeWeeks: value })} />
-          <CasesByAgeChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.casesByAgeWeeks * 7))} />
         </section>}
 
         <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
