@@ -36,14 +36,14 @@ export default class DataTable extends React.Component {
                             {
                                 this.state.saturationDay.hospitals &&
                                 <Tr>
-                                    <Th>Projected day of hospital saturation<span data-tip={saturationTooltip(AVAILABLE_BEDS)} style={{color: 'red'}}>*</span></Th>
+                                    <Th>Day of hospital saturation (at current rate)<span data-tip={saturationTooltip(AVAILABLE_BEDS)} style={{color: 'red'}}>*</span></Th>
                                     <Td>{this.state.saturationDay.hospitals}</Td>
                                 </Tr>
                             }
                             {
                                 this.state.saturationDay.icu &&
                                 <Tr>
-                                    <Th>Projected day of ICU saturation<span data-tip={saturationTooltip(AVAILABLE_ICU_BEDS, true)} style={{color: 'red'}}>*</span></Th>
+                                    <Th>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(AVAILABLE_ICU_BEDS, true)} style={{color: 'red'}}>*</span></Th>
                                     <Td>{this.state.saturationDay.icu}</Td>
                                 </Tr>
                             }
