@@ -6,9 +6,9 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 function saturationTooltip(availableBeds, icu = false) {
     return 'This is obviously a very naive calculation:<br>' +
-    'If the weekly average of patients at the hospital continues to rise' +
+    `If the weekly average of patients ${icu ? 'in intensive care' : 'at the hospital'} continues to rise` +
     ' at the pace it did between yesterday and today,' +
-    ' this is the day that hospitals would get overrun.<br><br><br>' +
+    ` this is the day that ${icu ? 'ICUs' : 'hospitals'} would get overrun.<br><br><br>` +
     `current_patients * (1 + rise_percentage)^days_to_saturation = ${availableBeds}<br>` +
     `<=> days_to_saturation = log(${availableBeds} / current_patients) / log(1 + rise_percentage) <br>` +
     `(where ${availableBeds} is the ` +
