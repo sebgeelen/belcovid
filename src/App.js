@@ -14,7 +14,7 @@ export default class App extends React.Component {
   };
   render() {
     return (
-      <div style={{ marginBottom: '40px' }}>
+      <div>
         <h1 style={{ textAlign: 'center' }}>BelCovid</h1>
 
         {!this.state.data && <p>Loading...</p>}
@@ -46,6 +46,9 @@ export default class App extends React.Component {
             onChange={value => this.setState({ caseByTestsWeeks: value })} />
           <CasesByTestChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.caseByTestsWeeks * 7))} />
         </section>}
+        <footer>Made with ❤ by <a href="http://www.antoineguenet.com">Antoine Guenet</a> (2020) •
+        All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
+        Official national <a href="https://www.info-coronavirus.be/">information on Covid-19</a>.</footer>
       </div>
     );
   }
