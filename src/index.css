@@ -26,3 +26,9 @@ footer {
 footer a {
   color: #A6A6A6;
 }
+.zoom-in {
+  cursor: zoom-in;
+}
+.zoom-out {
+  cursor: zoom-out;
+}

@@ -72,6 +72,6 @@ export function getAveragePoints(points, interval) {
         };
     });
 }
-export function computeDaysBetween(day1, day2) {
-    return (day1.getTime() - day2.getTime()) / (1000 * 60 * 60 * 24);
+export function getDaysBetween(day1, day2) {
+    return Math.abs((day1.getTime() - day2.getTime()) / (1000 * 60 * 60 * 24));
 }

@@ -3,7 +3,7 @@ import PatientsInHospitalChart from './components/PatientsInHospitalChart.js';
 import CasesByTestChart from './components/CasesByTestChart.js';
 import DataTable from './components/DataTable.js';
 import InputRange from 'react-input-range';
-import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, computeDaysBetween } from './helpers';
+import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, getDaysBetween } from './helpers';
 import 'react-input-range/lib/css/index.css';
 import './App.css';
 import PatientsInICUChart from './components/PatientsInICUChart.js';
@@ -14,7 +14,6 @@ export default class App extends React.Component {
     hospiWeeks: 3,
     icuWeeks: 3,
     caseByTestsWeeks: 12,
-    casesByAgeWeeks: 3,
   };
   render() {
     return (
@@ -31,13 +30,8 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section>
-          <h2>New cases, by age group (last {this.state.casesByAgeWeeks > 1 ? this.state.casesByAgeWeeks + ' weeks' : 'week'})</h2>
-          <InputRange
-            minValue={1}
-            maxValue={this.state.weeksSinceStart}
-            value={this.state.casesByAgeWeeks}
-            onChange={value => this.setState({ casesByAgeWeeks: value })} />
-          <CasesByAgeChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.casesByAgeWeeks * 7))} />
+          <h2>New cases, by age group</h2>
+          <CasesByAgeChart data={this.state.data} />
         </section>}
 
         {this.state.data &&
@@ -87,7 +81,7 @@ export default class App extends React.Component {
     const hospi = await (await fetch(LINK_HOSPI)).json();
     const tests = await (await fetch(LINK_TOTAL_TESTS)).json();
     const cases = await (await fetch(LINK_CASES)).json();
-    const weeksSinceStart = Math.ceil(computeDaysBetween(new Date(), this._getFirstDay(cases)) / 7);
+    const weeksSinceStart = Math.ceil(getDaysBetween(new Date(), this._getFirstDay(cases)) / 7);
     this.setState({
       data: { hospi, tests, cases },
       weeksSinceStart

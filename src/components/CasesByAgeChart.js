@@ -1,6 +1,7 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
+import { getDateFrom, getDaysBetween, getIsoDate } from '../helpers';
 
 const AGE_GROUPS = [
     '0-9',
@@ -16,14 +17,24 @@ const AGE_GROUPS = [
     'Age unknown'
 ];
 
+const START_WEEK = 3;
 export default class CasesByAgeChart extends React.Component {
-    state = {};
+    state = {
+        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (START_WEEK * 7)))),
+        max: new Date(getIsoDate(new Date())),
+    };
+    _isZoomingOut = false;
     render() {
         let casesData = this.props.data?.cases || [];
-        if (this.props.start) {
-            casesData = casesData.filter(item => new Date(item.DATE) > this.props.start);
+        if (this.state.min || this.state.max) {
+            casesData = casesData.filter(item => {
+                if (!item.DATE) return false;
+                const date = new Date(item.DATE);
+                return (!this.state.min || date >= this.state.min) &&
+                    (!this.state.max || date <= this.state.max);
+            });
         }
-        const dates = new Set(casesData?.map(item => item.DATE));
+        const dates = new Set(casesData?.map(item => item.DATE).filter(item => item));
 
         const points = {};
         AGE_GROUPS.reduce((points, group) => {
@@ -47,14 +58,13 @@ export default class CasesByAgeChart extends React.Component {
         for (const group of AGE_GROUPS) {
             points[group].total = points[group].values.reduce((a, b) => a + b.y, 0);
         }
-        const data = memoize(
-            () => AGE_GROUPS.sort((a, b) => points[a].total - points[b].total).map(group => {
-                return {
-                    label: `New cases (${group})`,
-                    data: points[group].values,
-                };
-            }), [{points}],
-        );
+        const sortedPoints = AGE_GROUPS.sort((a, b) => points[a].total - points[b].total).map(group => {
+            return {
+                label: `New cases (${group})`,
+                data: points[group].values,
+            };
+        });
+        const data = memoize(() => sortedPoints, [sortedPoints]);
         const series = memoize(
             () => ({
                 type: 'area',
@@ -62,14 +72,41 @@ export default class CasesByAgeChart extends React.Component {
             }),
             []
         );
-
         const axes = memoize(
             () => [
-            { primary: true, type: 'utc', position: 'bottom' },
+            {
+                primary: true,
+                type: 'utc',
+                position: 'bottom',
+                hardMin: null,
+                hardMax: null,
+            },
             { type: 'linear', position: 'left', stacked: true }
             ],
             []
         );
+        const brush = memoize(
+            () => ({
+                onSelect: brushData => {
+                    if (isNaN(brushData.start.getTime()) || isNaN(brushData.end.getTime())) return;
+                    let min = new Date(getIsoDate(new Date(Math.min(brushData.start, brushData.end))));
+                    let max = new Date(getIsoDate(new Date(Math.max(brushData.start, brushData.end))));
+                    const interval = getDaysBetween(min, max);
+                    if (interval < 1) {
+                        max = getDateFrom(min, 1);
+                    }
+                    if (this._isZoomingOut) {
+                        this._isZoomingOut = false;
+                        min = getDateFrom(this.state.min, -1 * Math.ceil(interval) * 2);
+                        max = getDateFrom(this.state.max, Math.ceil(interval) * 2);
+                    }
+                    this.setState({ min, max });
+                }
+            }),
+            []
+        );
+
+        const tooltip = memoize(() => ({ anchor: 'gridBottom' }), []);
 
         return (
             // A react-chart hyper-responsively and continuously fills the available
@@ -80,7 +117,29 @@ export default class CasesByAgeChart extends React.Component {
                     height: '300px',
                 }}
             >
-                <Chart data={data()} series={series()} axes={axes()} tooltip primaryCursor secondaryCursor />
+                <Chart
+                    data={data()}
+                    series={series()}
+                    axes={axes()}
+                    brush={brush()}
+                    tooltip={tooltip()}
+                    onMouseDown={(e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                            e.currentTarget.classList.add('zoom-out');
+                        } else {
+                            e.currentTarget.classList.add('zoom-in');
+                        }
+                    }}
+                    onMouseUp={(e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                            e.currentTarget.classList.remove('zoom-out');
+                            this._isZoomingOut = true;
+                        } else {
+                            e.currentTarget.classList.remove('zoom-in');
+                        }
+                    }}
+                    primaryCursor secondaryCursor
+                />
             </div>
         );
     }
