@@ -41,8 +41,8 @@ export default class DataTable extends React.Component {
         const hospiData = this.props.data?.hospi;
         if (!hospiData) return;
 
-        const hospiDay1 = sumByKeyAtDate(hospiData, getDateFrom(new Date(), -2), 'TOTAL_IN');
-        const hospiDay2 = sumByKeyAtDate(hospiData, getDateFrom(new Date(), -1), 'TOTAL_IN');
+        const hospiDay1 = getAverageOver(hospiData, getDateFrom(new Date(), -9), getDateFrom(new Date(), -2), 'TOTAL_IN');
+        const hospiDay2 = getAverageOver(hospiData, getDateFrom(new Date(), -8), getDateFrom(new Date(), -1), 'TOTAL_IN');
         if (!hospiDay2 || hospiDay1 >= hospiDay2) return;
 
         const pcChange = (hospiDay2 - hospiDay1) / hospiDay1;
