@@ -73,8 +73,7 @@ export default class App extends React.Component {
           <CasesByAgeChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.casesByAgeWeeks * 7))} />
         </section>}
 
-        <footer>Made with ❤ by <a href="http://www.antoineguenet.com">Antoine Guenet</a> (2020) •
-        All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
+        <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
         Official national <a href="https://www.info-coronavirus.be/">information on Covid-19</a>.</footer>
       </div>
     );
