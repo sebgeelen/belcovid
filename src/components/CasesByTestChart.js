@@ -1,7 +1,6 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
-import { ResizableArea } from 'react-resizable-area';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../helpers';
 
 export default class CasesByTestChart extends React.Component {
@@ -68,13 +67,7 @@ export default class CasesByTestChart extends React.Component {
                     height: '300px',
                 }}
             >
-                <ResizableArea
-                    initHeight={{px: 0, percent: 100}}
-                    initWidth={{px: 0, percent: 100}}
-                    parentContainer={document.querySelector('.resizable-container')}
-                >
-                    <Chart data={data()} series={series()} axes={axes()} tooltip primaryCursor secondaryCursor />
-                </ResizableArea>
+                <Chart data={data()} series={series()} axes={axes()} tooltip primaryCursor secondaryCursor />
             </div>
         );
     }
