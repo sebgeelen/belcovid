@@ -60,7 +60,7 @@ export default class CasesByAgeChart extends React.Component {
         }
         const sortedPoints = AGE_GROUPS.sort((a, b) => points[a].total - points[b].total).map(group => {
             return {
-                label: `New cases (${group})`,
+                label: `${group}`,
                 data: points[group].values,
             };
         });
@@ -105,8 +105,70 @@ export default class CasesByAgeChart extends React.Component {
             }),
             []
         );
-
-        const tooltip = memoize(() => ({ anchor: 'gridBottom' }), []);
+        const tooltip = memoize(() => ({
+            render: ({ datum, primaryAxis, getStyle }) => {
+                const localData = memoize(
+                    () =>
+                        datum ? [
+                            {
+                                data: datum.group.map(d => ({
+                                    primary: d.series.label,
+                                    secondary: d.secondary,
+                                    color: getStyle(d).fill
+                                }))
+                            }
+                        ] : [],
+                    [datum, getStyle]
+                );
+                return datum ? (
+                    <div
+                        style={{
+                            color: 'white',
+                            pointerEvents: 'none'
+                        }}
+                    >
+                        <h3
+                            style={{
+                                display: 'block',
+                                textAlign: 'center'
+                                }}
+                        >
+                            {primaryAxis.format(datum.primary)}
+                        </h3>
+                        <div
+                            style={{
+                            width: '300px',
+                            height: '200px',
+                            display: 'flex'
+                            }}
+                        >
+                            <Chart
+                                data={localData()}
+                                dark
+                                series={{ type: 'bar' }}
+                                axes={[
+                                    {
+                                        primary: true,
+                                        position: 'bottom',
+                                        type: 'ordinal'
+                                    },
+                                    {
+                                        position: 'left',
+                                        type: 'linear'
+                                    }
+                                ]}
+                                getDatumStyle={datum => ({
+                                    color: datum.originalDatum.color
+                                })}
+                                primaryCursor={{
+                                    value: datum.seriesLabel
+                                }}
+                            />
+                        </div>
+                    </div>
+                ) : null;
+            }
+         }), []);
 
         return (
             // A react-chart hyper-responsively and continuously fills the available
