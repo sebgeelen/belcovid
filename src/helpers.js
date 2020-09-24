@@ -75,3 +75,9 @@ export function getAveragePoints(points, interval) {
 export function getDaysBetween(day1, day2) {
     return Math.abs((day1.getTime() - day2.getTime()) / (1000 * 60 * 60 * 24));
 }
+export function today() {
+    return new Date();
+}
+export function lastConsolidatedDataDay() {
+    return getDateFrom(today(), -4);
+}

@@ -15,6 +15,7 @@ function saturationTooltip(availableBeds, icu = false) {
     (icu ? 'number of beds available in ICU in Belgium (source: VRT, 2020).' : `total number of hospital beds in Belgium, all` +
     'categories together (source: healthybelgium.be, 2019)).');
 }
+const CASES_TOOLTIP = 'Excluding the last 4 days, counting from today included, which are not yet consolidated.';
 
 export default class DataTable extends React.Component {
     state = {
@@ -30,8 +31,8 @@ export default class DataTable extends React.Component {
                     <Table className="bordered">
                         <Tbody>
                             <Tr>
-                                <Th>Cases (weekly average)</Th>
-                                <Td>{Math.round(getAverageOver(this.props.data.cases, new Date(), -8, 'CASES'))}</Td>
+                                <Th>Cases (last 7 days, daily average)<span data-tip={CASES_TOOLTIP} style={{color: 'red'}}>*</span></Th>
+                                <Td>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -6, 'CASES'))}</Td>
                             </Tr>
                             {
                                 this.state.saturationDay.hospitals &&
@@ -60,13 +61,13 @@ export default class DataTable extends React.Component {
         const hospiData = this.props.data?.hospi;
         if (!hospiData) return;
 
-        const hospiDay1 = getAverageOver(hospiData, getDateFrom(new Date(), -2), -7, key);
-        const hospiDay2 = getAverageOver(hospiData, getDateFrom(new Date(), -1), -7, key);
+        const hospiDay1 = getAverageOver(hospiData, getDateFrom(lastConsolidatedDataDay(), -1), -6, key);
+        const hospiDay2 = getAverageOver(hospiData, lastConsolidatedDataDay(), -6, key);
         if (!hospiDay2 || hospiDay1 >= hospiDay2) return;
 
         const pcChange = (hospiDay2 - hospiDay1) / hospiDay1;
-        const daysToSaturation = Math.log(availableBeds / hospiDay2) / Math.log((1 + pcChange));
-        const saturationDay = getDateFrom(new Date(), daysToSaturation + 1);
+        const daysToSaturation = Math.floor(Math.log(availableBeds / hospiDay2) / Math.log((1 + pcChange)));
+        const saturationDay = getDateFrom(lastConsolidatedDataDay(), daysToSaturation);
 
         return saturationDay;
     }

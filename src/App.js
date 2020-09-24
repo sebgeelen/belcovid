@@ -3,7 +3,7 @@ import PatientsInHospitalChart from './components/PatientsInHospitalChart.js';
 import CasesByTestChart from './components/CasesByTestChart.js';
 import DataTable from './components/DataTable.js';
 import InputRange from 'react-input-range';
-import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, getDaysBetween } from './helpers';
+import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, getDaysBetween, today } from './helpers';
 import 'react-input-range/lib/css/index.css';
 import './App.css';
 import PatientsInICUChart from './components/PatientsInICUChart.js';
@@ -42,7 +42,7 @@ export default class App extends React.Component {
             maxValue={this.state.weeksSinceStart}
             value={this.state.hospiWeeks}
             onChange={value => this.setState({ hospiWeeks: value })} />
-          <PatientsInHospitalChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.hospiWeeks * 7))} />
+          <PatientsInHospitalChart data={this.state.data} start={getDateFrom(today(), -(this.state.hospiWeeks * 7))} />
         </section>}
 
         {this.state.data &&
@@ -53,7 +53,7 @@ export default class App extends React.Component {
             maxValue={this.state.weeksSinceStart}
             value={this.state.icuWeeks}
             onChange={value => this.setState({ icuWeeks: value })} />
-          <PatientsInICUChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.icuWeeks * 7))} />
+          <PatientsInICUChart data={this.state.data} start={getDateFrom(today(), -(this.state.icuWeeks * 7))} />
         </section>}
 
         {this.state.data &&
@@ -64,7 +64,7 @@ export default class App extends React.Component {
             maxValue={this.state.weeksSinceStart}
             value={this.state.caseByTestsWeeks}
             onChange={value => this.setState({ caseByTestsWeeks: value })} />
-          <CasesByTestChart data={this.state.data} start={getDateFrom(new Date(), -1 - (this.state.caseByTestsWeeks * 7))} />
+          <CasesByTestChart data={this.state.data} start={getDateFrom(today(), -(this.state.caseByTestsWeeks * 7))} />
         </section>}
 
         <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •

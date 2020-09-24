@@ -1,7 +1,7 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
-import { getDateFrom, getDaysBetween, getIsoDate } from '../helpers';
+import { getDateFrom, getDaysBetween, getIsoDate, today } from '../helpers';
 
 const AGE_GROUPS = [
     '0-9',
@@ -20,8 +20,8 @@ const AGE_GROUPS = [
 const START_WEEK = 3;
 export default class CasesByAgeChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (START_WEEK * 7)))),
-        max: new Date(getIsoDate(new Date())),
+        min: new Date(getIsoDate(getDateFrom(today(), -(START_WEEK * 7)))),
+        max: new Date(getIsoDate(today())),
     };
     _isZoomingOut = false;
     render() {
