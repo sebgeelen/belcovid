@@ -1,6 +1,7 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
+import BarChartTooltip from './BarChartTooltip.js';
 import { getDateFrom, getDaysBetween, getIsoDate, today } from '../helpers';
 
 const AGE_GROUPS = [
@@ -107,66 +108,7 @@ export default class CasesByAgeChart extends React.Component {
         );
         const tooltip = memoize(() => ({
             render: ({ datum, primaryAxis, getStyle }) => {
-                const localData = memoize(
-                    () =>
-                        datum ? [
-                            {
-                                data: datum.group.map(d => ({
-                                    primary: d.series.label,
-                                    secondary: d.secondary,
-                                    color: getStyle(d).fill
-                                }))
-                            }
-                        ] : [],
-                    [datum, getStyle]
-                );
-                return datum ? (
-                    <div
-                        style={{
-                            color: 'white',
-                            pointerEvents: 'none'
-                        }}
-                    >
-                        <h3
-                            style={{
-                                display: 'block',
-                                textAlign: 'center'
-                                }}
-                        >
-                            {primaryAxis.format(datum.primary)}
-                        </h3>
-                        <div
-                            style={{
-                            width: '300px',
-                            height: '200px',
-                            display: 'flex'
-                            }}
-                        >
-                            <Chart
-                                data={localData()}
-                                dark
-                                series={{ type: 'bar' }}
-                                axes={[
-                                    {
-                                        primary: true,
-                                        position: 'bottom',
-                                        type: 'ordinal'
-                                    },
-                                    {
-                                        position: 'left',
-                                        type: 'linear'
-                                    }
-                                ]}
-                                getDatumStyle={datum => ({
-                                    color: datum.originalDatum.color
-                                })}
-                                primaryCursor={{
-                                    value: datum.seriesLabel
-                                }}
-                            />
-                        </div>
-                    </div>
-                ) : null;
+                return <BarChartTooltip {...{ getStyle, primaryAxis, datum }} />;
             }
          }), []);
 
