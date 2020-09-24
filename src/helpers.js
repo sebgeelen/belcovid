@@ -3,9 +3,22 @@ import PolynomialRegression from 'js-polynomial-regression';
 export const LINK_HOSPI = 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json';
 export const LINK_TOTAL_TESTS = 'https://epistat.sciensano.be/Data/COVID19BE_tests.json';
 export const LINK_CASES = 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.json';
-export const AVAILABLE_BEDS = 52565;
+export const TOTAL_BEDS = 52565;
 // source: https://www.healthybelgium.be/en/key-data-in-healthcare/general-hospitals/organisation-of-the-hospital-landscape/categorisation-of-hospital-activities/evolution-of-the-number-of-accredited-hospital-beds
-export const AVAILABLE_ICU_BEDS = 2650;
+
+export const HOSPITALISATIONS_PER_YEAR = Math.round(1820000 * Math.pow(1 + 0.0102, 6));
+// hospitalisations per year in 2014 * (1 + percentage average increase per year)^(2020 - 2014))
+// source: https://kce.fgov.be/sites/default/files/atoms/files/T%C3%A9l%C3%A9charger%20la%20synth%C3%A8se%20en%20fran%C3%A7ais%20%2884%20p.%29.pdf
+
+export const DAYS_PER_HOSPITALISATION = Math.round(6.99 * Math.pow(1 - 0.015, 6));
+// days per hospitalisation in 2014 * (1 - percentage average decrease per year)^(2020 - 2014)
+// source: https://kce.fgov.be/sites/default/files/atoms/files/T%C3%A9l%C3%A9charger%20la%20synth%C3%A8se%20en%20fran%C3%A7ais%20%2884%20p.%29.pdf
+
+export const HOSPITAL_DAYS_PER_YEAR = HOSPITALISATIONS_PER_YEAR * DAYS_PER_HOSPITALISATION;
+export const TAKEN_BEDS_PER_DAY = Math.round(HOSPITAL_DAYS_PER_YEAR / 365);
+export const AVAILABLE_BEDS = TOTAL_BEDS - TAKEN_BEDS_PER_DAY;
+
+export const TOTAL_ICU_BEDS = 2650;
 // source: https://www.vrt.be/vrtnws/en/2020/03/22/health-minister-says-that-an-additional-759-intensive-care-beds/
 
 export function getPolynomialRegressionPoints(data, degree = 1) {

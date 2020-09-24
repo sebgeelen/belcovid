@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, sumByKeyAtDate, getAverageOver, AVAILABLE_ICU_BEDS } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, sumByKeyAtDate, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay } from '../helpers';
 import ReactTooltip from 'react-tooltip';
 import { Table, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
@@ -12,8 +12,10 @@ function saturationTooltip(availableBeds, icu = false) {
     `current_patients * (1 + rise_percentage)^days_to_saturation = ${availableBeds}<br>` +
     `<=> days_to_saturation = log(${availableBeds} / current_patients) / log(1 + rise_percentage) <br>` +
     `(where ${availableBeds} is the ` +
-    (icu ? 'number of beds available in ICU in Belgium (source: VRT, 2020).' : `total number of hospital beds in Belgium, all` +
-    'categories together (source: healthybelgium.be, 2019)).');
+    (icu ? 'number of beds available in ICU in Belgium (source: VRT, 2020).' :
+    'total number of hospital beds in Belgium, all categories mixed ' +
+    '(source: healthybelgium.be, 2019), minus the average number of beds ' +
+    'used per day for other causes (sources: KCE,  2014)).');
 }
 const CASES_TOOLTIP = 'Excluding the last 4 days, counting from today included, which are not yet consolidated.';
 
@@ -21,7 +23,7 @@ export default class DataTable extends React.Component {
     state = {
         saturationDay: {
             hospitals: this.getSaturationDay('TOTAL_IN', AVAILABLE_BEDS)?.toDateString(),
-            icu: this.getSaturationDay('TOTAL_IN_ICU', AVAILABLE_ICU_BEDS)?.toDateString(),
+            icu: this.getSaturationDay('TOTAL_IN_ICU', TOTAL_ICU_BEDS)?.toDateString(),
         },
     }
     render() {
@@ -44,7 +46,7 @@ export default class DataTable extends React.Component {
                             {
                                 this.state.saturationDay.icu &&
                                 <Tr>
-                                    <Th>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(AVAILABLE_ICU_BEDS, true)} style={{color: 'red'}}>*</span></Th>
+                                    <Th>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(TOTAL_ICU_BEDS, true)} style={{color: 'red'}}>*</span></Th>
                                     <Td>{this.state.saturationDay.icu}</Td>
                                 </Tr>
                             }
