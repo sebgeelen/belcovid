@@ -4,18 +4,14 @@ import ReactTooltip from 'react-tooltip';
 import { Table, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-function saturationTooltip(availableBeds, icu = false) {
-    return 'This is obviously a very naive calculation:<br>' +
-    `If the weekly average of patients ${icu ? 'in intensive care' : 'at the hospital'} continues to rise` +
-    ' at the pace it did between yesterday and today,' +
-    ` this is the day that ${icu ? 'ICUs' : 'hospitals'} would get overrun.<br><br><br>` +
-    `current_patients * (1 + rise_percentage)^days_to_saturation = ${availableBeds}<br>` +
-    `<=> days_to_saturation = log(${availableBeds} / current_patients) / log(1 + rise_percentage) <br>` +
-    `(where ${availableBeds} is the ` +
-    (icu ? 'number of beds available in ICU in Belgium (source: VRT, 2020).' :
-    'total number of hospital beds in Belgium, all categories mixed ' +
-    '(source: healthybelgium.be, 2019), minus the average number of beds ' +
-    'used per day for other causes (sources: KCE,  2014)).');
+function saturationTooltip(icu = false) {
+    return `The day that all available ${icu ? 'ICU' : 'hospital'} beds would` +
+        ` be in use if the 7-day rolling average total number of COVID-19` +
+        ` patients in ${icu ? 'ICU' : 'hospitals'} were to keep growing at` +
+        ` the same pace.<br><br>` +
+        (icu ? `Source on the number of beds in ICU: VRT, 2020.` :
+        `Sources on the number of hospital beds and the average number of` +
+        ` hospitalized patients per day: KCE, 2014 and healthybelgium.be.`);
 }
 const CASES_TOOLTIP = 'Excluding the last 4 days, counting from today included, which are not yet consolidated.';
 
@@ -37,16 +33,25 @@ export default class DataTable extends React.Component {
                                 <Td>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -6, 'CASES'))}</Td>
                             </Tr>
                             {
+                                (this.state.saturationDay.hospitals || this.state.saturationDay.icu) &&
+                                <Tr>
+                                    <Td colspan="2" style={{ textAlign: 'center' }}>
+                                        <small><u>Note</u>: please take the rest of this table with a healthy dose of skepticism. These are not meant as
+                                        strict predictions but merely to help grasping the current rate of growth. They are naive estimates.</small>
+                                    </Td>
+                                </Tr>
+                            }
+                            {
                                 this.state.saturationDay.hospitals &&
                                 <Tr>
-                                    <Th>Day of hospital saturation (at current rate)<span data-tip={saturationTooltip(AVAILABLE_BEDS)} style={{color: 'red'}}>*</span></Th>
+                                    <Th>Day of hospital saturation (at current rate)<span data-tip={saturationTooltip()} style={{color: 'red'}}>*</span></Th>
                                     <Td>{this.state.saturationDay.hospitals}</Td>
                                 </Tr>
                             }
                             {
                                 this.state.saturationDay.icu &&
                                 <Tr>
-                                    <Th>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(TOTAL_ICU_BEDS, true)} style={{color: 'red'}}>*</span></Th>
+                                    <Th>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(true)} style={{color: 'red'}}>*</span></Th>
                                     <Td>{this.state.saturationDay.icu}</Td>
                                 </Tr>
                             }
