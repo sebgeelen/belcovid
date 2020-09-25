@@ -1,4 +1,5 @@
 import PolynomialRegression from 'js-polynomial-regression';
+import memoize from 'memoize-one';
 
 export const LINK_HOSPI = 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json';
 export const LINK_TOTAL_TESTS = 'https://epistat.sciensano.be/Data/COVID19BE_tests.json';
@@ -93,4 +94,26 @@ export function today() {
 }
 export function lastConsolidatedDataDay() {
     return getDateFrom(today(), -4);
+}
+export function getDateBrush() {
+        return memoize(
+            () => ({
+                onSelect: brushData => {
+                    if (isNaN(brushData.start.getTime()) || isNaN(brushData.end.getTime())) return;
+                    let min = new Date(getIsoDate(new Date(Math.min(brushData.start, brushData.end))));
+                    let max = new Date(getIsoDate(new Date(Math.max(brushData.start, brushData.end))));
+                    const interval = getDaysBetween(min, max);
+                    if (interval < 1) {
+                        max = getDateFrom(min, 1);
+                    }
+                    if (this._isZoomingOut) {
+                        this._isZoomingOut = false;
+                        min = getDateFrom(this.state.min, -1 * Math.ceil(interval) * 2);
+                        max = getDateFrom(this.state.max, Math.ceil(interval) * 2);
+                    }
+                    this.setState({ min, max });
+                }
+            }),
+            []
+        );
 }

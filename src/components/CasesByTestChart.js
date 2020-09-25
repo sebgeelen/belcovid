@@ -1,18 +1,31 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
-import { getAveragePoints, getPolynomialRegressionPoints } from '../helpers';
+import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../helpers';
 
+const START_WEEK = 12;
 export default class CasesByTestChart extends React.Component {
-    state = {};
+    state = {
+        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (START_WEEK * 7)))),
+        max: new Date(getIsoDate(new Date())),
+    };
+    _isZoomingOut = false;
     render() {
         let casesData = this.props.data?.cases || [];
         let testsData = this.props.data?.tests || [];
-        if (this.props.start) {
-            casesData = casesData.filter(item => new Date(item.DATE) > this.props.start);
-            testsData = testsData.filter(item => new Date(item.DATE) > this.props.start);
+        if (this.state.min || this.state.max) {
+            casesData = casesData.filter(item => {
+                const date = new Date(item.DATE);
+                return (!this.state.min || date >= this.state.min) &&
+                    (!this.state.max || date <= this.state.max);
+            });
+            testsData = testsData.filter(item => {
+                const date = new Date(item.DATE);
+                return (!this.state.min || date >= this.state.min) &&
+                    (!this.state.max || date <= this.state.max);
+            });
         }
-        const dates = new Set(casesData?.map(item => item.DATE));
+        const dates = new Set(casesData?.map(item => item.DATE).filter(item => item));
         const points = [];
         let itemsYesterday = [];
         for (const date of dates) {
@@ -49,14 +62,21 @@ export default class CasesByTestChart extends React.Component {
             }),
             []
         );
-
         const axes = memoize(
             () => [
-            { primary: true, type: 'utc', position: 'bottom' },
+            {
+                primary: true,
+                type: 'utc',
+                position: 'bottom',
+                hardMin: null,
+                hardMax: null,
+            },
             { type: 'linear', position: 'left' }
             ],
             []
         );
+        const brush = getDateBrush.bind(this)();
+        const tooltip = memoize(() => ({ anchor: 'gridBottom' }), []);
 
         return (
             // A react-chart hyper-responsively and continuously fills the available
@@ -67,7 +87,29 @@ export default class CasesByTestChart extends React.Component {
                     height: '300px',
                 }}
             >
-                <Chart data={data()} series={series()} axes={axes()} tooltip primaryCursor secondaryCursor />
+                <Chart
+                    data={data()}
+                    series={series()}
+                    axes={axes()}
+                    brush={brush()}
+                    tooltip={tooltip()}
+                    onMouseDown={(e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                            e.currentTarget.classList.add('zoom-out');
+                        } else {
+                            e.currentTarget.classList.add('zoom-in');
+                        }
+                    }}
+                    onMouseUp={(e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                            e.currentTarget.classList.remove('zoom-out');
+                            this._isZoomingOut = true;
+                        } else {
+                            e.currentTarget.classList.remove('zoom-in');
+                        }
+                    }}
+                    primaryCursor secondaryCursor
+                />
             </div>
         );
     }

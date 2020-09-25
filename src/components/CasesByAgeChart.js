@@ -2,7 +2,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import BarChartTooltip from './BarChartTooltip.js';
-import { getAveragePoints, getDateFrom, getDaysBetween, getIsoDate, today } from '../helpers';
+import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, today } from '../helpers';
 
 const AGE_GROUPS = [
     '0-9',
@@ -86,26 +86,7 @@ export default class CasesByAgeChart extends React.Component {
             ],
             []
         );
-        const brush = memoize(
-            () => ({
-                onSelect: brushData => {
-                    if (isNaN(brushData.start.getTime()) || isNaN(brushData.end.getTime())) return;
-                    let min = new Date(getIsoDate(new Date(Math.min(brushData.start, brushData.end))));
-                    let max = new Date(getIsoDate(new Date(Math.max(brushData.start, brushData.end))));
-                    const interval = getDaysBetween(min, max);
-                    if (interval < 1) {
-                        max = getDateFrom(min, 1);
-                    }
-                    if (this._isZoomingOut) {
-                        this._isZoomingOut = false;
-                        min = getDateFrom(this.state.min, -1 * Math.ceil(interval) * 2);
-                        max = getDateFrom(this.state.max, Math.ceil(interval) * 2);
-                    }
-                    this.setState({ min, max });
-                }
-            }),
-            []
-        );
+        const brush = getDateBrush.bind(this)();
         const tooltip = memoize(() => ({
             render: ({ datum, primaryAxis, getStyle }) => {
                 return <BarChartTooltip {...{ getStyle, primaryAxis, datum }} />;

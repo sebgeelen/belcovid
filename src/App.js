@@ -14,7 +14,6 @@ export default class App extends React.Component {
   state = {
     hospiWeeks: 3,
     icuWeeks: 3,
-    caseByTestsWeeks: 12,
   };
   render() {
     return (
@@ -72,13 +71,8 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section id="positive-test-rate">
-          <h2>Percentage of positive tests (last {this.state.caseByTestsWeeks > 1 ? this.state.caseByTestsWeeks + ' weeks' : 'week'})</h2>
-          <InputRange
-            minValue={1}
-            maxValue={this.state.weeksSinceStart}
-            value={this.state.caseByTestsWeeks}
-            onChange={value => this.setState({ caseByTestsWeeks: value })} />
-          <CasesByTestChart data={this.state.data} start={getDateFrom(today(), -(this.state.caseByTestsWeeks * 7))} />
+          <h2>Percentage of positive tests</h2>
+          <CasesByTestChart data={this.state.data} />
         </section>}
 
         <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
