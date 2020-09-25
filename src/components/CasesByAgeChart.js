@@ -2,7 +2,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import BarChartTooltip from './BarChartTooltip.js';
-import { getDateFrom, getDaysBetween, getIsoDate, today } from '../helpers';
+import { getAveragePoints, getDateFrom, getDaysBetween, getIsoDate, today } from '../helpers';
 
 const AGE_GROUPS = [
     '0-9',
@@ -59,13 +59,13 @@ export default class CasesByAgeChart extends React.Component {
         for (const group of AGE_GROUPS) {
             points[group].total = points[group].values.reduce((a, b) => a + b.y, 0);
         }
-        const sortedPoints = AGE_GROUPS.sort((a, b) => points[a].total - points[b].total).map(group => {
+        const sortedAveragedPoints = AGE_GROUPS.sort((a, b) => points[a].total - points[b].total).map(group => {
             return {
                 label: `${group}`,
-                data: points[group].values,
+                data: getAveragePoints(points[group].values, 7),
             };
         });
-        const data = memoize(() => sortedPoints, [sortedPoints]);
+        const data = memoize(() => sortedAveragedPoints, [sortedAveragedPoints]);
         const series = memoize(
             () => ({
                 type: 'area',

@@ -8,6 +8,7 @@ import 'react-input-range/lib/css/index.css';
 import './App.css';
 import PatientsInICUChart from './components/PatientsInICUChart.js';
 import CasesByAgeChart from './components/CasesByAgeChart.js';
+import ReactTooltip from 'react-tooltip';
 
 export default class App extends React.Component {
   state = {
@@ -30,7 +31,8 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section>
-          <h2>New cases, by age group</h2>
+          <h2 data-tip={`Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`}>New cases, by age group (7-day rolling average)</h2>
+          <ReactTooltip multiline/>
           <CasesByAgeChart data={this.state.data} />
         </section>}
 
