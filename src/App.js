@@ -30,14 +30,26 @@ export default class App extends React.Component {
         </section>}
 
         {this.state.data &&
-        <section>
+        <div style={{ textAlign: 'center' }}>
+          <h2>Charts</h2>
+          <ul style={{ listStyle: 'none' }}>
+            <li><a href="#cases-age">New cases, by age group (7-day rolling average)</a></li>
+            <li><a href="#hospital-patients">Patients at the hospital</a></li>
+            <li><a href="#icu-patients">Patients in intensive care</a></li>
+            <li><a href="#positive-test-rate">Percentage of positive tests</a></li>
+          </ul>
+        </div>
+        }
+
+        {this.state.data &&
+        <section id="cases-age">
           <h2 data-tip={`Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`}>New cases, by age group (7-day rolling average)</h2>
           <ReactTooltip multiline/>
           <CasesByAgeChart data={this.state.data} />
         </section>}
 
         {this.state.data &&
-        <section>
+        <section id="hospital-patients">
           <h2>Patients at the hospital (last {this.state.hospiWeeks > 1 ? this.state.hospiWeeks + ' weeks' : 'week'})</h2>
           <InputRange
             minValue={1}
@@ -48,7 +60,7 @@ export default class App extends React.Component {
         </section>}
 
         {this.state.data &&
-        <section>
+        <section id="icu-patients">
           <h2>Patients in intensive care (last {this.state.icuWeeks > 1 ? this.state.icuWeeks + ' weeks' : 'week'})</h2>
           <InputRange
             minValue={1}
@@ -59,7 +71,7 @@ export default class App extends React.Component {
         </section>}
 
         {this.state.data &&
-        <section>
+        <section id="positive-test-rate">
           <h2>Percentage of positive tests (last {this.state.caseByTestsWeeks > 1 ? this.state.caseByTestsWeeks + ' weeks' : 'week'})</h2>
           <InputRange
             minValue={1}
