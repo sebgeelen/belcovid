@@ -10,9 +10,10 @@ import PatientsInICUChart from './components/PatientsInICUChart.js';
 import CasesByAgeChart from './components/CasesByAgeChart.js';
 import ReactTooltip from 'react-tooltip';
 
+const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
+
 export default class App extends React.Component {
   state = {
-    hospiWeeks: 3,
     icuWeeks: 3,
   };
   render() {
@@ -42,20 +43,16 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section id="cases-age">
-          <h2 data-tip={`Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`}>New cases, by age group (7-day rolling average)</h2>
+          <h2 data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</h2>
           <ReactTooltip multiline/>
           <CasesByAgeChart data={this.state.data} />
         </section>}
 
         {this.state.data &&
         <section id="hospital-patients">
-          <h2>Patients at the hospital (last {this.state.hospiWeeks > 1 ? this.state.hospiWeeks + ' weeks' : 'week'})</h2>
-          <InputRange
-            minValue={1}
-            maxValue={this.state.weeksSinceStart}
-            value={this.state.hospiWeeks}
-            onChange={value => this.setState({ hospiWeeks: value })} />
-          <PatientsInHospitalChart data={this.state.data} start={getDateFrom(today(), -(this.state.hospiWeeks * 7))} />
+          <h2 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h2>
+          <ReactTooltip multiline/>
+          <PatientsInHospitalChart data={this.state.data} />
         </section>}
 
         {this.state.data &&
@@ -71,7 +68,8 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section id="positive-test-rate">
-          <h2>Percentage of positive tests</h2>
+          <h2 data-tip={ZOOM_TOOLTIP}>Percentage of positive tests</h2>
+          <ReactTooltip multiline/>
           <CasesByTestChart data={this.state.data} />
         </section>}
 
