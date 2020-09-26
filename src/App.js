@@ -3,7 +3,6 @@ import PatientsInHospitalChart from './components/PatientsInHospitalChart.js';
 import CasesByTestChart from './components/CasesByTestChart.js';
 import DataTable from './components/DataTable.js';
 import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, getDaysBetween, today } from './helpers';
-import 'react-input-range/lib/css/index.css';
 import './App.css';
 import PatientsInICUChart from './components/PatientsInICUChart.js';
 import CasesByAgeChart from './components/CasesByAgeChart.js';
