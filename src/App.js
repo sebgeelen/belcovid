@@ -2,7 +2,6 @@ import React from 'react';
 import PatientsInHospitalChart from './components/PatientsInHospitalChart.js';
 import CasesByTestChart from './components/CasesByTestChart.js';
 import DataTable from './components/DataTable.js';
-import InputRange from 'react-input-range';
 import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, getDaysBetween, today } from './helpers';
 import 'react-input-range/lib/css/index.css';
 import './App.css';
@@ -13,9 +12,7 @@ import ReactTooltip from 'react-tooltip';
 const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
 
 export default class App extends React.Component {
-  state = {
-    icuWeeks: 3,
-  };
+  state = {};
   render() {
     return (
       <div>
@@ -57,12 +54,8 @@ export default class App extends React.Component {
 
         {this.state.data &&
         <section id="icu-patients">
-          <h2>Patients in intensive care (last {this.state.icuWeeks > 1 ? this.state.icuWeeks + ' weeks' : 'week'})</h2>
-          <InputRange
-            minValue={1}
-            maxValue={this.state.weeksSinceStart}
-            value={this.state.icuWeeks}
-            onChange={value => this.setState({ icuWeeks: value })} />
+          <h2 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h2>
+          <ReactTooltip multiline/>
           <PatientsInICUChart data={this.state.data} start={getDateFrom(today(), -(this.state.icuWeeks * 7))} />
         </section>}
 
