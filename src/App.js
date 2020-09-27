@@ -1,72 +1,20 @@
 import React from 'react';
-import PatientsInHospitalChart from './components/PatientsInHospitalChart.js';
-import CasesByTestChart from './components/CasesByTestChart.js';
-import DataTable from './components/DataTable.js';
-import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDateFrom, getDaysBetween, today } from './helpers';
+import { LINK_HOSPI, LINK_TOTAL_TESTS, LINK_CASES, getDaysBetween } from './helpers';
+import MainContent from './components/MainContent.js';
 import './App.css';
-import PatientsInICUChart from './components/PatientsInICUChart.js';
-import CasesByAgeChart from './components/CasesByAgeChart.js';
-import ReactTooltip from 'react-tooltip';
 
-const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
+const HEADER = <h1 style={{ textAlign: 'center' }}>BelCovid</h1>;
+const FOOTER = <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
+Official national <a href="https://www.info-coronavirus.be/">information on Covid-19</a>.</footer>;
 
 export default class App extends React.Component {
   state = {};
   render() {
     return (
       <div>
-        <h1 style={{ textAlign: 'center' }}>BelCovid</h1>
-
-        {!this.state.data && <p>Loading...</p>}
-
-        {this.state.data &&
-        <section>
-          <h2>Today {new Date().toDateString()}</h2>
-          <DataTable data={this.state.data} />
-        </section>}
-
-        {this.state.data &&
-        <div style={{ textAlign: 'center' }}>
-          <h2>Charts</h2>
-          <ul style={{ listStyle: 'none' }}>
-            <li><a href="#cases-age">New cases, by age group (7-day rolling average)</a></li>
-            <li><a href="#hospital-patients">Patients at the hospital</a></li>
-            <li><a href="#icu-patients">Patients in intensive care</a></li>
-            <li><a href="#positive-test-rate">Percentage of positive tests</a></li>
-          </ul>
-        </div>
-        }
-
-        {this.state.data &&
-        <section id="cases-age">
-          <h2 data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</h2>
-          <ReactTooltip multiline/>
-          <CasesByAgeChart data={this.state.data} />
-        </section>}
-
-        {this.state.data &&
-        <section id="hospital-patients">
-          <h2 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h2>
-          <ReactTooltip multiline/>
-          <PatientsInHospitalChart data={this.state.data} />
-        </section>}
-
-        {this.state.data &&
-        <section id="icu-patients">
-          <h2 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h2>
-          <ReactTooltip multiline/>
-          <PatientsInICUChart data={this.state.data} start={getDateFrom(today(), -(this.state.icuWeeks * 7))} />
-        </section>}
-
-        {this.state.data &&
-        <section id="positive-test-rate">
-          <h2 data-tip={ZOOM_TOOLTIP}>Percentage of positive tests</h2>
-          <ReactTooltip multiline/>
-          <CasesByTestChart data={this.state.data} />
-        </section>}
-
-        <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •
-        Official national <a href="https://www.info-coronavirus.be/">information on Covid-19</a>.</footer>
+        {HEADER}
+        <MainContent data={this.state.data}/>
+        {FOOTER}
       </div>
     );
   }
