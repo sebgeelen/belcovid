@@ -11,7 +11,7 @@ export default class PatientsInICUChart extends React.Component {
     };
     _isZoomingOut = false;
     render() {
-        let hospiData = this.props.data?.hospi || [];
+        let hospiData = this.props.data?.hospitalisations || [];
         if (this.state.min || this.state.max) {
             hospiData = hospiData.filter(item => {
                 const date = new Date(item.DATE);

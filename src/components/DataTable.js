@@ -78,7 +78,7 @@ export default class DataTable extends React.Component {
         }
     }
     getSaturationDay(key, availableBeds) {
-        const hospiData = this.props.data?.hospi;
+        const hospiData = this.props.data?.hospitalisations;
         if (!hospiData) return;
 
         const hospiDay1 = getAverageOver(hospiData, getDateFrom(lastConsolidatedDataDay(), -1), -6, key);
@@ -97,7 +97,7 @@ export default class DataTable extends React.Component {
     }
 
     _getPeak(key) {
-        const hospiData = this.props.data?.hospi;
+        const hospiData = this.props.data?.hospitalisations;
         if (!hospiData) return;
 
         const dates = new Set(hospiData.map(item => item.DATE));
