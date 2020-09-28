@@ -3,6 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import CasesByAgeChart from './CasesByAgeChart';
 import CasesByTestChart from './CasesByTestChart';
 import DataTable from "./DataTable";
+import MortalityByTestChart from './MortalityByTestChart';
 import PatientsInHospitalChart from './PatientsInHospitalChart';
 import PatientsInICUChart from './PatientsInICUChart';
 
@@ -25,6 +26,7 @@ export default class MainContent extends React.Component {
                         <li><a href="#hospital-patients">Patients at the hospital</a></li>
                         <li><a href="#icu-patients">Patients in intensive care</a></li>
                         <li><a href="#positive-test-rate">Percentage of positive tests</a></li>
+                        <li><a href="#mortality-test-rate">Percentage of mortality for the amount of tests</a></li>
                         </ul>
                     </div>
 
@@ -50,6 +52,12 @@ export default class MainContent extends React.Component {
                         <h2 data-tip={ZOOM_TOOLTIP}>Percentage of positive tests</h2>
                         <ReactTooltip multiline/>
                         <CasesByTestChart data={this.props.data} />
+                    </section>
+
+                    <section id="mortality-test-rate">
+                        <h2 data-tip={ZOOM_TOOLTIP}>Percentage of mortality for the amount of tests</h2>
+                        <ReactTooltip multiline/>
+                        <MortalityByTestChart data={this.props.data} />
                     </section>
                 </main>
             );
