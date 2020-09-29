@@ -105,10 +105,10 @@ export function getDateBrush() {
                     }
                     if (this._isZoomingOut) {
                         this._isZoomingOut = false;
-                        min = getDateFrom(this.state.min, -1 * Math.ceil(interval) * 2);
-                        max = getDateFrom(this.state.max, Math.ceil(interval) * 2);
+                        min = getDateFrom(this.props.min, -1 * Math.ceil(interval) * 2);
+                        max = getDateFrom(this.props.max, Math.ceil(interval) * 2);
                     }
-                    this.setState({ min, max });
+                    this.props.setDataRange(min, max);
                 }
             }),
             []

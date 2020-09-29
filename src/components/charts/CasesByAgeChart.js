@@ -1,8 +1,8 @@
 import React from 'react';
 import memoize from 'memoize-one';
-import { Chart } from 'react-charts';
 import BarChartTooltip from './BarChartTooltip.js';
-import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, today } from '../../helpers';
+import { getAveragePoints, getDateFrom, getIsoDate, today } from '../../helpers';
+import CovidChart from './CovidChart.js';
 
 const AGE_GROUPS = [
     '0-9',
@@ -65,67 +65,20 @@ export default class CasesByAgeChart extends React.Component {
                 data: getAveragePoints(points[group].values, 7),
             };
         });
-        const data = memoize(() => sortedAveragedPoints, [sortedAveragedPoints]);
-        const series = memoize(
-            () => ({
-                type: 'area',
-                showPoints: false,
-            }),
-            []
-        );
-        const axes = memoize(
-            () => [
-            {
-                primary: true,
-                type: 'utc',
-                position: 'bottom',
-                hardMin: null,
-                hardMax: null,
-            },
-            { type: 'linear', position: 'left', stacked: true }
-            ],
-            []
-        );
-        const brush = getDateBrush.bind(this)();
         const tooltip = memoize(() => ({
             render: ({ datum, primaryAxis, getStyle }) => {
                 return <BarChartTooltip {...{ getStyle, primaryAxis, datum }} />;
             }
          }), []);
 
-        return (
-            // A react-chart hyper-responsively and continuously fills the available
-            // space of its parent element automatically
-            <div
-                style={{
-                    width: '90%',
-                    height: '300px',
-                }}
-            >
-                <Chart
-                    data={data()}
-                    series={series()}
-                    axes={axes()}
-                    brush={brush()}
-                    tooltip={tooltip()}
-                    onMouseDown={(e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            e.currentTarget.classList.add('zoom-out');
-                        } else {
-                            e.currentTarget.classList.add('zoom-in');
-                        }
-                    }}
-                    onMouseUp={(e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            e.currentTarget.classList.remove('zoom-out');
-                            this._isZoomingOut = true;
-                        } else {
-                            e.currentTarget.classList.remove('zoom-in');
-                        }
-                    }}
-                    primaryCursor secondaryCursor
-                />
-            </div>
-        );
+        return <CovidChart
+            data={sortedAveragedPoints}
+            setDataRange={(min, max) => this.setState({ min, max })}
+            seriesType="area"
+            secondaryAxisType="linear"
+            min={this.state.min}
+            max={this.state.max}
+            tooltip={tooltip()}
+        />;
     }
 }

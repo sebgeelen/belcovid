@@ -1,7 +1,6 @@
 import React from 'react';
-import memoize from 'memoize-one';
-import { Chart } from 'react-charts';
-import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
+import { getAveragePoints, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
+import CovidChart from './CovidChart';
 
 export const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
 export default class LineChart extends React.Component {
@@ -26,8 +25,7 @@ export default class LineChart extends React.Component {
             const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
             points.push({x: new Date(date), y: patients});
         }
-        const plotData = memoize(
-            () => [
+        const plotData = [
             {
                 label: 'Number of patients in the hospital (weekly average)',
                 data: getAveragePoints(points, 7),
@@ -40,62 +38,14 @@ export default class LineChart extends React.Component {
                 label: 'Number of patients in the hospital',
                 data: points,
             },
-            ], [points]
-        );
-        const series = memoize(
-            () => ({
-                showPoints: false,
-            }),
-            []
-        );
-        const axes = memoize(
-            () => [
-            {
-                primary: true,
-                type: 'utc',
-                position: 'bottom',
-                hardMin: null,
-                hardMax: null,
-            },
-            { type: 'linear', position: 'left' }
-            ],
-            []
-        );
-        const brush = getDateBrush.bind(this)();
-        const tooltip = memoize(() => ({ anchor: 'gridBottom' }), []);
+        ];
 
-        return (
-            // A react-chart hyper-responsively and continuously fills the available
-            // space of its parent element automatically
-            <div
-                style={{
-                    width: '90%',
-                    height: '300px',
-                }}
-            >
-                <Chart
-                    data={plotData()}
-                    series={series()}
-                    axes={axes()}
-                    brush={brush()}
-                    tooltip={tooltip()}
-                    onMouseDown={(e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            e.currentTarget.classList.add('zoom-out');
-                        } else {
-                            e.currentTarget.classList.add('zoom-in');
-                        }
-                    }}
-                    onMouseUp={(e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            e.currentTarget.classList.remove('zoom-out');
-                            this._isZoomingOut = true;
-                        } else {
-                            e.currentTarget.classList.remove('zoom-in');
-                        }
-                    }}
-                    primaryCursor secondaryCursor />
-            </div>
-        );
+        return <CovidChart
+            data={plotData}
+            setDataRange={(min, max) => this.setState({ min, max })}
+            secondaryAxisType="linear"
+            min={this.state.min}
+            max={this.state.max}
+        />;
     }
 }
