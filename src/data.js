@@ -1,3 +1,4 @@
+import { lastConsolidatedDataDay } from "./helpers";
 
 
 const URL_HOSPI = 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json';
@@ -11,14 +12,20 @@ const urls = {
     cases: URL_CASES,
     mortality: URL_MORTALITY,
 };
-export async function fetchData(key) {
+export async function fetchData(key, filtered = true) {
     const url = urls[key];
     return url && (await fetch(url)).json();
 }
-export async function fetchAllData() {
+export async function fetchAllData(filtered = true) {
     const data = {};
     for (const key of Object.keys(urls)) {
-        data[key] = await fetchData(key);
+        const fetched = await fetchData(key);
+        if (filtered) {
+            const max = lastConsolidatedDataDay();
+            data[key] = fetched.filter(item => new Date(item.DATE) <= max);
+        } else {
+            data[key] = fetched;
+        }
     }
     return data;
 }
