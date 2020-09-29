@@ -2,7 +2,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import BarChartTooltip from './BarChartTooltip.js';
-import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, today } from '../helpers';
+import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, today } from '../../helpers';
 
 const AGE_GROUPS = [
     '0-9',

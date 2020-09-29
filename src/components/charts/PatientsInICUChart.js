@@ -1,7 +1,7 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
-import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../helpers';
+import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
 
 const START_WEEK = 3;
 export default class PatientsInICUChart extends React.Component {

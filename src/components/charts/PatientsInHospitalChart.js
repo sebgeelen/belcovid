@@ -1,57 +1,43 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
-import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../helpers';
+import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
 
-const START_WEEK = 12;
-export default class DeathsByTestChart extends React.Component {
+const START_WEEK = 3;
+export default class PatientsInHospitalChart extends React.Component {
     state = {
         min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (START_WEEK * 7)))),
         max: new Date(getIsoDate(new Date())),
     };
     _isZoomingOut = false;
     render() {
-        let mortalityData = this.props.data?.mortality || [];
-        let testsData = this.props.data?.tests || [];
+        let hospiData = this.props.data?.hospitalisations || [];
         if (this.state.min || this.state.max) {
-            mortalityData = mortalityData.filter(item => {
-                const date = new Date(item.DATE);
-                return (!this.state.min || date >= this.state.min) &&
-                    (!this.state.max || date <= this.state.max);
-            });
-            testsData = testsData.filter(item => {
+            hospiData = hospiData.filter(item => {
                 const date = new Date(item.DATE);
                 return (!this.state.min || date >= this.state.min) &&
                     (!this.state.max || date <= this.state.max);
             });
         }
-        const dates = new Set(mortalityData?.map(item => item.DATE).filter(item => item));
+        const dates = new Set(hospiData?.map(item => item.DATE).filter(item => item));
         const points = [];
-        let itemsYesterday = [];
         for (const date of dates) {
-            const deaths = mortalityData.filter(item => item.DATE === date);
-            const tests = testsData.filter(item => item.DATE === date);
-            const totalTests = tests.reduce((a, b) => a + b.TESTS_ALL, 0);
-            const testsYesterday = itemsYesterday.reduce((a, b) => a + b.TESTS_ALL, 0) || 0;
-            const testsToday = totalTests - testsYesterday;
-            if (testsToday) {
-                const deathsToday = deaths.reduce((a, b) => a + b.DEATHS, 0) || 0;
-                points.push({x: new Date(date), y: 100 * deathsToday / testsToday});
-            }
-            itemsYesterday = [...deaths];
+            const items = hospiData.filter(item => item.DATE === date);
+            const patients = items.reduce((a, b) => a + b.TOTAL_IN, 0) || 0;
+            points.push({x: new Date(date), y: patients});
         }
         const data = memoize(
             () => [
             {
-                label: '% mortality for the amount of tests (weekly average)',
+                label: 'Number of patients in the hospital (weekly average)',
                 data: getAveragePoints(points, 7),
             },
             {
                 label: 'Trend line',
-                data: getPolynomialRegressionPoints(points),
+                data: getPolynomialRegressionPoints(points, 3),
             },
             {
-                label: '% positive tests',
+                label: 'Number of patients in the hospital',
                 data: points,
             },
             ], [points]
@@ -108,8 +94,7 @@ export default class DeathsByTestChart extends React.Component {
                             e.currentTarget.classList.remove('zoom-in');
                         }
                     }}
-                    primaryCursor secondaryCursor
-                />
+                    primaryCursor secondaryCursor />
             </div>
         );
     }

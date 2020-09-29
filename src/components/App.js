@@ -1,7 +1,7 @@
 import React from 'react';
-import MainContent from './components/MainContent.js';
-import './App.css';
-import { fetchAllData } from './data';
+import MainContent from './MainContent.js';
+import '../App.css';
+import { fetchAllData } from '../data';
 
 const HEADER = <h1 style={{ textAlign: 'center' }}>BelCovid</h1>;
 const FOOTER = <footer>All data from <a href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</a> •

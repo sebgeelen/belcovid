@@ -1,13 +1,6 @@
 import React from 'react';
-import ReactTooltip from 'react-tooltip';
-import CasesByAgeChart from './CasesByAgeChart';
-import CasesByTestChart from './CasesByTestChart';
+import Charts from './charts/Charts';
 import DataTable from "./DataTable";
-import MortalityByTestChart from './MortalityByTestChart';
-import PatientsInHospitalChart from './PatientsInHospitalChart';
-import PatientsInICUChart from './PatientsInICUChart';
-
-const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
 
 export default class MainContent extends React.Component {
     render() {
@@ -30,34 +23,8 @@ export default class MainContent extends React.Component {
                         </ul>
                     </div>
 
-                    <section id="cases-age">
-                        <h2 data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</h2>
-                        <ReactTooltip multiline/>
-                        <CasesByAgeChart data={this.props.data} />
-                    </section>
-
-                    <section id="hospital-patients">
-                        <h2 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h2>
-                        <ReactTooltip multiline/>
-                        <PatientsInHospitalChart data={this.props.data} />
-                    </section>
-
-                    <section id="icu-patients">
-                        <h2 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h2>
-                        <ReactTooltip multiline/>
-                        <PatientsInICUChart data={this.props.data} />
-                    </section>
-
-                    <section id="positive-test-rate">
-                        <h2 data-tip={ZOOM_TOOLTIP}>Percentage of positive tests</h2>
-                        <ReactTooltip multiline/>
-                        <CasesByTestChart data={this.props.data} />
-                    </section>
-
-                    <section id="mortality-test-rate">
-                        <h2 data-tip={ZOOM_TOOLTIP}>Percentage of mortality for the amount of tests</h2>
-                        <ReactTooltip multiline/>
-                        <MortalityByTestChart data={this.props.data} />
+                    <section id="charts">
+                        <Charts data={this.props.data}/>
                     </section>
                 </main>
             );
