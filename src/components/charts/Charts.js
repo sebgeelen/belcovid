@@ -19,13 +19,23 @@ export default class Charts extends React.Component {
                 <section id="hospital-patients">
                     <h2 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h2>
                     <ReactTooltip multiline/>
-                    <LineChart data={this.props.data.hospitalisations} keyToPlot="TOTAL_IN" startWeek={3} />
+                    <LineChart
+                        data={this.props.data.hospitalisations}
+                        keyToPlot="TOTAL_IN"
+                        startWeek={3}
+                        chartName="Number of patients in the hospital"
+                    />
                 </section>
 
                 <section id="icu-patients">
                     <h2 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h2>
                     <ReactTooltip multiline/>
-                    <LineChart data={this.props.data.hospitalisations} keyToPlot="TOTAL_IN_ICU" startWeek={3} />
+                    <LineChart
+                        data={this.props.data.hospitalisations}
+                        keyToPlot="TOTAL_IN_ICU"
+                        startWeek={3}
+                        chartName="Number of patients in ICU"
+                    />
                 </section>
 
                 <section id="positive-test-rate">
@@ -35,6 +45,7 @@ export default class Charts extends React.Component {
                         testData={this.props.data.tests}
                         comparativeData={this.props.data.cases}
                         keyToCompare="CASES"
+                        startWeek={3}
                     />
                 </section>
 
@@ -45,6 +56,7 @@ export default class Charts extends React.Component {
                         testData={this.props.data.tests}
                         comparativeData={this.props.data.mortality}
                         keyToCompare="DEATHS"
+                        startWeek={3}
                     />
                 </section>
 
@@ -55,6 +67,7 @@ export default class Charts extends React.Component {
                         testData={this.props.data.tests}
                         comparativeData={this.props.data.hospitalisations}
                         keyToCompare="TOTAL_IN"
+                        startWeek={3}
                     />
                 </section>
 
@@ -65,6 +78,7 @@ export default class Charts extends React.Component {
                         testData={this.props.data.tests}
                         comparativeData={this.props.data.hospitalisations}
                         keyToCompare="TOTAL_IN_ICU"
+                        startWeek={3}
                     />
                 </section>
             </div>

@@ -1,5 +1,4 @@
 import React from 'react';
-import memoize from 'memoize-one';
 import BarChartTooltip from './BarChartTooltip.js';
 import { getAveragePoints, getDateFrom, getIsoDate, today } from '../../helpers';
 import CovidChart from './CovidChart.js';
@@ -65,20 +64,21 @@ export default class CasesByAgeChart extends React.Component {
                 data: getAveragePoints(points[group].values, 7),
             };
         });
-        const tooltip = memoize(() => ({
+        const tooltip = {
             render: ({ datum, primaryAxis, getStyle }) => {
                 return <BarChartTooltip {...{ getStyle, primaryAxis, datum }} />;
             }
-         }), []);
+         };
 
         return <CovidChart
             data={sortedAveragedPoints}
             setDataRange={(min, max) => this.setState({ min, max })}
             seriesType="area"
             secondaryAxisType="linear"
+            stacked={true}
             min={this.state.min}
             max={this.state.max}
-            tooltip={tooltip()}
+            tooltip={tooltip}
         />;
     }
 }

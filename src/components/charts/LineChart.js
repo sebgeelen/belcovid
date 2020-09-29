@@ -2,15 +2,13 @@ import React from 'react';
 import { getAveragePoints, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
 import CovidChart from './CovidChart';
 
-export const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
 export default class LineChart extends React.Component {
     state = {
         min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (this.props.startWeek * 7)))),
         max: new Date(getIsoDate(new Date())),
     };
-    _isZoomingOut = false;
     render() {
-        let data = this.props.data || [];
+        let data = [...this.props.data] || [];
         if (this.state.min || this.state.max) {
             data = data.filter(item => {
                 const date = new Date(item.DATE);
@@ -27,16 +25,16 @@ export default class LineChart extends React.Component {
         }
         const plotData = [
             {
-                label: 'Number of patients in the hospital (weekly average)',
-                data: getAveragePoints(points, 7),
+                label: `${this.props.chartName} (weekly average)`,
+                data: getAveragePoints([...points], 7),
             },
             {
                 label: 'Trend line',
-                data: getPolynomialRegressionPoints(points, 3),
+                data: getPolynomialRegressionPoints([...points], 3),
             },
             {
-                label: 'Number of patients in the hospital',
-                data: points,
+                label: `${this.props.chartName}`,
+                data: [...points],
             },
         ];
 

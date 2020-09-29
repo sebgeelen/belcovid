@@ -1,15 +1,12 @@
-import memoize from 'memoize-one';
 import React from 'react';
-import { Chart } from 'react-charts';
-import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
+import { getAveragePoints, getDateFrom, getIsoDate, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
+import CovidChart from './CovidChart';
 
-const START_WEEK = 3;
 export default class TestingChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(lastConsolidatedDataDay(), -1 - (START_WEEK * 7)))),
+        min: new Date(getIsoDate(getDateFrom(lastConsolidatedDataDay(), -1 - (this.props.startWeek * 7)))),
         max: new Date(getIsoDate(lastConsolidatedDataDay())),
     };
-    _isZoomingOut = false;
     render() {
         let comparativeData = this.props.comparativeData;
         let testData = this.props.testData;
@@ -37,8 +34,7 @@ export default class TestingChart extends React.Component {
             }
             itemsYesterday = [...comparisons];
         }
-        const data = memoize(
-            () => [
+        const data = [
             {
                 label: `% ${this.props.keyToCompare.toLowerCase()} / test (7d rolling average)`,
                 data: getAveragePoints(points, 7),
@@ -64,16 +60,8 @@ export default class TestingChart extends React.Component {
                 data: rawTestPoints,
                 secondaryAxisID: 'raw',
             },
-            ], [points]
-        );
-        const series = memoize(
-            () => ({
-                showPoints: false,
-            }),
-            []
-        );
-        const axes = memoize(
-            () => [
+        ];
+        const axes = [
             {
                 primary: true,
                 type: 'utc',
@@ -83,11 +71,7 @@ export default class TestingChart extends React.Component {
             },
             { type: 'linear', position: 'left', id: 'rates' },
             { type: 'log', position: 'right', id: 'raw' },
-            ],
-            []
-        );
-        const brush = getDateBrush.bind(this)();
-        const tooltip = memoize(() => ({ anchor: 'gridBottom' }), []);
+        ];
 
         return (
             // A react-chart hyper-responsively and continuously fills the available
@@ -98,27 +82,12 @@ export default class TestingChart extends React.Component {
                     height: '300px',
                 }}
             >
-                <Chart
-                    data={data()}
-                    series={series()}
-                    axes={axes()}
-                    brush={brush()}
-                    tooltip={tooltip()}
-                    onMouseDown={(e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            e.currentTarget.classList.add('zoom-out');
-                        } else {
-                            e.currentTarget.classList.add('zoom-in');
-                        }
-                    }}
-                    onMouseUp={(e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            e.currentTarget.classList.remove('zoom-out');
-                            this._isZoomingOut = true;
-                        } else {
-                            e.currentTarget.classList.remove('zoom-in');
-                        }
-                    }}
+                <CovidChart
+                    data={data}
+                    setDataRange={(min, max) => this.setState({ min, max })}
+                    axes={axes}
+                    min={this.state.min}
+                    max={this.state.max}
                     primaryCursor secondaryCursor
                 />
             </div>
