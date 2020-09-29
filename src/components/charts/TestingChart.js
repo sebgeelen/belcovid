@@ -3,7 +3,7 @@ import React from 'react';
 import { Chart } from 'react-charts';
 import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
 
-const START_WEEK = 12;
+const START_WEEK = 3;
 export default class TestingChart extends React.Component {
     state = {
         min: new Date(getIsoDate(getDateFrom(lastConsolidatedDataDay(), -1 - (START_WEEK * 7)))),
