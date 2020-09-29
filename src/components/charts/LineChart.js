@@ -3,33 +3,33 @@ import memoize from 'memoize-one';
 import { Chart } from 'react-charts';
 import { getAveragePoints, getDateBrush, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
 
-const START_WEEK = 3;
-export default class PatientsInICUChart extends React.Component {
+export const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
+export default class LineChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (START_WEEK * 7)))),
+        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (this.props.startWeek * 7)))),
         max: new Date(getIsoDate(new Date())),
     };
     _isZoomingOut = false;
     render() {
-        let hospiData = this.props.data?.hospitalisations || [];
+        let data = this.props.data || [];
         if (this.state.min || this.state.max) {
-            hospiData = hospiData.filter(item => {
+            data = data.filter(item => {
                 const date = new Date(item.DATE);
                 return (!this.state.min || date >= this.state.min) &&
                     (!this.state.max || date <= this.state.max);
             });
         }
-        const dates = new Set(hospiData?.map(item => item.DATE).filter(item => item));
+        const dates = new Set(data?.map(item => item.DATE).filter(item => item));
         const points = [];
         for (const date of dates) {
-            const items = hospiData.filter(item => item.DATE === date);
-            const patients = items.reduce((a, b) => a + b.TOTAL_IN_ICU, 0) || 0;
+            const items = data.filter(item => item.DATE === date);
+            const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
             points.push({x: new Date(date), y: patients});
         }
-        const data = memoize(
+        const plotData = memoize(
             () => [
             {
-                label: 'Number of patients in intensive care (weekly average)',
+                label: 'Number of patients in the hospital (weekly average)',
                 data: getAveragePoints(points, 7),
             },
             {
@@ -37,7 +37,7 @@ export default class PatientsInICUChart extends React.Component {
                 data: getPolynomialRegressionPoints(points, 3),
             },
             {
-                label: 'Number of patients in intensive care',
+                label: 'Number of patients in the hospital',
                 data: points,
             },
             ], [points]
@@ -74,7 +74,7 @@ export default class PatientsInICUChart extends React.Component {
                 }}
             >
                 <Chart
-                    data={data()}
+                    data={plotData()}
                     series={series()}
                     axes={axes()}
                     brush={brush()}

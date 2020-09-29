@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 import CasesByAgeChart from './CasesByAgeChart';
-import PatientsInHospitalChart from './PatientsInHospitalChart';
-import PatientsInICUChart from './PatientsInICUChart';
+import LineChart from './LineChart';
 import TestingChart from './TestingChart';
 
 export const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
@@ -21,13 +20,13 @@ export default class Charts extends React.Component {
                     <section id="hospital-patients">
                         <h2 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h2>
                         <ReactTooltip multiline/>
-                        <PatientsInHospitalChart data={this.props.data} />
+                        <LineChart data={this.props.data.hospitalisations} keyToPlot="TOTAL_IN" startWeek={3} />
                     </section>
 
                     <section id="icu-patients">
                         <h2 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h2>
                         <ReactTooltip multiline/>
-                        <PatientsInICUChart data={this.props.data} />
+                        <LineChart data={this.props.data.hospitalisations} keyToPlot="TOTAL_IN_ICU" startWeek={3} />
                     </section>
 
                     <section id="positive-test-rate">
