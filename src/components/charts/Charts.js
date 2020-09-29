@@ -49,6 +49,26 @@ export default class Charts extends React.Component {
                             keyToCompare="DEATHS"
                         />
                     </section>
+
+                    <section id="hospi-test-rate">
+                        <h2 data-tip={ZOOM_TOOLTIP}>Percentage of simultaneous hospital patients for the amount of tests</h2>
+                        <ReactTooltip multiline/>
+                        <TestingChart
+                            testData={this.props.data.tests}
+                            comparativeData={this.props.data.hospitalisations}
+                            keyToCompare="TOTAL_IN"
+                        />
+                    </section>
+
+                    <section id="icu-test-rate">
+                        <h2 data-tip={ZOOM_TOOLTIP}>Percentage of simultaneous ICU patients for the amount of tests</h2>
+                        <ReactTooltip multiline/>
+                        <TestingChart
+                            testData={this.props.data.tests}
+                            comparativeData={this.props.data.hospitalisations}
+                            keyToCompare="TOTAL_IN_ICU"
+                        />
+                    </section>
                 </div>
             );
         } else {
