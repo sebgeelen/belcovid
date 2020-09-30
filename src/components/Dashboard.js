@@ -11,6 +11,7 @@ import Title from './Title';
 import ReactTooltip from 'react-tooltip';
 import CasesByAgeChart from './charts/CasesByAgeChart';
 import { ZOOM_TOOLTIP } from './charts/Charts';
+import { Skeleton } from '@material-ui/lab';
 
 function Footer() {
   return (
@@ -39,7 +40,10 @@ export default class Dashboard extends React.Component {
               <Paper className={this.fixedHeightPaper} style={{overflow: 'hidden'}}>
                 <Title data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</Title>
                 <ReactTooltip multiline/>
-                {this.props.data ? <CasesByAgeChart data={this.props.data} /> : <p>Loading...</p>}
+                {this.props.data ?
+                  <CasesByAgeChart data={this.props.data} /> :
+                  <Skeleton variant="rect" height={'100%'} />
+                }
               </Paper>
             </Grid>
             {/* Recent News */}
@@ -51,7 +55,10 @@ export default class Dashboard extends React.Component {
             {/* Recent Data */}
             <Grid item xs={12}>
               <Paper className={this.classes.paper}>
-                {this.props.data ? <DataTable data={this.props.data} /> : <p>Loading...</p>}
+                {this.props.data ?
+                  <DataTable data={this.props.data} /> :
+                  <Skeleton variant="rect" height={200} />
+                }
               </Paper>
             </Grid>
           </Grid>
