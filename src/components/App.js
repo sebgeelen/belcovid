@@ -93,7 +93,7 @@ const styles = (theme) => ({
 class App extends React.Component {
   state = {
     open: true,
-    page: 'dashboard',
+    page: localStorage.getItem('belcovid:page') || 'dashboard',
   };
   classes = this.props.classes;
   async componentDidMount() {
@@ -173,6 +173,7 @@ class App extends React.Component {
   }
   _goto(page) {
     this.setState({ page });
+    localStorage.setItem('belcovid:page', page);
   }
   _handleDrawerOpen() {
     this.setState({ open: true });
