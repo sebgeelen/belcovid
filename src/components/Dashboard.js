@@ -55,7 +55,7 @@ export default class Dashboard extends React.Component {
             </Grid> */}
             {/* Recent Data */}
             <Grid item xs={12}>
-              <Paper className={this.classes.paper}>
+              <Paper className={this.classes.paper} style={{ overflow: 'hidden' }}>
                 {this.props.data ?
                   <DataTable data={this.props.data} /> :
                   <Skeleton variant="rect" height={200} />
