@@ -1,11 +1,13 @@
 import React from 'react';
 import clsx from 'clsx';
 import Dashboard from './Dashboard.js';
+import Charts from './charts/Charts.js';
 import { fetchAllData } from '../data';
-import { AppBar, CssBaseline, Divider, Drawer, IconButton, List, Toolbar, Typography, withStyles } from '@material-ui/core';
+import { AppBar, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, withStyles } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import { mainListItems } from './listItems.js';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import BarChartIcon from '@material-ui/icons/BarChart';
 import '../App.css';
 
 const drawerWidth = 240;
@@ -91,6 +93,7 @@ const styles = (theme) => ({
 class App extends React.Component {
   state = {
     open: true,
+    page: 'dashboard',
   };
   classes = this.props.classes;
   async componentDidMount() {
@@ -98,6 +101,17 @@ class App extends React.Component {
     this.setState({ data });
   }
   render() {
+    let main;
+    switch (this.state.page) {
+      case 'dashboard':
+        main = <Dashboard classes={this.classes} data={this.state.data}/>;
+        break;
+      case 'charts':
+        main = <Charts classes={this.classes} data={this.state.data}/>;
+        break;
+      default:
+        main = null;
+    }
     return (
       <div className={this.classes.root}>
         <CssBaseline />
@@ -130,11 +144,35 @@ class App extends React.Component {
             </IconButton>
           </div>
           <Divider />
-          <List>{mainListItems}</List>
+          <List>
+            <ListItem
+              button
+              selected={this.state.page === 'dashboard'}
+              onClick={this._goto.bind(this, 'dashboard')}
+            >
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItem>
+            <ListItem
+              button
+              selected={this.state.page === 'charts'}
+              onClick={this._goto.bind(this, 'charts')}
+            >
+              <ListItemIcon>
+                <BarChartIcon />
+              </ListItemIcon>
+              <ListItemText primary="Charts" />
+            </ListItem>
+          </List>
         </Drawer>
-        <Dashboard classes={this.classes} data={this.state.data}/>
+        {main}
       </div>
     );
+  }
+  _goto(page) {
+    this.setState({ page });
   }
   _handleDrawerOpen() {
     this.setState({ open: true });
