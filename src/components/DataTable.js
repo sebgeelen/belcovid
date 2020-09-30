@@ -1,26 +1,45 @@
 import React from 'react';
 import { AVAILABLE_BEDS, getDateFrom, sumByKeyAtDate, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints } from '../helpers';
-import ReactTooltip from 'react-tooltip';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Title from './Title';
+import { Link, Tooltip } from '@material-ui/core';
 
 function saturationTooltip(icu = false) {
-    return `The day that all available ${icu ? 'ICU' : 'hospital'} beds would
-        be in use if the 7-day rolling average total number of COVID-19
-        patients in ${icu ? 'ICU' : 'hospitals'} were to keep growing at
-        the same pace.<br><br>
-        ${icu ? `Source on the number of beds in ICU: VRT, 2020.` :
-        `Sources on the number of hospital beds and the average number of
-        hospitalized patients per day: KCE, 2014 and healthybelgium.be.`}`;
+    let source;
+    if (icu) {
+        source = (<small><i>
+            Source on the number of beds in ICU: <Link href="https://www.vrt.be/vrtnws/en/2020/03/22/health-minister-says-that-an-additional-759-intensive-care-beds/">VRT, 2020.</Link>
+        </i></small>);
+    } else {
+        source = (<small><i>
+            Sources on the number of hospital beds and the average number of
+            hospitalized patients per day: <Link href="https://kce.fgov.be/sites/default/files/atoms/files/T%C3%A9l%C3%A9charger%20la%20synth%C3%A8se%20en%20fran%C3%A7ais%20%2884%20p.%29.pdf">KCE, 2014</Link> and
+            <Link href="https://www.healthybelgium.be/en/key-data-in-healthcare/general-hospitals/organisation-of-the-hospital-landscape/categorisation-of-hospital-activities/evolution-of-the-number-of-accredited-hospital-beds">healthybelgium.be</Link>.
+        </i></small>);
+    }
+    return (
+        <React.Fragment>
+            The day that all available ${icu ? 'ICU' : 'hospital'} beds would
+            be in use if the 7-day rolling average total number of COVID-19
+            patients in {icu ? 'ICU' : 'hospitals'} were to keep growing at
+            the same pace.<br/>
+            <br/>
+            {source}
+        </React.Fragment>
+    );
 }
 const CASES_TOOLTIP = 'Excluding the last 4 days, counting from today included, which are not yet consolidated.';
 function peakTooltip(peak) {
-    return `The day that the number of people at the hospital would be the same
-        as on the highest day recorded (${peak.x.toDateString()}: ${Math.round(peak.y)}),
-        based on 7-day rolling average to account for statistical noise.`;
+    return (
+        <React.Fragment>
+            The day that the number of people at the hospital would be the same
+            as on the highest day recorded ({peak.x.toDateString()}: {Math.round(peak.y)}),
+            based on 7-day rolling average to account for statistical noise.`
+        </React.Fragment>
+    );
 }
 
 export default class DataTable extends React.Component {
@@ -39,7 +58,9 @@ export default class DataTable extends React.Component {
                     <Table size="small">
                         <TableBody>
                             <TableRow>
-                                <TableCell>Cases (last 7 days, daily average)<span data-tip={CASES_TOOLTIP} style={{color: 'red'}}>*</span></TableCell>
+                                <Tooltip title={CASES_TOOLTIP} placement="bottom-start" arrow>
+                                    <TableCell>Cases (last 7 days, daily average)</TableCell>
+                                </Tooltip>
                                 <TableCell>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -6, 'CASES'))}</TableCell>
                             </TableRow>
                             {
@@ -54,27 +75,32 @@ export default class DataTable extends React.Component {
                             {
                                 this.state.saturationDay.peak &&
                                 <TableRow>
-                                    <TableCell>Day of new peak (at current rate)<span data-tip={peakTooltip(this._getPeak('TOTAL_IN'))} style={{color: 'red'}}>*</span></TableCell>
+                                    <Tooltip title={peakTooltip(this._getPeak('TOTAL_IN'))} placement="bottom-start" arrow>
+                                        <TableCell>Day of new peak (at current rate)</TableCell>
+                                    </Tooltip>
                                     <TableCell>{this.state.saturationDay.peak}</TableCell>
                                 </TableRow>
                             }
                             {
                                 this.state.saturationDay.hospitals &&
                                 <TableRow>
-                                    <TableCell>Day of hospital saturation (at current rate)<span data-tip={saturationTooltip()} style={{color: 'red'}}>*</span></TableCell>
+                                    <Tooltip title={saturationTooltip()} placement="bottom-start" arrow>
+                                        <TableCell>Day of hospital saturation (at current rate)</TableCell>
+                                    </Tooltip>
                                     <TableCell>{this.state.saturationDay.hospitals}</TableCell>
                                 </TableRow>
                             }
                             {
                                 this.state.saturationDay.icu &&
                                 <TableRow>
-                                    <TableCell>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(true)} style={{color: 'red'}}>*</span></TableCell>
+                                    <Tooltip title={saturationTooltip(true)} placement="bottom-start" arrow>
+                                        <TableCell>Day of ICU saturation (at current rate)</TableCell>
+                                    </Tooltip>
                                     <TableCell>{this.state.saturationDay.icu}</TableCell>
                                 </TableRow>
                             }
                         </TableBody>
                     </Table>
-                    <ReactTooltip multiline/>
                 </React.Fragment>
             );
         } else {

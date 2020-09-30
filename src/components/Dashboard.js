@@ -8,10 +8,10 @@ import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import DataTable from './DataTable';
 import Title from './Title';
-import ReactTooltip from 'react-tooltip';
 import CasesByAgeChart from './charts/CasesByAgeChart';
 import { ZOOM_TOOLTIP } from './charts/Charts';
 import { Skeleton } from '@material-ui/lab';
+import { Tooltip } from '@material-ui/core';
 
 function Footer() {
   return (
@@ -38,8 +38,9 @@ export default class Dashboard extends React.Component {
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
               <Paper className={this.fixedHeightPaper} style={{overflow: 'hidden'}}>
-                <Title data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</Title>
-                <ReactTooltip multiline/>
+                <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
+                  <Title>New cases, by age group (7-day rolling average)</Title>
+                </Tooltip>
                 {this.props.data ?
                   <CasesByAgeChart data={this.props.data} /> :
                   <Skeleton variant="rect" height={'100%'} />
