@@ -1,8 +1,11 @@
 import React from 'react';
 import { AVAILABLE_BEDS, getDateFrom, sumByKeyAtDate, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints } from '../helpers';
 import ReactTooltip from 'react-tooltip';
-import { Table, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import Title from './Title';
 
 function saturationTooltip(icu = false) {
     return `The day that all available ${icu ? 'ICU' : 'hospital'} beds would
@@ -31,47 +34,48 @@ export default class DataTable extends React.Component {
     render() {
         if (this.props.data) {
             return (
-                <div>
-                    <Table className="bordered">
-                        <Tbody>
-                            <Tr>
-                                <Th>Cases (last 7 days, daily average)<span data-tip={CASES_TOOLTIP} style={{color: 'red'}}>*</span></Th>
-                                <Td>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -6, 'CASES'))}</Td>
-                            </Tr>
+                <React.Fragment>
+                    <Title>Today</Title>
+                    <Table size="small">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>Cases (last 7 days, daily average)<span data-tip={CASES_TOOLTIP} style={{color: 'red'}}>*</span></TableCell>
+                                <TableCell>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -6, 'CASES'))}</TableCell>
+                            </TableRow>
                             {
                                 (this.state.saturationDay.hospitals || this.state.saturationDay.icu || this.state.saturationDay.peak) &&
-                                <Tr>
-                                    <Td colSpan={2} style={{ textAlign: 'center' }}>
+                                <TableRow>
+                                    <TableCell colSpan={2} style={{ textAlign: 'center' }}>
                                         <small><u>Note</u>: please take the rest of this table with a healthy dose of skepticism. These are not meant as
                                         strict predictions but merely to help grasping the current rate of growth. They are naive estimates.</small>
-                                    </Td>
-                                </Tr>
+                                    </TableCell>
+                                </TableRow>
                             }
                             {
                                 this.state.saturationDay.peak &&
-                                <Tr>
-                                    <Th>Day of new peak (at current rate)<span data-tip={peakTooltip(this._getPeak('TOTAL_IN'))} style={{color: 'red'}}>*</span></Th>
-                                    <Td>{this.state.saturationDay.peak}</Td>
-                                </Tr>
+                                <TableRow>
+                                    <TableCell>Day of new peak (at current rate)<span data-tip={peakTooltip(this._getPeak('TOTAL_IN'))} style={{color: 'red'}}>*</span></TableCell>
+                                    <TableCell>{this.state.saturationDay.peak}</TableCell>
+                                </TableRow>
                             }
                             {
                                 this.state.saturationDay.hospitals &&
-                                <Tr>
-                                    <Th>Day of hospital saturation (at current rate)<span data-tip={saturationTooltip()} style={{color: 'red'}}>*</span></Th>
-                                    <Td>{this.state.saturationDay.hospitals}</Td>
-                                </Tr>
+                                <TableRow>
+                                    <TableCell>Day of hospital saturation (at current rate)<span data-tip={saturationTooltip()} style={{color: 'red'}}>*</span></TableCell>
+                                    <TableCell>{this.state.saturationDay.hospitals}</TableCell>
+                                </TableRow>
                             }
                             {
                                 this.state.saturationDay.icu &&
-                                <Tr>
-                                    <Th>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(true)} style={{color: 'red'}}>*</span></Th>
-                                    <Td>{this.state.saturationDay.icu}</Td>
-                                </Tr>
+                                <TableRow>
+                                    <TableCell>Day of ICU saturation (at current rate)<span data-tip={saturationTooltip(true)} style={{color: 'red'}}>*</span></TableCell>
+                                    <TableCell>{this.state.saturationDay.icu}</TableCell>
+                                </TableRow>
                             }
-                        </Tbody>
+                        </TableBody>
                     </Table>
                     <ReactTooltip multiline/>
-                </div>
+                </React.Fragment>
             );
         } else {
             return <p>Loading...</p>;
