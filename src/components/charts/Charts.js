@@ -3,6 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import CasesByAgeChart from './CasesByAgeChart';
 import LineChart from './LineChart';
 import TestingChart from './TestingChart';
+import RateOfChangeChart from './RateOfChangeChart';
 
 export const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
 
@@ -79,6 +80,42 @@ export default class Charts extends React.Component {
                         comparativeData={this.props.data.hospitalisations}
                         keyToCompare="TOTAL_IN_ICU"
                         startWeek={3}
+                    />
+                </section>
+
+                <section id="rate-of-change-cases">
+                    <h2 data-tip={ZOOM_TOOLTIP}>Rate of change in new cases</h2>
+                    <p><small>How fast is the number of cases rising/falling (in %) ?</small></p>
+                    <ReactTooltip multiline/>
+                    <RateOfChangeChart
+                        data={this.props.data.cases}
+                        keyToPlot="CASES"
+                        startWeek={3}
+                        chartName="New cases"
+                    />
+                </section>
+
+                <section id="rate-of-change-hospi">
+                    <h2 data-tip={ZOOM_TOOLTIP}>Rate of change in hospitalized patients</h2>
+                    <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
+                    <ReactTooltip multiline/>
+                    <RateOfChangeChart
+                        data={this.props.data.hospitalisations}
+                        keyToPlot="TOTAL_IN"
+                        startWeek={3}
+                        chartName="Hospitalized patients"
+                    />
+                </section>
+
+                <section id="rate-of-change-icu">
+                    <h2 data-tip={ZOOM_TOOLTIP}>Rate of change in patients in ICU</h2>
+                    <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
+                    <ReactTooltip multiline/>
+                    <RateOfChangeChart
+                        data={this.props.data.hospitalisations}
+                        keyToPlot="TOTAL_IN_ICU"
+                        startWeek={3}
+                        chartName="Patients in ICU"
                     />
                 </section>
             </div>

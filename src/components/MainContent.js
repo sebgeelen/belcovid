@@ -22,6 +22,7 @@ export default class MainContent extends React.Component {
                         <li><a href="#mortality-test-rate">Percentage of mortality for the amount of tests</a></li>
                         <li><a href="#hospi-test-rate">Percentage of simultaneous hospital patients for the amount of tests</a></li>
                         <li><a href="#icu-test-rate">Percentage of simultaneous ICU patients for the amount of tests</a></li>
+                        <li><a href="#rate-of-change-cases">Rate of change in new cases</a></li>
                         </ul>
                     </div>
 
