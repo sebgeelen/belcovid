@@ -10,6 +10,7 @@ import DataTable from './DataTable';
 import Title from './Title';
 import ReactTooltip from 'react-tooltip';
 import CasesByAgeChart from './charts/CasesByAgeChart';
+import { ZOOM_TOOLTIP } from './charts/Charts';
 
 function Footer() {
   return (
@@ -23,7 +24,6 @@ function Footer() {
   );
 }
 
-const ZOOM_TOOLTIP = `Zoom-in: select<br>Zoom-out: CTRL+select<br><br>Note: currently doesn't work on mobile devices.`;
 export default class Dashboard extends React.Component {
   classes = this.props.classes;
   fixedHeightPaper = clsx(this.classes.paper, this.classes.fixedHeight);
