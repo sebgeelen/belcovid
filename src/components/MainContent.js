@@ -12,19 +12,41 @@ export default class MainContent extends React.Component {
                         <DataTable data={this.props.data} />
                     </section>
 
-                    <div style={{ textAlign: 'center' }}>
-                        <h2>Charts</h2>
+                    <section>
+                        <h2>Table of Charts</h2>
                         <ul style={{ listStyle: 'none' }}>
-                        <li><a href="#cases-age">New cases, by age group (7-day rolling average)</a></li>
-                        <li><a href="#hospital-patients">Patients at the hospital</a></li>
-                        <li><a href="#icu-patients">Patients in intensive care</a></li>
-                        <li><a href="#positive-test-rate">Percentage of positive tests</a></li>
-                        <li><a href="#mortality-test-rate">Percentage of mortality for the amount of tests</a></li>
-                        <li><a href="#hospi-test-rate">Percentage of simultaneous hospital patients for the amount of tests</a></li>
-                        <li><a href="#icu-test-rate">Percentage of simultaneous ICU patients for the amount of tests</a></li>
-                        <li><a href="#rate-of-change-cases">Rate of change in new cases</a></li>
+                            <li>
+                                <a href="#cases">Cases</a>
+                                <ul style={{ listStyle: 'none' }}>
+                                    <li><a href="#cases-age">New cases, by age group (7-day rolling average)</a></li>
+                                    <li><a href="#positive-test-rate">Case/test ratio</a></li>
+                                    <li><a href="#rate-of-change-cases">Rate of change</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#hospi">Hospitalizations</a>
+                                <ul style={{ listStyle: 'none' }}>
+                                    <li><a href="#hospital-patients">Total in hospital</a></li>
+                                    <li><a href="#hospi-test-rate">Total in hospital/test ratio</a></li>
+                                    <li><a href="#rate-of-change-hospi">Rate of change</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#icu">Intensive Care Units</a>
+                                <ul style={{ listStyle: 'none' }}>
+                                    <li><a href="#icu-patients">Total in ICU</a></li>
+                                    <li><a href="#icu-test-rate">Total in ICU/test ratio</a></li>
+                                    <li><a href="#rate-of-change-icu">Rate of change</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#mortality">Mortality</a>
+                                <ul style={{ listStyle: 'none' }}>
+                                    <li><a href="#mortality-test-rate">Mortality/test ratio</a></li>
+                                </ul>
+                            </li>
                         </ul>
-                    </div>
+                    </section>
 
                     <section id="charts">
                         <Charts data={this.props.data}/>

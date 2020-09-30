@@ -11,36 +11,16 @@ export default class Charts extends React.Component {
     render() {
         return (
             <div>
+                <h2 id="cases">Cases</h2>
+
                 <section id="cases-age">
-                    <h2 data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</h2>
+                    <h3 data-tip={ZOOM_TOOLTIP}>New cases, by age group (7-day rolling average)</h3>
                     <ReactTooltip multiline/>
                     <CasesByAgeChart data={this.props.data} />
                 </section>
 
-                <section id="hospital-patients">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h2>
-                    <ReactTooltip multiline/>
-                    <LineChart
-                        data={this.props.data.hospitalisations}
-                        keyToPlot="TOTAL_IN"
-                        startWeek={3}
-                        chartName="Number of patients in the hospital"
-                    />
-                </section>
-
-                <section id="icu-patients">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h2>
-                    <ReactTooltip multiline/>
-                    <LineChart
-                        data={this.props.data.hospitalisations}
-                        keyToPlot="TOTAL_IN_ICU"
-                        startWeek={3}
-                        chartName="Number of patients in ICU"
-                    />
-                </section>
-
                 <section id="positive-test-rate">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Percentage of positive tests</h2>
+                    <h3 data-tip={ZOOM_TOOLTIP}>Percentage of positive tests</h3>
                     <ReactTooltip multiline/>
                     <TestingChart
                         testData={this.props.data.tests}
@@ -50,41 +30,8 @@ export default class Charts extends React.Component {
                     />
                 </section>
 
-                <section id="mortality-test-rate">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Percentage of mortality for the amount of tests</h2>
-                    <ReactTooltip multiline/>
-                    <TestingChart
-                        testData={this.props.data.tests}
-                        comparativeData={this.props.data.mortality}
-                        keyToCompare="DEATHS"
-                        startWeek={3}
-                    />
-                </section>
-
-                <section id="hospi-test-rate">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Percentage of simultaneous hospital patients for the amount of tests</h2>
-                    <ReactTooltip multiline/>
-                    <TestingChart
-                        testData={this.props.data.tests}
-                        comparativeData={this.props.data.hospitalisations}
-                        keyToCompare="TOTAL_IN"
-                        startWeek={3}
-                    />
-                </section>
-
-                <section id="icu-test-rate">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Percentage of simultaneous ICU patients for the amount of tests</h2>
-                    <ReactTooltip multiline/>
-                    <TestingChart
-                        testData={this.props.data.tests}
-                        comparativeData={this.props.data.hospitalisations}
-                        keyToCompare="TOTAL_IN_ICU"
-                        startWeek={3}
-                    />
-                </section>
-
                 <section id="rate-of-change-cases">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Rate of change in new cases</h2>
+                    <h3 data-tip={ZOOM_TOOLTIP}>Rate of change in new cases</h3>
                     <p><small>How fast is the number of cases rising/falling (in %) ?</small></p>
                     <ReactTooltip multiline/>
                     <RateOfChangeChart
@@ -95,8 +42,33 @@ export default class Charts extends React.Component {
                     />
                 </section>
 
+                <h2 id="hospi">Hospitalizations</h2>
+                <p><small>We count here in number of patients that are hospitalized <i>simultaneously</i> (not just new admissions).</small></p>
+
+                <section id="hospital-patients">
+                    <h3 data-tip={ZOOM_TOOLTIP}>Patients at the hospital</h3>
+                    <ReactTooltip multiline/>
+                    <LineChart
+                        data={this.props.data.hospitalisations}
+                        keyToPlot="TOTAL_IN"
+                        startWeek={3}
+                        chartName="Number of patients in the hospital"
+                    />
+                </section>
+
+                <section id="hospi-test-rate">
+                    <h3 data-tip={ZOOM_TOOLTIP}>Percentage of simultaneous hospital patients for the amount of tests</h3>
+                    <ReactTooltip multiline/>
+                    <TestingChart
+                        testData={this.props.data.tests}
+                        comparativeData={this.props.data.hospitalisations}
+                        keyToCompare="TOTAL_IN"
+                        startWeek={3}
+                    />
+                </section>
+
                 <section id="rate-of-change-hospi">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Rate of change in hospitalized patients</h2>
+                    <h3 data-tip={ZOOM_TOOLTIP}>Rate of change in hospitalized patients</h3>
                     <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
                     <ReactTooltip multiline/>
                     <RateOfChangeChart
@@ -107,8 +79,33 @@ export default class Charts extends React.Component {
                     />
                 </section>
 
+                <h2 id="icu">Intensive Care Units</h2>
+                <p><small>We count here in number of patients that are <i>simultaneously</i> in ICU (not just new admissions).</small></p>
+
+                <section id="icu-patients">
+                    <h3 data-tip={ZOOM_TOOLTIP}>Patients in intensive care</h3>
+                    <ReactTooltip multiline/>
+                    <LineChart
+                        data={this.props.data.hospitalisations}
+                        keyToPlot="TOTAL_IN_ICU"
+                        startWeek={3}
+                        chartName="Number of patients in ICU"
+                    />
+                </section>
+
+                <section id="icu-test-rate">
+                    <h3 data-tip={ZOOM_TOOLTIP}>Percentage of simultaneous ICU patients for the amount of tests</h3>
+                    <ReactTooltip multiline/>
+                    <TestingChart
+                        testData={this.props.data.tests}
+                        comparativeData={this.props.data.hospitalisations}
+                        keyToCompare="TOTAL_IN_ICU"
+                        startWeek={3}
+                    />
+                </section>
+
                 <section id="rate-of-change-icu">
-                    <h2 data-tip={ZOOM_TOOLTIP}>Rate of change in patients in ICU</h2>
+                    <h3 data-tip={ZOOM_TOOLTIP}>Rate of change in patients in ICU</h3>
                     <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
                     <ReactTooltip multiline/>
                     <RateOfChangeChart
@@ -116,6 +113,19 @@ export default class Charts extends React.Component {
                         keyToPlot="TOTAL_IN_ICU"
                         startWeek={3}
                         chartName="Patients in ICU"
+                    />
+                </section>
+
+                <h2 id="mortality">Mortality</h2>
+
+                <section id="mortality-test-rate">
+                    <h3 data-tip={ZOOM_TOOLTIP}>Percentage of mortality for the amount of tests</h3>
+                    <ReactTooltip multiline/>
+                    <TestingChart
+                        testData={this.props.data.tests}
+                        comparativeData={this.props.data.mortality}
+                        keyToCompare="DEATHS"
+                        startWeek={3}
                     />
                 </section>
             </div>
