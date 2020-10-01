@@ -24,6 +24,12 @@ const urls = {
             language: 'NL',
         },
         {
+            source: 'VRT nws',
+            rss: 'https://www.vrt.be/vrtnws/nl.rss.articles.xml',
+            icon: 'vrtnws.jpg',
+            language: 'NL',
+        },
+        {
             source: 'RTBF Info',
             rss: 'http://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml',
             icon: 'rtbfinfo.png',
@@ -40,12 +46,18 @@ const urls = {
 export async function fetchData(url, filtered = true) {
     return url && (await fetch(url)).json();
 }
+const covidKeywordsRegex = /corona|covid|sars/g;
 export async function fetchRssData(url, filtered = true) {
     const feed = await parser.parseURL(proxy + url);
-    const coronaItems = feed.items.filter(a => {
-        return a.title.toLowerCase().includes('corona') || a.description?.toLowerCase().includes('corona');
-    });
-    return coronaItems;
+    if (filtered) {
+        return feed.items.filter(a => {
+            return covidKeywordsRegex.test(a.title.toLowerCase()) ||
+                covidKeywordsRegex.test(a.contentSnippet?.toLowerCase() || '') ||
+                covidKeywordsRegex.test(a.content?.toLowerCase() || '');
+        });
+    } else {
+        return feed.items;
+    }
 }
 export async function fetchStatsData(filtered = true) {
     const data = {};
