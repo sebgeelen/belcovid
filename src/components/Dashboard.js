@@ -42,8 +42,8 @@ export default class Dashboard extends React.Component {
                 <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
                   <Title>New cases, by age group (7-day rolling average)</Title>
                 </Tooltip>
-                {this.props.data ?
-                  <CasesByAgeChart data={this.props.data} /> :
+                {this.props.statsData ?
+                  <CasesByAgeChart data={this.props.statsData} /> :
                   <Skeleton variant="rect" height={'100%'} />
                 }
               </Paper>
@@ -52,15 +52,15 @@ export default class Dashboard extends React.Component {
             <Grid item xs={12} md={5} lg={5}>
               <Paper className={this.fixedHeightPaper}>
                 <Title>Latest news</Title>
-                <News />
+                <News data={this.props.newsData}/>
               </Paper>
             </Grid>
             {/* Recent Data */}
             <Grid item xs={12}>
               <Paper className={this.classes.paper} style={{ overflow: 'hidden' }}>
                 <Title>Today</Title>
-                {this.props.data ?
-                  <DataTable data={this.props.data} /> :
+                {this.props.statsData ?
+                  <DataTable data={this.props.statsData} /> :
                   <Skeleton variant="rect" height={200} />
                 }
               </Paper>

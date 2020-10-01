@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Dashboard from './Dashboard.js';
 import Charts from './charts/Charts.js';
-import { fetchAllData } from '../data';
+import { fetchStatsData, fetchNewsData } from '../data';
 import { AppBar, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, withStyles } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -97,17 +97,19 @@ class App extends React.Component {
   };
   classes = this.props.classes;
   async componentDidMount() {
-    const data = await fetchAllData();
-    this.setState({ data });
+    const statsData = await fetchStatsData();
+    this.setState({ statsData });
+    const newsData = await fetchNewsData();
+    this.setState({ newsData });
   }
   render() {
     let main;
     switch (this.state.page) {
       case 'dashboard':
-        main = <Dashboard classes={this.classes} data={this.state.data}/>;
+        main = <Dashboard classes={this.classes} statsData={this.state.statsData} newsData={this.state.newsData}/>;
         break;
       case 'charts':
-        main = <Charts classes={this.classes} data={this.state.data}/>;
+        main = <Charts classes={this.classes} data={this.state.statsData}/>;
         break;
       default:
         main = null;
