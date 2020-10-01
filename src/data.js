@@ -10,11 +10,26 @@ const urls = {
         cases: 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.json',
         mortality: 'https://epistat.sciensano.be/Data/COVID19BE_MORT.json',
     },
-    news: {
-        'vrt-science-en': 'https://www.vrt.be/vrtnws/en.rss.wetenschap.xml',
-        'vrt-wetenschap-nl': 'https://www.vrt.be/vrtnws/nl.rss.wetenschap.xml',
-        'rtbf-info': 'http://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml'
-    }
+    news: [
+        {
+            source: 'VRT (science)',
+            rss: 'https://www.vrt.be/vrtnws/en.rss.wetenschap.xml',
+            icon: 'vrtnws.jpg',
+            language: 'EN',
+        },
+        {
+            source: 'VRT (wetenschap)',
+            rss: 'https://www.vrt.be/vrtnws/nl.rss.wetenschap.xml',
+            icon: 'vrtnws.jpg',
+            language: 'NL',
+        },
+        {
+            source: 'RTBF Info',
+            rss: 'http://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml',
+            icon: 'rtbfinfo.png',
+            language: 'FR',
+        }
+    ]
 };
 export async function fetchData(url, filtered = true) {
     return url && (await fetch(url)).json();
@@ -40,13 +55,13 @@ export async function fetchStatsData(filtered = true) {
     return data;
 }
 export async function fetchNewsData() {
+    const sources = urls.news;
     let data = [];
-    for (const source of Object.keys(urls.news)) {
-        const newData = await fetchRssData(urls.news[source]);
-        for (const item of newData) {
-            item.source = source;
-        }
-        data = [...data, ...newData];
+    for (const source of sources) {
+        const newData = await fetchRssData(source.rss);
+        data = [...data, ...newData.map(item => {
+            return { ...item, ...source };
+        })];
     }
     return data.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 }
