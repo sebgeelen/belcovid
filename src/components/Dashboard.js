@@ -52,7 +52,7 @@ export default class Dashboard extends React.Component {
             <Grid item xs={12} md={5} lg={5}>
               <Paper className={this.fixedHeightPaper}>
                 <Title>Latest news</Title>
-                <News data={this.props.newsData}/>
+                <News data={this.props.newsData} classes={this.classes}/>
               </Paper>
             </Grid>
             {/* Recent Data */}

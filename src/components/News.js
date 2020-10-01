@@ -1,11 +1,18 @@
-import { Avatar, Link, List, ListItem, ListItemAvatar, ListItemText } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
 import React from 'react';
+import { Avatar, Link, List, ListItem, ListItemAvatar, ListItemText, SvgIcon } from '@material-ui/core';
+import { Skeleton, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import Flags from 'country-flag-icons/react/3x2';
 
 export default class News extends React.Component {
+    state = {
+        languages: ['en', 'fr', 'nl']
+    }
+    classes = this.props.classes;
     render() {
         if (this.props.data) {
-            const listItems = this.props.data.map((item, index) => {
+            const listItems = this.props.data
+                .filter(item => this.state.languages.includes(item.language.toLowerCase()))
+                .map((item, index) => {
                 const date = new Date(item.pubDate).toDateString();
                 return (
                     <ListItem key={`${item.source}-${index}`} alignItems="flex-start">
@@ -19,11 +26,35 @@ export default class News extends React.Component {
                     </ListItem>
                 );
             });
-            return <List>
-                { listItems }
-            </List>;
+            return (
+                <React.Fragment>
+                    <div style={{textAlign: 'right'}}>
+                        <ToggleButtonGroup
+                            value={this.state.languages}
+                            onChange={this._toggleLanguage.bind(this)}
+                            aria-label="News languages"
+                        >
+                            <ToggleButton value="en" aria-label="English" className={this.classes.flagButton}>
+                                <SvgIcon><Flags.GB title="English" /></SvgIcon>
+                            </ToggleButton>
+                            <ToggleButton value="fr" aria-label="French" className={this.classes.flagButton}>
+                                <SvgIcon><Flags.FR title="French" /></SvgIcon>
+                            </ToggleButton>
+                            <ToggleButton value="nl" aria-label="Dutch" className={this.classes.flagButton}>
+                                <SvgIcon><Flags.NL title="Dutch" /></SvgIcon>
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </div>
+                    <List>
+                        { listItems }
+                    </List>
+                </React.Fragment>
+            );
         } else {
             return <Skeleton variant="rect" height={200} />;
         }
+    }
+    _toggleLanguage(ev, languages) {
+        this.setState({ languages });
     }
 }

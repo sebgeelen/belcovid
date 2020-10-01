@@ -89,6 +89,12 @@ const styles = (theme) => ({
     fixedHeight: {
         height: 300,
     },
+    flagButton: {
+        paddingTop: 0,
+        paddingBottom: 0,
+        paddingLeft: 5,
+        paddingRight: 5,
+    },
 });
 
 class App extends React.Component {
