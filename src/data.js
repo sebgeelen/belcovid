@@ -12,33 +12,39 @@ const urls = {
     },
     news: [
         {
-            source: 'VRT (science)',
+            sourceName: 'VRT (science)',
             rss: 'https://www.vrt.be/vrtnws/en.rss.wetenschap.xml',
             icon: 'vrtnws.jpg',
             language: 'EN',
         },
         {
-            source: 'VRT (wetenschap)',
+            sourceName: 'VRT (wetenschap)',
             rss: 'https://www.vrt.be/vrtnws/nl.rss.wetenschap.xml',
             icon: 'vrtnws.jpg',
             language: 'NL',
         },
         {
-            source: 'VRT nws',
+            sourceName: 'VRT nws',
             rss: 'https://www.vrt.be/vrtnws/nl.rss.articles.xml',
             icon: 'vrtnws.jpg',
             language: 'NL',
         },
         {
-            source: 'RTBF Info',
+            sourceName: 'RTBF Info',
             rss: 'http://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml',
             icon: 'rtbfinfo.png',
             language: 'FR',
         },
         {
-            source: 'City of Brussels',
+            sourceName: 'City of Brussels',
             rss: 'https://www.brussels.be/rss.xml',
             icon: 'bxl.png',
+            language: 'EN',
+        },
+        {
+            sourceName: 'Nature Medicine',
+            rss: 'https://www.nature.com/nm.rss',
+            icon: 'naturemed.jpg',
             language: 'EN',
         }
     ]
@@ -48,16 +54,17 @@ export async function fetchData(url, filtered = true) {
 }
 const covidKeywordsRegex = /corona|covid|sars/g;
 export async function fetchRssData(url, filtered = true) {
-    const feed = await parser.parseURL(proxy + url);
-    if (filtered) {
-        return feed.items.filter(a => {
-            return covidKeywordsRegex.test(a.title.toLowerCase()) ||
-                covidKeywordsRegex.test(a.contentSnippet?.toLowerCase() || '') ||
-                covidKeywordsRegex.test(a.content?.toLowerCase() || '');
-        });
-    } else {
-        return feed.items;
-    }
+    return parser.parseURL(proxy + url).then(feed => {
+        if (filtered) {
+            return feed.items.filter(a => {
+                return covidKeywordsRegex.test(a.title.toLowerCase()) ||
+                    covidKeywordsRegex.test(a.contentSnippet?.toLowerCase() || '') ||
+                    covidKeywordsRegex.test(a.content?.toLowerCase() || '');
+            });
+        } else {
+            return feed.items;
+        }
+    });
 }
 export async function fetchStatsData(filtered = true) {
     const data = {};
@@ -72,14 +79,11 @@ export async function fetchStatsData(filtered = true) {
     }
     return data;
 }
-export async function fetchNewsData() {
+export function fetchNewsData() {
     const sources = urls.news;
-    let data = [];
+    let dataPromises = [];
     for (const source of sources) {
-        const newData = await fetchRssData(source.rss);
-        data = [...data, ...newData.map(item => {
-            return { ...item, ...source };
-        })];
+        dataPromises.push({ ...source, promise: fetchRssData(source.rss)});
     }
-    return data.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    return dataPromises;
 }

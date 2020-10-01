@@ -115,10 +115,10 @@ class App extends React.Component {
       if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
         this.setState({ statsData: JSON.parse(statsData) });
       } else {
-        await this._updateData('stats');
+        this._updateData('stats');
       }
     } else {
-      await this._updateData('stats');
+      this._updateData('stats');
     }
 
     // Update news data.
@@ -129,10 +129,10 @@ class App extends React.Component {
       if (newsData && lastSaveHours < 1) {
         this.setState({ newsData: JSON.parse(newsData) });
       } else {
-        await this._updateData('news');
+        this._updateData('news');
       }
     } else {
-      await this._updateData('news');
+      this._updateData('news');
     }
   }
   render() {
@@ -206,16 +206,32 @@ class App extends React.Component {
       </div>
     );
   }
-  async _updateData(name) {
-    let data;
+  _updateData(name) {
     if (name === 'stats') {
-      data = await fetchStatsData();
+      fetchStatsData().then(data => {
+        localStorage.setItem('belcovid:stats', JSON.stringify(data));
+        localStorage.setItem('belcovid:update:stats', today().toDateString());
+        this.setState({ newsData: data });
+      });
     } else if (name === 'news') {
-      data = await fetchNewsData();
+      const data = [];
+      const dataPromises = fetchNewsData();
+      for (const dataPromise of dataPromises) {
+        dataPromise.promise.then(datum => {
+          for (const item of datum) {
+            const formattedItem = { ...dataPromise, ...item };
+            delete formattedItem.promise;
+            if (!formattedItem.pubDate && formattedItem.date) {
+              formattedItem.pubDate = formattedItem.date;
+            }
+            data.push(formattedItem);
+          }
+          this.setState({ newsData: data });
+          localStorage.setItem('belcovid:news', JSON.stringify(data));
+          localStorage.setItem('belcovid:update:news', today().toDateString());
+        });
+      }
     }
-    localStorage.setItem('belcovid:' + name, JSON.stringify(data));
-    localStorage.setItem('belcovid:update:' + name, today().toDateString());
-    this.setState({ [`${name}Data`]: data });
   }
   _goto(page) {
     this.setState({ page });

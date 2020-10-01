@@ -12,19 +12,20 @@ export default class News extends React.Component {
         if (this.props.data) {
             const listItems = this.props.data
                 .filter(item => this.state.languages.includes(item.language.toLowerCase()))
+                .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
                 .map((item, index) => {
-                const date = new Date(item.pubDate).toDateString();
-                return (
-                    <ListItem key={`${item.source}-${index}`} alignItems="flex-start">
-                        <ListItemAvatar>
-                            <Avatar alt={item.source} src={process.env.PUBLIC_URL + '/icons/' + item.icon}/>
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={<Link href={item.link} target="_blank" rel="noopener noreferrer">{item.title}</Link>}
-                            secondary={`${date} (${item.source.replace('-', ' ')})`}
-                        />
-                    </ListItem>
-                );
+                    const date = new Date(item.pubDate).toDateString();
+                    return (
+                        <ListItem key={`${item.sourceName}-${index}`} alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Avatar alt={item.sourceName} src={process.env.PUBLIC_URL + '/icons/' + item.icon}/>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={<Link href={item.link} target="_blank" rel="noopener noreferrer">{item.title}</Link>}
+                                secondary={`${date} (${item.sourceName})`}
+                            />
+                        </ListItem>
+                    );
             });
             return (
                 <React.Fragment>
