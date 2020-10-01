@@ -28,6 +28,12 @@ const urls = {
             rss: 'http://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml',
             icon: 'rtbfinfo.png',
             language: 'FR',
+        },
+        {
+            source: 'City of Brussels',
+            rss: 'https://www.brussels.be/rss.xml',
+            icon: 'bxl.png',
+            language: 'EN',
         }
     ]
 };
