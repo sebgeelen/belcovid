@@ -92,7 +92,7 @@ const styles = (theme) => ({
 
 class App extends React.Component {
   state = {
-    open: true,
+    open: false,
     page: localStorage.getItem('belcovid:page') || 'dashboard',
   };
   classes = this.props.classes;
