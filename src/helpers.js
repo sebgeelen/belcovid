@@ -83,7 +83,9 @@ export function getAveragePoints(points, interval) {
     });
 }
 export function getDaysBetween(day1, day2) {
-    return Math.abs((day1.getTime() - day2.getTime()) / (1000 * 60 * 60 * 24));
+    day1 = new Date(day1.toDateString());
+    day2 = new Date(day2.toDateString());
+    return Math.round(Math.abs((day1.getTime() - day2.getTime()) / (1000 * 60 * 60 * 24)));
 }
 export function today() {
     return new Date();

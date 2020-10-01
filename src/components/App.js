@@ -8,6 +8,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
+import { getDaysBetween, today } from '../helpers.js';
 import '../App.css';
 
 const drawerWidth = 240;
@@ -97,10 +98,36 @@ class App extends React.Component {
   };
   classes = this.props.classes;
   async componentDidMount() {
-    const statsData = await fetchStatsData();
-    this.setState({ statsData });
-    const newsData = await fetchNewsData();
-    this.setState({ newsData });
+    const lastSaveStats = localStorage.getItem('belcovid:update:stats');
+    const lastSaveNews = localStorage.getItem('belcovid:update:news');
+
+    // Update stats data.
+    if (lastSaveStats) {
+      const statsData = localStorage.getItem('belcovid:stats');
+      const lastSaveDate = new Date(lastSaveStats);
+      const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / 3600;
+      if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
+        this.setState({ statsData: JSON.parse(statsData) });
+      } else {
+        await this._updateData('stats');
+      }
+    } else {
+      await this._updateData('stats');
+    }
+
+    // Update news data.
+    if (lastSaveNews) {
+      const newsData = localStorage.getItem('belcovid:news');
+      const lastSaveDate = new Date(lastSaveStats);
+      const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / 3600;
+      if (newsData && lastSaveHours < 1) {
+        this.setState({ newsData: JSON.parse(newsData) });
+      } else {
+        await this._updateData('news');
+      }
+    } else {
+      await this._updateData('news');
+    }
   }
   render() {
     let main;
@@ -172,6 +199,17 @@ class App extends React.Component {
         {main}
       </div>
     );
+  }
+  async _updateData(name) {
+    let data;
+    if (name === 'stats') {
+      data = await fetchStatsData();
+    } else if (name === 'news') {
+      data = await fetchNewsData();
+    }
+    localStorage.setItem('belcovid:' + name, JSON.stringify(data));
+    localStorage.setItem('belcovid:update:' + name, today().toDateString());
+    this.setState({ [`${name}Data`]: data });
   }
   _goto(page) {
     this.setState({ page });
