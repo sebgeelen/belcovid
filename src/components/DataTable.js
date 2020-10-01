@@ -4,7 +4,6 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import Title from './Title';
 import { Link, Tooltip } from '@material-ui/core';
 
 function saturationTooltip(icu = false) {
@@ -54,7 +53,6 @@ export default class DataTable extends React.Component {
         if (this.props.data) {
             return (
                 <React.Fragment>
-                    <Title>Today</Title>
                     <Table size="small">
                         <TableBody>
                             <TableRow>
