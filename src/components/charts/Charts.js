@@ -72,7 +72,7 @@ export default class Charts extends React.Component {
                         <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
                             <h3>New cases, by age group (7-day rolling average)</h3>
                         </Tooltip>
-                        <CasesByAgeChart data={this.props.data} />
+                        <CasesByAgeChart data={this.props.data} startWeek={3} />
                     </section> :
                     <Skeleton variant="rect" height={200} />
                 }

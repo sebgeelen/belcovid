@@ -17,10 +17,9 @@ const AGE_GROUPS = [
     'Age unknown'
 ];
 
-const START_WEEK = 3;
 export default class CasesByAgeChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(today(), -(START_WEEK * 7)))),
+        min: new Date(getIsoDate(getDateFrom(today(), -(this.props.startWeek * 7)))),
         max: new Date(getIsoDate(today())),
     };
     _isZoomingOut = false;
