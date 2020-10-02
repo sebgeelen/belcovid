@@ -211,7 +211,7 @@ class App extends React.Component {
       fetchStatsData().then(data => {
         localStorage.setItem('belcovid:stats', JSON.stringify(data));
         localStorage.setItem('belcovid:update:stats', today().toDateString());
-        this.setState({ newsData: data });
+        this.setState({ statsData: data });
       });
     } else if (name === 'news') {
       const data = [];

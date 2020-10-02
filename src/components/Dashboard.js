@@ -15,10 +15,17 @@ import { Tooltip } from '@material-ui/core';
 import News from './News';
 
 function Footer() {
+  const lastStatsUpdate = localStorage.getItem('belcovid:update:stats');
+  const lastStatsUpdateDate = lastStatsUpdate && new Date(lastStatsUpdate);
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'All data from '}
       <Link color="inherit" href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</Link>
+      {
+        localStorage.getItem('belcovid:update:stats') ?
+          <small onDoubleClick={() => localStorage.clear()}> (last update: {lastStatsUpdateDate.toDateString()})</small> :
+          ''
+      }
       {' • '}
       <Link color="inherit" href="https://www.info-coronavirus.be/" target="_blank" rel="noopener noreferrer">Official national information on Covid-19</Link>
       {'.'}
