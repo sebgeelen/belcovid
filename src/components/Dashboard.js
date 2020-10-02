@@ -23,7 +23,7 @@ function Footer() {
       <Link color="inherit" href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</Link>
       {
         localStorage.getItem('belcovid:update:stats') ?
-          <small onDoubleClick={() => localStorage.clear()}> (last update: {lastStatsUpdateDate.toDateString()})</small> :
+          <small onDoubleClick={() => localStorage.clear()}> (last update: {lastStatsUpdateDate.toDateString()} at {lastStatsUpdateDate.toLocaleTimeString()})</small> :
           ''
       }
       {' • '}

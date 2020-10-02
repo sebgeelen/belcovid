@@ -210,7 +210,7 @@ class App extends React.Component {
     if (name === 'stats') {
       fetchStatsData().then(data => {
         localStorage.setItem('belcovid:stats', JSON.stringify(data));
-        localStorage.setItem('belcovid:update:stats', today().toDateString());
+        localStorage.setItem('belcovid:update:stats', today().toISOString());
         this.setState({ statsData: data });
       });
     } else if (name === 'news') {
@@ -228,7 +228,7 @@ class App extends React.Component {
           }
           this.setState({ newsData: data });
           localStorage.setItem('belcovid:news', JSON.stringify(data));
-          localStorage.setItem('belcovid:update:news', today().toDateString());
+          localStorage.setItem('belcovid:update:news', today().toISOString());
         });
       }
     }
