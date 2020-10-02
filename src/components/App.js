@@ -111,7 +111,7 @@ class App extends React.Component {
     if (lastSaveStats) {
       const statsData = localStorage.getItem('belcovid:stats');
       const lastSaveDate = new Date(lastSaveStats);
-      const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / 3600;
+      const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
       if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
         this.setState({ statsData: JSON.parse(statsData) });
       } else {
@@ -125,7 +125,7 @@ class App extends React.Component {
     if (lastSaveNews) {
       const newsData = localStorage.getItem('belcovid:news');
       const lastSaveDate = new Date(lastSaveStats);
-      const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / 3600;
+      const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / 3600;
       if (newsData && lastSaveHours < 1) {
         this.setState({ newsData: JSON.parse(newsData) });
       } else {
