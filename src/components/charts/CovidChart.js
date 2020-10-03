@@ -1,7 +1,7 @@
 import React from 'react';
 import { Chart } from 'react-charts';
 import memoize from 'memoize-one';
-import { getIsoDate, getDaysBetween, getDateFrom } from '../../helpers';
+import { getDaysBetween, getDateFrom } from '../../helpers';
 
 export default class CovidChart extends React.Component {
     _isZoomingOut = false;
@@ -34,8 +34,8 @@ export default class CovidChart extends React.Component {
             () => ({
                 onSelect: brushData => {
                     if (isNaN(brushData.start.getTime()) || isNaN(brushData.end.getTime())) return;
-                    let min = new Date(getIsoDate(new Date(Math.min(brushData.start, brushData.end))));
-                    let max = new Date(getIsoDate(new Date(Math.max(brushData.start, brushData.end))));
+                    let min = new Date(Math.min(brushData.start, brushData.end));
+                    let max = new Date(Math.max(brushData.start, brushData.end));
                     const interval = getDaysBetween(min, max);
                     if (interval < 1) {
                         max = getDateFrom(min, 1);
