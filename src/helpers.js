@@ -106,7 +106,8 @@ export function getAverageOver(data, startDate, endDateOrInterval, key) {
     if (typeof endDateOrInterval === 'number') {
         // We subtract 1 from the interval so as to average over `interval`
         // number of days (counting the start date).
-        endDate = getDateFrom(startDate, endDateOrInterval - 1);
+        const interval = endDateOrInterval > 0 ? endDateOrInterval - 1 : endDateOrInterval + 1;
+        endDate = getDateFrom(startDate, interval);
     } else {
         endDate = endDateOrInterval;
     }

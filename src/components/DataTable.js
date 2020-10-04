@@ -59,7 +59,7 @@ export default class DataTable extends React.Component {
                                 <Tooltip title={CASES_TOOLTIP} placement="bottom-start" arrow>
                                     <TableCell>Cases (last 7 days, daily average)</TableCell>
                                 </Tooltip>
-                                <TableCell>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -6, 'CASES'))}</TableCell>
+                                <TableCell>{Math.round(getAverageOver(this.props.data.cases, lastConsolidatedDataDay(), -7, 'CASES'))}</TableCell>
                             </TableRow>
                             {
                                 (this.state.saturationDay.hospitals || this.state.saturationDay.icu || this.state.saturationDay.peak) &&
