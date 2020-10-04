@@ -6,6 +6,7 @@ import RateOfChangeChart from './RateOfChangeChart';
 import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
+import { provinces } from '../../data';
 
 export const ZOOM_TOOLTIP = (<React.Fragment>
     <b>Zoom-in</b>: select<br/>
@@ -29,7 +30,7 @@ export default class Charts extends React.Component {
             <main className={this.classes.content}>
                 <div className={this.classes.appBarSpacer} />
                 <Container maxWidth="lg" className={this.classes.container}>
-                    <Title>Charts</Title>
+                    <Title>Charts for {provinces[this.props.province]}</Title>
                     <FormControl component="fieldset" className={this.classes.formControl}>
                         <FormLabel component="legend">Main variable</FormLabel>
                         <FormGroup>

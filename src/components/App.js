@@ -2,8 +2,24 @@ import React from 'react';
 import clsx from 'clsx';
 import Dashboard from './Dashboard.js';
 import Charts from './charts/Charts.js';
-import { fetchStatsData, fetchNewsData } from '../data';
-import { AppBar, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, withStyles } from '@material-ui/core';
+import { fetchStatsData, fetchNewsData, provinces } from '../data';
+import {
+  AppBar,
+  CssBaseline,
+  Divider,
+  Drawer,
+  FormControl,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Select,
+  Toolbar,
+  Typography,
+  withStyles
+} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -95,14 +111,21 @@ const styles = (theme) => ({
         paddingLeft: 5,
         paddingRight: 5,
     },
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
 });
 
 class App extends React.Component {
   state = {
     open: false,
     page: localStorage.getItem('belcovid:page') || 'dashboard',
+    province: localStorage.getItem('belcovid:province') || 'Belgium',
+    statsData: this._filterStatsData(),
   };
   classes = this.props.classes;
+  _isFilteringStatsData = false;
   async componentDidMount() {
     const lastSaveStats = localStorage.getItem('belcovid:update:stats');
     const lastSaveNews = localStorage.getItem('belcovid:update:news');
@@ -113,7 +136,7 @@ class App extends React.Component {
       const lastSaveDate = new Date(lastSaveStats);
       const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
       if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
-        this.setState({ statsData: JSON.parse(statsData) });
+        this.setState({ rawStatsData: JSON.parse(statsData) });
       } else {
         this._updateData('stats');
       }
@@ -135,14 +158,34 @@ class App extends React.Component {
       this._updateData('news');
     }
   }
+  async componentWillUpdate(nextProps, nextState) {
+    if (
+        !this._isFilteringStatsData && (
+          this.state.rawStatsData !== nextState.rawStatsData ||
+          !nextState.statsData ||
+          this.state.province !== nextState.province
+        )
+      ) {
+      this._isFilteringStatsData = true;
+      await this.setState({statsData: this._filterStatsData(nextState.rawStatsData, nextState.province)});
+      this._isFilteringStatsData = false;
+    }
+    return true;
+  }
   render() {
     let main;
     switch (this.state.page) {
       case 'dashboard':
-        main = <Dashboard classes={this.classes} statsData={this.state.statsData} newsData={this.state.newsData}/>;
+        main = <Dashboard
+          classes={this.classes}
+          rawStatsData={this.state.rawStatsData}
+          statsData={this.state.statsData}
+          newsData={this.state.newsData}
+          province={this.state.province}
+        />;
         break;
       case 'charts':
-        main = <Charts classes={this.classes} data={this.state.statsData}/>;
+        main = <Charts classes={this.classes} data={this.state.statsData} province={this.state.province}/>;
         break;
       default:
         main = null;
@@ -164,6 +207,19 @@ class App extends React.Component {
             <Typography component="h1" variant="h6" color="inherit" noWrap className={this.classes.title}>
               BelCovid
             </Typography>
+            <FormControl className={this.classes.formControl}>
+              <Select
+                id="province-select"
+                value={this.state.province}
+                onChange={ev => {
+                  const province = ev.target.value;
+                  localStorage.setItem('belcovid:province', province);
+                  this.setState({ province });
+                }}
+              >
+                { Object.keys(provinces).map(key => <MenuItem value={key} key={key}>{provinces[key]}</MenuItem>)}
+              </Select>
+            </FormControl>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -211,7 +267,7 @@ class App extends React.Component {
       fetchStatsData().then(data => {
         localStorage.setItem('belcovid:stats', JSON.stringify(data));
         localStorage.setItem('belcovid:update:stats', today().toISOString());
-        this.setState({ statsData: data });
+        this.setState({ rawStatsData: data });
       });
     } else if (name === 'news') {
       const data = [];
@@ -231,6 +287,24 @@ class App extends React.Component {
           localStorage.setItem('belcovid:update:news', today().toISOString());
         });
       }
+    }
+  }
+  _filterStatsData(rawStatsData, province) {
+    if (province === 'Belgium') {
+      return rawStatsData;
+    } else if (rawStatsData) {
+      const data = {};
+      for (const name of Object.keys(rawStatsData)) {
+        if (name === 'mortality') {
+          // The mortality dataset doesn't have the data per province.
+          data[name] = rawStatsData[name];
+        } else {
+          data[name] = rawStatsData[name].filter(data => {
+            return data.PROVINCE === province;
+          });
+        }
+      }
+      return data;
     }
   }
   _goto(page) {

@@ -49,6 +49,20 @@ const urls = {
         }
     ]
 };
+export const provinces = {
+    'Belgium': 'Belgium',
+    'Antwerpen': 'Antwerpen',
+    'OostVlaanderen': 'Oost Vlaanderen',
+    'VlaamsBrabant': 'Vlaams Brabant',
+    'Limburg': 'Limburg',
+    'WestVlaanderen': 'West Vlaanderen',
+    'Hainaut': 'Hainaut',
+    'Liège': 'Liège',
+    'Luxembourg': 'Luxembourg',
+    'Namur': 'Namur',
+    'BrabantWallon': 'Brabant Wallon',
+    'Brussels': 'Brussels Capital',
+  };
 export async function fetchData(url, filtered = true) {
     return url && (await fetch(url)).json();
 }
