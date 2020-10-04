@@ -1,6 +1,6 @@
 import React from 'react';
 import BarChartTooltip from './BarChartTooltip.js';
-import { getAveragePoints, getDateFrom, getIsoDate, today } from '../../helpers';
+import { getAveragePoints, lastConsolidatedDataDay } from '../../helpers';
 import CovidChart from './CovidChart.js';
 
 const AGE_GROUPS = [
@@ -19,8 +19,8 @@ const AGE_GROUPS = [
 
 export default class CasesByAgeChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(today(), -(this.props.startWeek * 7)))),
-        max: new Date(getIsoDate(today())),
+        min: new Date('2020-09-01'),
+        max: lastConsolidatedDataDay(),
     };
     _isZoomingOut = false;
     render() {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { getAveragePoints, getDateFrom, getIsoDate, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
+import { getAveragePoints, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
 import CovidChart from './CovidChart';
 
 export default class TestingChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(lastConsolidatedDataDay(), -1 - (this.props.startWeek * 7)))),
-        max: new Date(getIsoDate(lastConsolidatedDataDay())),
+        min: new Date('2020-09-01'),
+        max: lastConsolidatedDataDay(),
     };
     render() {
         let comparativeData = this.props.comparativeData;

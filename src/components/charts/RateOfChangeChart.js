@@ -1,11 +1,11 @@
 import React from 'react';
-import { getAveragePoints, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
+import { getAveragePoints, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
 import CovidChart from './CovidChart';
 
 export default class RateOfChangeChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (this.props.startWeek * 7)))),
-        max: new Date(getIsoDate(new Date())),
+        min: new Date('2020-09-01'),
+        max: lastConsolidatedDataDay(),
     };
     render() {
         let data = [...this.props.data] || [];
@@ -24,7 +24,7 @@ export default class RateOfChangeChart extends React.Component {
             points.push({x: new Date(date), y: patients});
         }
         const rateOfChangePoints = getAveragePoints(points, 7).map((point, index) => {
-            return index > 2 && this._getRateOfChangePoint(points, index, 2);
+            return index && this._getRateOfChangePoint(points, index, 2);
         }).filter(d => d);
         const plotData = [
             {

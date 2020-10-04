@@ -1,11 +1,11 @@
 import React from 'react';
-import { getAveragePoints, getDateFrom, getIsoDate, getPolynomialRegressionPoints } from '../../helpers';
+import { getAveragePoints, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
 import CovidChart from './CovidChart';
 
 export default class LineChart extends React.Component {
     state = {
-        min: new Date(getIsoDate(getDateFrom(new Date(), -1 - (this.props.startWeek * 7)))),
-        max: new Date(getIsoDate(new Date())),
+        min: new Date('2020-09-01'),
+        max: lastConsolidatedDataDay(),
     };
     render() {
         let data = [...this.props.data] || [];

@@ -1,7 +1,7 @@
 const { default: RateOfChangeChart } = require("./components/charts/RateOfChangeChart");
 
 describe('RateOfChangeChart', () => {
-    const rateComponent = new RateOfChangeChart({ startWeek: 1});
+    const rateComponent = new RateOfChangeChart();
     describe('_getRateOfChangePoint', () => {
         test('should get a constant rate of 0%', () => {
             const data = [

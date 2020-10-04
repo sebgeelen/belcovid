@@ -50,7 +50,7 @@ export default class Dashboard extends React.Component {
                   <Title>New cases, by age group (7-day rolling average)</Title>
                 </Tooltip>
                 {this.props.statsData ?
-                  <CasesByAgeChart data={this.props.statsData} startWeek={2} /> :
+                  <CasesByAgeChart data={this.props.statsData} /> :
                   <Skeleton variant="rect" height={'100%'} />
                 }
               </Paper>

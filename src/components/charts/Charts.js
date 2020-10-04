@@ -86,7 +86,6 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.cases}
                             keyToCompare="CASES"
-                            startWeek={3}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -101,7 +100,6 @@ export default class Charts extends React.Component {
                         <RateOfChangeChart
                             data={this.props.data.cases}
                             keyToPlot="CASES"
-                            startWeek={3}
                             chartName="New cases"
                         />
                     </section> :
@@ -127,7 +125,6 @@ export default class Charts extends React.Component {
                         <LineChart
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
-                            startWeek={3}
                             chartName="Number of patients in the hospital"
                         />
                     </section> :
@@ -143,7 +140,6 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN"
-                            startWeek={3}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -158,7 +154,6 @@ export default class Charts extends React.Component {
                         <RateOfChangeChart
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
-                            startWeek={3}
                             chartName="Hospitalized patients"
                         />
                     </section> :
@@ -184,7 +179,6 @@ export default class Charts extends React.Component {
                         <LineChart
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
-                            startWeek={3}
                             chartName="Number of patients in ICU"
                         />
                     </section> :
@@ -200,7 +194,6 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN_ICU"
-                            startWeek={3}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -215,7 +208,6 @@ export default class Charts extends React.Component {
                         <RateOfChangeChart
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
-                            startWeek={3}
                             chartName="Patients in ICU"
                         />
                     </section> :
@@ -241,7 +233,6 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.mortality}
                             keyToCompare="DEATHS"
-                            startWeek={3}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
