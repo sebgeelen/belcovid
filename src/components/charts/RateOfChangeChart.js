@@ -25,7 +25,7 @@ export default class RateOfChangeChart extends React.Component {
         }
         const rateOfChangePoints = getAveragePoints(points, 7).map((point, index) => {
             return index && this._getRateOfChangePoint(points, index, 2);
-        }).filter(d => d);
+        }).filter(d => d && typeof d.y === 'number');
         const plotData = [
             {
                 label: `Rate of change of ${this.props.chartName.toLowerCase()} (7-day rolling average)`,
@@ -56,11 +56,24 @@ export default class RateOfChangeChart extends React.Component {
      * @returns {object}
      */
     _getRateOfChangePoint(points, index) {
-        const firstPointY = points[index - 1]?.y;
-        let lastPointY = points[index].y;
+        const oldPointY = points[index - 1]?.y;
+        let newPointY = points[index].y;
+        let y;
+        if (!index) {
+            y = 0;
+        } else if (oldPointY) {
+            y = 100 * ((newPointY / oldPointY) - 1);
+        } else if (newPointY) {
+            // If we come from 0 and get to a value, the rate of change is
+            // undefined.
+            y = undefined;
+        } else {
+            // If we come from 0 and stay at 0, the rate of change is 0.
+            y = 0;
+        }
         return {
             x: points[index].x,
-            y: index === 0 ? 0 : 100 * ((lastPointY / firstPointY) - 1),
+            y: y,
         };
     }
 }

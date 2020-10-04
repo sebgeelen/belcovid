@@ -147,17 +147,20 @@ export function getAveragePoints(points, interval) {
         let n = 0;
         for (let i = 0; i < interval; i++) {
             if (index - i >= 0 && points[index - i] !== undefined) {
-                y += points[index - i].y;
-                n++;
+                const newY = points[index - i].y;
+                if (typeof newY === 'number') {
+                    y += newY;
+                    n++;
+                }
             }
         }
         y = y / (n || 1);
-        if (!index) y = point.y;
+        if (!index) y = typeof point.y === 'number' ? point.y : undefined;
         return {
             x: point.x,
             y,
         };
-    });
+    }).filter(p => p && typeof p.y === 'number');
 }
 /**
  * Return the rounded number of days between two dates.
