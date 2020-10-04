@@ -124,8 +124,8 @@ class App extends React.Component {
     // Update news data.
     if (lastSaveNews) {
       const newsData = localStorage.getItem('belcovid:news');
-      const lastSaveDate = new Date(lastSaveStats);
-      const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / 3600;
+      const lastSaveDate = new Date(lastSaveNews);
+      const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / (1000 * 60 * 60);
       if (newsData && lastSaveHours < 1) {
         this.setState({ newsData: JSON.parse(newsData) });
       } else {
