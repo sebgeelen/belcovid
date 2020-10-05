@@ -34,22 +34,31 @@ export default class Charts extends React.Component {
                     <FormControl component="fieldset" className={this.classes.formControl}>
                         <FormLabel component="legend">Main variable</FormLabel>
                         <FormGroup>
-                        <FormControlLabel
-                            control={<Checkbox checked={this.state.cases} onChange={this._toggleVariable.bind(this, 'cases')} name="cases" />}
-                            label="Cases"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox checked={this.state.hospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
-                            label="Hospitalizations"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox checked={this.state.icu} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
-                            label="Intensive Care Units"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox checked={this.state.mortality} onChange={this._toggleVariable.bind(this, 'mortality')} name="mortality" />}
-                            label="Mortality"
-                        />
+                            <FormControlLabel
+                                control={<Checkbox checked={this.state.cases} onChange={this._toggleVariable.bind(this, 'cases')} name="cases" />}
+                                label="Cases"
+                            />
+                            <FormControlLabel
+                                control={<Checkbox checked={this.state.hospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
+                                label="Hospitalizations"
+                            />
+                            <FormControlLabel
+                                control={<Checkbox checked={this.state.icu} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
+                                label="Intensive Care Units"
+                            />
+                            <Tooltip title="Mortality data cannot be filtered per province.">
+                                <FormControlLabel
+                                    control={
+                                            <Checkbox
+                                                checked={this.state.mortality}
+                                                onChange={this._toggleVariable.bind(this, 'mortality')}
+                                                name="mortality"
+                                                disabled={this.props.province !== 'Belgium'}
+                                            />
+                                        }
+                                    label="Mortality"
+                                />
+                            </Tooltip>
                         </FormGroup>
                     </FormControl>
                     { this.state.cases && this.Cases() }
