@@ -5,7 +5,10 @@ import Flags from 'country-flag-icons/react/3x2';
 
 export default class News extends React.Component {
     state = {
-        languages: ['en', 'fr', 'nl']
+        languages: (
+            localStorage.getItem('belcovid:news:languages') &&
+            JSON.parse(localStorage.getItem('belcovid:news:languages'))
+        ) || ['en', 'fr', 'nl']
     }
     classes = this.props.classes;
     render() {
@@ -62,5 +65,6 @@ export default class News extends React.Component {
     }
     _toggleLanguage(ev, languages) {
         this.setState({ languages });
+        localStorage.setItem('belcovid:news:languages', JSON.stringify(languages));
     }
 }
