@@ -12,16 +12,16 @@ const urls = {
     },
     news: [
         {
-            sourceName: 'VRT (science)',
-            rss: 'https://www.vrt.be/vrtnws/en.rss.wetenschap.xml',
-            icon: 'vrtnws.jpg',
+            sourceName: 'The Lancet',
+            rss: 'http://www.thelancet.com/rssfeed/lancet_online.xml',
+            icon: 'lancet.jpg',
             language: 'EN',
         },
         {
-            sourceName: 'VRT (wetenschap)',
-            rss: 'https://www.vrt.be/vrtnws/nl.rss.wetenschap.xml',
-            icon: 'vrtnws.jpg',
-            language: 'NL',
+            sourceName: 'Nature Medicine',
+            rss: 'https://www.nature.com/nm.rss',
+            icon: 'naturemed.jpg',
+            language: 'EN',
         },
         {
             sourceName: 'VRT nws',
@@ -36,17 +36,23 @@ const urls = {
             language: 'FR',
         },
         {
+            sourceName: 'VRT (science)',
+            rss: 'https://www.vrt.be/vrtnws/en.rss.wetenschap.xml',
+            icon: 'vrtnws.jpg',
+            language: 'EN',
+        },
+        {
+            sourceName: 'VRT (wetenschap)',
+            rss: 'https://www.vrt.be/vrtnws/nl.rss.wetenschap.xml',
+            icon: 'vrtnws.jpg',
+            language: 'NL',
+        },
+        {
             sourceName: 'City of Brussels',
             rss: 'https://www.brussels.be/rss.xml',
             icon: 'bxl.png',
             language: 'EN',
         },
-        {
-            sourceName: 'Nature Medicine',
-            rss: 'https://www.nature.com/nm.rss',
-            icon: 'naturemed.jpg',
-            language: 'EN',
-        }
     ]
 };
 export const provinces = {
