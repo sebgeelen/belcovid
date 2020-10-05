@@ -226,6 +226,20 @@ export default class Charts extends React.Component {
                 <Title id="mortality">Mortality</Title>
 
                 {this.props.data ?
+                    <section id="mortality">
+                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
+                            <h3>Number of deaths attributed to Covid-19</h3>
+                        </Tooltip>
+                        <LineChart
+                            data={this.props.data.mortality}
+                            keyToPlot="DEATHS"
+                            chartName="Deaths"
+                        />
+                    </section> :
+                    <Skeleton variant="rect" height={200} />
+                }
+
+                {this.props.data ?
                     <section id="mortality-test-rate">
                         <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
                             <h3>Percentage of mortality for the amount of tests</h3>
@@ -234,6 +248,21 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.mortality}
                             keyToCompare="DEATHS"
+                        />
+                    </section> :
+                    <Skeleton variant="rect" height={200} />
+                }
+
+                {this.props.data ?
+                    <section id="rate-of-change-mortality">
+                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
+                            <h3>Rate of change in mortality</h3>
+                        </Tooltip>
+                        <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
+                        <RateOfChangeChart
+                            data={this.props.data.mortality}
+                            keyToPlot="DEATHS"
+                            chartName="Deaths"
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
