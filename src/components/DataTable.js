@@ -36,7 +36,7 @@ function peakTooltip(peak) {
         <React.Fragment>
             The day that the number of people at the hospital would be the same
             as on the highest day recorded ({peak.x.toDateString()}: {Math.round(peak.y)}),
-            based on 7-day rolling average to account for statistical noise.`
+            based on 7-day rolling average to account for statistical noise.
         </React.Fragment>
     );
 }
@@ -74,7 +74,7 @@ export default class DataTable extends React.Component {
                                 this.state.saturationDay.peak &&
                                 <TableRow>
                                     <Tooltip title={peakTooltip(this._getPeak('TOTAL_IN'))} placement="bottom-start" arrow>
-                                        <TableCell>Day of new peak (at current rate)</TableCell>
+                                        <TableCell>Day of new total in hospital peak (at current rate)</TableCell>
                                     </Tooltip>
                                     <TableCell>{this.state.saturationDay.peak}</TableCell>
                                 </TableRow>
