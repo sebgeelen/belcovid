@@ -109,12 +109,13 @@ export default class DataTable extends React.Component {
         const hospiData = this.props.data?.hospitalisations;
         if (!hospiData) return;
 
-        const hospiDay1 = getAverageOver(hospiData, getDateFrom(lastConsolidatedDataDay(), -1), -6, key);
+        const interval = 7;
+        const hospiDay1 = getAverageOver(hospiData, getDateFrom(lastConsolidatedDataDay(), -(interval)), -6, key);
         const hospiDay2 = getAverageOver(hospiData, lastConsolidatedDataDay(), -6, key);
         if (!hospiDay2 || hospiDay1 >= hospiDay2) return;
 
         const pcChange = (hospiDay2 - hospiDay1) / hospiDay1;
-        const daysToSaturation = Math.floor(Math.log(availableBeds / hospiDay2) / Math.log((1 + pcChange)));
+        const daysToSaturation = interval * (Math.floor(Math.log(availableBeds / hospiDay2) / Math.log((1 + pcChange))));
         const saturationDay = getDateFrom(lastConsolidatedDataDay(), daysToSaturation);
 
         return saturationDay;
