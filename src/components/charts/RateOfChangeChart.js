@@ -62,7 +62,11 @@ export default class RateOfChangeChart extends React.Component {
         if (!index) {
             y = 0;
         } else if (oldPointY) {
-            y = 100 * ((newPointY / oldPointY) - 1);
+            if (newPointY >= oldPointY) {
+                y = Math.round(100 * ((newPointY / oldPointY) - 1), 2);
+            } else {
+                y = Math.round(-100 * ((oldPointY / newPointY) - 1), 2);
+            }
         } else if (newPointY) {
             // If we come from 0 and get to a value, the rate of change is
             // undefined.
