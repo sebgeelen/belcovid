@@ -17,6 +17,7 @@
     "js-polynomial-regression": "^0.9.1",
     "memoize-one": "^5.1.1",
     "react": "^16.13.1",
+    "react-chartjs-2": "^2.10.0",
     "react-charts": "^2.0.0-beta.7",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
