@@ -24,7 +24,7 @@ export default class CasesByAge extends React.Component {
         const dates = new Set(casesData?.map(item => item.DATE).filter(item => item));
         const points = {};
         AGE_GROUPS.reduce((points, group) => {
-            points[group] = { values: [], total: 0 };
+            points[group] = [];
             return points;
         }, points);
 
@@ -42,18 +42,27 @@ export default class CasesByAge extends React.Component {
                     groupItems = items.filter(item => item.AGEGROUP === group);
                 }
                 const groupCases = groupItems.reduce((a, b) => a + b.CASES, 0) || 0;
-                points[group].values.push({x: new Date(date), y: groupCases});
+                points[group].push({
+                    x: new Date(date),
+                    y: groupCases,
+                });
             }
         }
-        for (const group of AGE_GROUPS) {
-            points[group].total = points[group].values.reduce((a, b) => a + b.y, 0);
-        }
-        const chartjsDatasets = AGE_GROUPS.map(group => {
+        const datasets = AGE_GROUPS.map(group => {
             return {
                 label: `${group}`,
-                data: getAveragePoints(points[group].values, 7),
+                data: getAveragePoints(points[group], 7),
             };
         });
-        return <StackedAreaTimeChart datasets={chartjsDatasets} start={start} end={end} />;
+        const bounds = {
+            x: {
+                min: start,
+                max: end,
+            },
+            y: {
+                min: 0,
+            },
+        };
+        return <StackedAreaTimeChart datasets={datasets} bounds={bounds} />;
     }
 }

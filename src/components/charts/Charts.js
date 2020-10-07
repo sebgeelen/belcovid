@@ -1,10 +1,9 @@
 import React from 'react';
 import CasesByAge from './CasesByAge';
-import LineChart from './LineChart';
+import AveragedData from './AveragedData';
 import TestingChart from './TestingChart';
 import RateOfChangeChart from './RateOfChangeChart';
-import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Tooltip } from '@material-ui/core';
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { provinces } from '../../data';
@@ -79,11 +78,8 @@ export default class Charts extends React.Component {
                 <Title>Cases</Title>
 
                 {this.props.data ?
-                    <section id="cases-age" style={{height: 400, marginBottom: 10}}>
+                    <section id="cases-age" className={this.classes.chartSection}>
                         <h3>New cases, by age group (7-day rolling average)</h3>
-                        <IconButton aria-label="reset" size="small">
-                            <RotateLeftIcon fontSize="inherit" />
-                        </IconButton>
                         <CasesByAge data={this.props.data} startWeek={3} />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -130,11 +126,9 @@ export default class Charts extends React.Component {
                 <p><small>We count here in number of patients that are hospitalized <i>simultaneously</i> (not just new admissions).</small></p>
 
                 {this.props.data ?
-                    <section id="hospital-patients">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Patients at the hospital</h3>
-                        </Tooltip>
-                        <LineChart
+                    <section id="hospital-patients" className={this.classes.chartSection}>
+                        <h3>Patients at the hospital</h3>
+                        <AveragedData
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
                             chartName="Number of patients in the hospital"
@@ -184,11 +178,9 @@ export default class Charts extends React.Component {
                 <p><small>We count here in number of patients that are <i>simultaneously</i> in ICU (not just new admissions).</small></p>
 
                 {this.props.data ?
-                    <section id="icu-patients">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Patients in intensive care</h3>
-                        </Tooltip>
-                        <LineChart
+                    <section id="icu-patients" className={this.classes.chartSection}>
+                        <h3>Patients in intensive care</h3>
+                        <AveragedData
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
                             chartName="Number of patients in ICU"
@@ -241,7 +233,7 @@ export default class Charts extends React.Component {
                         <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
                             <h3>Number of deaths attributed to Covid-19</h3>
                         </Tooltip>
-                        <LineChart
+                        <AveragedData
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
                             chartName="Deaths"

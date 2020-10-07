@@ -115,6 +115,10 @@ const styles = (theme) => ({
       margin: theme.spacing(1),
       minWidth: 120,
     },
+    chartSection: {
+      height: 400,
+      marginBottom: 50,
+    },
 });
 
 class App extends React.Component {

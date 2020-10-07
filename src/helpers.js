@@ -24,7 +24,7 @@ export function getPolynomialRegressionPoints(data, degree = 1) {
         return data.map(point => {
             return {
                 x: point.x,
-                y: regression.predictY(terms, point.x),
+                y: Math.round(regression.predictY(terms, point.x), 2),
             };
         });
 }
@@ -190,4 +190,24 @@ export function today() {
  */
 export function lastConsolidatedDataDay() {
     return getDateFrom(today(), -4);
+}
+const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+];
+export function prettyDate(date) {
+    if (typeof date === 'string') {
+        date = new Date(date);
+    }
+    return `${months[date.getMonth()]} ${date.getDate()}`;
 }

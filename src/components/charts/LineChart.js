@@ -1,49 +1,108 @@
 import React from 'react';
-import { getAveragePoints, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
-import CovidChart from './CovidChart';
+import { Line } from 'react-chartjs-2';
 
 export default class LineChart extends React.Component {
-    state = {
-        min: new Date('2020-09-01'),
-        max: lastConsolidatedDataDay(),
-    };
+    options = this._computeOptions();
     render() {
-        let data = [...this.props.data] || [];
-        if (this.state.min || this.state.max) {
-            data = data.filter(item => {
-                const date = new Date(item.DATE);
-                return (!this.state.min || date >= this.state.min) &&
-                    (!this.state.max || date <= this.state.max);
-            });
+        return (
+            <Line
+                data={{
+                    datasets: this.props.datasets,
+                }}
+                options={this.options}
+            />
+        );
+    }
+    _computeOptions() {
+        const options = {
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+                position: 'average',
+                xPadding: 10,
+                yPadding: 10,
+                titleAlign: 'center',
+                titleMarginBottom: 10,
+                bodySpacing: 5,
+                footerAlign: 'center',
+                footerMarginTop: 10,
+                callbacks: {},
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        tooltipFormat: 'MMM D YYYY'
+                    },
+                    ticks: {
+                        autoSkip: true,
+                        autoSkipPadding: 10,
+                        source: 'auto',
+                        min: new Date('2020-09-01'),
+                    },
+                }],
+                yAxes: [{
+                    ticks: {
+                        autoSkip: true,
+                        autoSkipPadding: 10,
+                        source: 'auto',
+                    },
+                }],
+            },
+            maintainAspectRatio: false,
+            zoom: {
+                enabled: true,
+                mode: 'x',
+                rangeMin: {
+                    x: null,
+                },
+                rangeMax: {
+                    x: null,
+                },
+            },
+            pan: {
+                enabled: true,
+                mode: 'x',
+                rangeMin: {
+                    x: null,
+                },
+                rangeMax: {
+                    x: null,
+                },
+            },
+        }; ;
+        if (this.props.stacked) {
+            options.scales.yAxes[0].stacked = true;
+            options.tooltips.callbacks = {
+                footer: items => {
+                    const total = items.reduce((sum, item) => {
+                        return sum + item.yLabel;
+                    }, 0);
+                    return `Total: ${total}`;
+                },
+            };
         }
-        const dates = new Set(data?.map(item => item.DATE).filter(item => item));
-        const points = [];
-        for (const date of dates) {
-            const items = data.filter(item => item.DATE === date);
-            const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
-            points.push({x: new Date(date), y: patients});
+        if (this.props.bounds) {
+            if (this.props.bounds.x?.min !== undefined) {
+                options.zoom.rangeMin.x = this.props.bounds.x.min;
+            }
+            if (this.props.bounds.x?.max !== undefined) {
+                options.scales.xAxes[0].ticks.max = this.props.bounds.x.max;
+                options.zoom.rangeMax.x = this.props.bounds.x.max;
+            }
+            if (this.props.bounds.y?.min !== undefined) {
+                options.scales.yAxes[0].ticks.min = this.props.bounds.y.min;
+            }
+            if (this.props.bounds.y?.max !== undefined) {
+                options.scales.yAxes[0].ticks.max = this.props.bounds.y.max;
+            }
         }
-        const plotData = [
-            {
-                label: `${this.props.chartName} (weekly average)`,
-                data: getAveragePoints([...points], 7),
-            },
-            {
-                label: 'Trend line',
-                data: getPolynomialRegressionPoints([...points], 3),
-            },
-            {
-                label: `${this.props.chartName}`,
-                data: [...points],
-            },
-        ];
-
-        return <CovidChart
-            data={plotData}
-            setDataRange={(min, max) => this.setState({ min, max })}
-            secondaryAxisType="linear"
-            min={this.state.min}
-            max={this.state.max}
-        />;
+        if (this.props.logarithmic) {
+            options.scales.yAxes[0].type = 'logarithmic';
+            // Pass tick values as a string into Number contructor to format them.
+            options.scales.yAxes[0].ticks.callback = value => '' + Number(value.toString());
+        }
+        return options;
     }
 }
