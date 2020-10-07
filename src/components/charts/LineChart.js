@@ -102,8 +102,21 @@ export default class LineChart extends React.Component {
         }
         if (this.props.logarithmic) {
             options.scales.yAxes[0].type = 'logarithmic';
-            // Pass tick values as a string into Number contructor to format them.
-            options.scales.yAxes[0].ticks.callback = value => '' + Number(value.toString());
+        }
+        if (this.props.yAxes) {
+            options.scales.yAxes = this.props.yAxes;
+        }
+        // Ensure logarithmic type y axes have proper labels.
+        for (let i = 0; i < options.scales.yAxes.length; i++) {
+            const yAxis = options.scales.yAxes[i];
+            if (yAxis.type === 'logarithmic') {
+                if (!options.scales.yAxes[i].ticks) {
+                    options.scales.yAxes[i].ticks = {};
+                }
+                // Pass tick values as a string into Number contructor to format
+                // them.
+                options.scales.yAxes[i].ticks.callback = value => '' + Number(value.toString());
+            }
         }
         return options;
     }

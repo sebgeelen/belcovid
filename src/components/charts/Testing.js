@@ -1,25 +1,21 @@
 import React from 'react';
-import { getAveragePoints, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
-import CovidChart from './CovidChart';
+import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
+import LineChart from './LineChart';
 
-export default class TestingChart extends React.Component {
-    state = {
-        min: new Date('2020-09-01'),
-        max: lastConsolidatedDataDay(),
-    };
+export default class Testing extends React.Component {
     render() {
         let comparativeData = this.props.comparativeData;
         let testData = this.props.testData;
-        if (this.state.min || this.state.max) {
-            comparativeData = this._filterForRange(this.props.comparativeData);
-            testData = this._filterForRange(this.props.testData);
-        }
         const dates = this._getDates(comparativeData);
         const points = [];
         const rawComparativePoints = [];
         const rawTestPoints = [];
         let itemsYesterday = [];
+        let start;
+        let end;
         for (const date of dates) {
+            if (!start || new Date(date) < start) start = new Date(date);
+            if (!end || new Date(date) > start) end = new Date(date);
             const comparisons = comparativeData.filter(item => item.DATE === date);
             const tests = testData.filter(item => item.DATE === date);
             const totalTests = tests.reduce((a, b) => a + b.TESTS_ALL, 0);
@@ -34,44 +30,81 @@ export default class TestingChart extends React.Component {
             }
             itemsYesterday = [...comparisons];
         }
-        const data = [
+        const datasets = [
             {
                 label: `% ${this.props.keyToCompare.toLowerCase()} / test (7d rolling average)`,
                 data: getAveragePoints(points, 7),
-                secondaryAxisID: 'rates',
+                borderColor: '#4ab5eb',
+                backgroundColor: '#4ab5eb',
+                fill: false,
+                radius: 0,
+                yAxisID: 'left-y-axis'
             },
             {
                 label: 'Trend line',
                 data: getPolynomialRegressionPoints(points),
-                secondaryAxisID: 'rates',
+                borderColor: '#fc6868',
+                backgroundColor: '#fc6868',
+                fill: false,
+                radius: 0,
+                yAxisID: 'left-y-axis'
             },
             {
                 label: `% ${this.props.keyToCompare.toLowerCase()} tests`,
                 data: points,
-                secondaryAxisID: 'rates',
+                borderColor: '#decf3f',
+                backgroundColor: '#decf3f',
+                fill: false,
+                radius: 0,
+                yAxisID: 'left-y-axis'
             },
             {
                 label: `${this.props.keyToCompare.toLowerCase()}`,
                 data: rawComparativePoints,
-                secondaryAxisID: 'raw',
+                borderColor: '#decf3f',
+                backgroundColor: '#decf3f',
+                fill: false,
+                radius: 0,
+                yAxisID: 'right-y-axis'
             },
             {
                 label: 'Tests',
                 data: rawTestPoints,
-                secondaryAxisID: 'raw',
+                borderColor: '#decf3f',
+                backgroundColor: '#decf3f',
+                fill: false,
+                radius: 0,
+                yAxisID: 'right-y-axis'
             },
         ];
-        const axes = [
+        const yAxes = [
             {
-                primary: true,
-                type: 'utc',
-                position: 'bottom',
-                hardMin: null,
-                hardMax: null,
+                id: 'left-y-axis',
+                type: 'linear',
+                position: 'left',
+                ticks: {
+                    autoSkip: true,
+                    autoSkipPadding: 10,
+                    source: 'auto',
+                },
             },
-            { type: 'linear', position: 'left', id: 'rates' },
-            { type: 'log', position: 'right', id: 'raw' },
+            {
+                id: 'right-y-axis',
+                type: 'logarithmic',
+                position: 'right',
+                ticks: {
+                    autoSkip: true,
+                    autoSkipPadding: 10,
+                    source: 'auto',
+                },
+            },
         ];
+        const bounds = {
+            x: {
+                min: start,
+                max: end,
+            },
+        };
 
         return (
             // A react-chart hyper-responsively and continuously fills the available
@@ -82,25 +115,15 @@ export default class TestingChart extends React.Component {
                     height: '300px',
                 }}
             >
-                <CovidChart
-                    data={data}
-                    setDataRange={(min, max) => this.setState({ min, max })}
-                    axes={axes}
-                    min={this.state.min}
-                    max={this.state.max}
-                    primaryCursor secondaryCursor
+                <LineChart
+                    datasets={datasets}
+                    yAxes={yAxes}
+                    bounds={bounds}
                 />
             </div>
         );
     }
 
-    _filterForRange(data) {
-        return data.filter(item => {
-            const date = new Date(item.DATE);
-            return (!this.state.min || date >= this.state.min) &&
-                (!this.state.max || date <= this.state.max);
-        });
-    }
     _getDates(data) {
         return new Set(data.map(item => item.DATE).filter(item => item));
     }

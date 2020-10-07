@@ -1,20 +1,12 @@
 import React from 'react';
 import CasesByAge from './CasesByAge';
 import AveragedData from './AveragedData';
-import TestingChart from './TestingChart';
+import Testing from './Testing';
 import RateOfChange from './RateOfChange';
 import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { provinces } from '../../data';
-
-export const ZOOM_TOOLTIP = (<React.Fragment>
-    <b>Zoom-in</b>: select<br/>
-    <b>Zoom-out</b>: CTRL+select<br/>
-    <br/>
-    <u>Note</u>: currently doesn't work on mobile devices.
-</React.Fragment>);
-
 
 export default class Charts extends React.Component {
     state = {
@@ -78,19 +70,17 @@ export default class Charts extends React.Component {
                 <Title>Cases</Title>
 
                 {this.props.data ?
-                    <section id="cases-age" className={this.classes.chartSection}>
+                    <section id="cases-age" className={this.classes.chartSection} style={{marginBottom: 50}}>
                         <h3>New cases, by age group (7-day rolling average)</h3>
-                        <CasesByAge data={this.props.data} startWeek={3} />
+                        <CasesByAge data={this.props.data} />
                     </section> :
                     <Skeleton variant="rect" height={200} />
                 }
 
                 {this.props.data ?
-                    <section id="positive-test-rate">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Percentage of positive tests</h3>
-                        </Tooltip>
-                        <TestingChart
+                    <section id="positive-test-rate" className={this.classes.chartSection}>
+                        <h3>Percentage of positive tests</h3>
+                        <Testing
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.cases}
                             keyToCompare="CASES"
@@ -100,10 +90,8 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="rate-of-change-cases">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Rate of change in new cases</h3>
-                        </Tooltip>
+                    <section id="rate-of-change-cases" className={this.classes.chartSection}>
+                        <h3>Rate of change in new cases</h3>
                         <p><small>How fast is the number of cases rising/falling (in %) ?</small></p>
                         <RateOfChange
                             data={this.props.data.cases}
@@ -138,11 +126,9 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="hospi-test-rate">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Percentage of simultaneous hospital patients for the amount of tests</h3>
-                        </Tooltip>
-                        <TestingChart
+                    <section id="hospi-test-rate" className={this.classes.chartSection}>
+                        <h3>Percentage of simultaneous hospital patients for the amount of tests</h3>
+                        <Testing
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN"
@@ -152,7 +138,7 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="rate-of-change-hospi">
+                    <section id="rate-of-change-hospi" className={this.classes.chartSection}>
                         <h3>Rate of change in hospitalized patients</h3>
                         <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
                         <RateOfChange
@@ -188,11 +174,9 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="icu-test-rate">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Percentage of simultaneous ICU patients for the amount of tests</h3>
-                        </Tooltip>
-                        <TestingChart
+                    <section id="icu-test-rate" className={this.classes.chartSection}>
+                        <h3>Percentage of simultaneous ICU patients for the amount of tests</h3>
+                        <Testing
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN_ICU"
@@ -202,7 +186,7 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="rate-of-change-icu">
+                    <section id="rate-of-change-icu" className={this.classes.chartSection}>
                         <h3>Rate of change in patients in ICU</h3>
                         <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
                         <RateOfChange
@@ -225,10 +209,8 @@ export default class Charts extends React.Component {
                 <Title id="mortality">Mortality</Title>
 
                 {this.props.data ?
-                    <section id="mortality">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Number of deaths attributed to Covid-19</h3>
-                        </Tooltip>
+                    <section id="mortality" className={this.classes.chartSection}>
+                        <h3>Number of deaths attributed to Covid-19</h3>
                         <AveragedData
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
@@ -239,11 +221,9 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="mortality-test-rate">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Percentage of mortality for the amount of tests</h3>
-                        </Tooltip>
-                        <TestingChart
+                    <section id="mortality-test-rate" className={this.classes.chartSection}>
+                        <h3>Percentage of mortality for the amount of tests</h3>
+                        <Testing
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.mortality}
                             keyToCompare="DEATHS"
@@ -253,7 +233,7 @@ export default class Charts extends React.Component {
                 }
 
                 {this.props.data ?
-                    <section id="rate-of-change-mortality">
+                    <section id="rate-of-change-mortality" className={this.classes.chartSection}>
                         <h3>Rate of change in mortality</h3>
                         <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
                         <RateOfChange
