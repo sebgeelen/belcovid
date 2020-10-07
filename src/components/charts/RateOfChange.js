@@ -1,6 +1,7 @@
 import React from 'react';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
 import LineChart from './LineChart';
+import 'chartjs-plugin-annotation';
 
 export default class RateOfChange extends React.Component {
     render() {
@@ -43,8 +44,21 @@ export default class RateOfChange extends React.Component {
                 max: end,
             },
         };
+        const annotations = [{
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-0',
+            value: '0',
+            borderColor: 'black',
+            borderDash: [2, 2],
+            borderWidth: 2,
+        }];
 
-        return <LineChart datasets={datasets} bounds={bounds} />;
+        return <LineChart
+            datasets={datasets}
+            bounds={bounds}
+            annotations={annotations}
+        />;
     }
     /**
      * Returns a point of format `{ x: any, y: number }` with `x` being whatever

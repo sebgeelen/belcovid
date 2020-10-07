@@ -122,6 +122,9 @@ export default class LineChart extends React.Component {
         if (this.props.yAxes) {
             options.scales.yAxes = this.props.yAxes;
         }
+        if (this.props.annotations) {
+            options.annotation = { annotations: this.props.annotations };
+        }
         // Ensure logarithmic type y axes have proper labels.
         for (let i = 0; i < options.scales.yAxes.length; i++) {
             const yAxis = options.scales.yAxes[i];
