@@ -24,7 +24,7 @@ export function getPolynomialRegressionPoints(data, degree = 1) {
         return data.map(point => {
             return {
                 x: point.x,
-                y: Math.round(regression.predictY(terms, point.x), 2),
+                y: regression.predictY(terms, point.x),
             };
         });
 }
@@ -154,7 +154,7 @@ export function getAveragePoints(points, interval) {
                 }
             }
         }
-        y = Math.round(y / (n || 1), 2);
+        y = y / (n || 1);
         if (!index) y = typeof point.y === 'number' ? point.y : undefined;
         return {
             x: point.x,

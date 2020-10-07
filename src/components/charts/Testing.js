@@ -50,7 +50,7 @@ export default class Testing extends React.Component {
                 yAxisID: 'left-y-axis'
             },
             {
-                label: `% ${this.props.keyToCompare.toLowerCase()} tests`,
+                label: `% ${this.props.keyToCompare.toLowerCase()} / tests`,
                 data: points,
                 borderColor: '#decf3f',
                 backgroundColor: '#decf3f',
@@ -61,8 +61,8 @@ export default class Testing extends React.Component {
             {
                 label: `${this.props.keyToCompare.toLowerCase()}`,
                 data: rawComparativePoints,
-                borderColor: '#decf3f',
-                backgroundColor: '#decf3f',
+                borderColor: '#846A6A',
+                backgroundColor: '#846A6A',
                 fill: false,
                 radius: 0,
                 yAxisID: 'right-y-axis'
@@ -70,11 +70,11 @@ export default class Testing extends React.Component {
             {
                 label: 'Tests',
                 data: rawTestPoints,
-                borderColor: '#decf3f',
-                backgroundColor: '#decf3f',
+                borderColor: '#63a088',
+                backgroundColor: '#63a088',
                 fill: false,
                 radius: 0,
-                yAxisID: 'right-y-axis'
+                yAxisID: 'right-y-axis',
             },
         ];
         const yAxes = [
@@ -96,6 +96,7 @@ export default class Testing extends React.Component {
                     autoSkip: true,
                     autoSkipPadding: 10,
                     source: 'auto',
+                    min: [...rawTestPoints, ...rawComparativePoints].map(p => p.y).filter(y => y).sort((a, b) => a - b)[0],
                 },
             },
         ];

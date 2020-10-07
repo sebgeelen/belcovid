@@ -27,7 +27,25 @@ export default class LineChart extends React.Component {
                 bodySpacing: 5,
                 footerAlign: 'center',
                 footerMarginTop: 10,
-                callbacks: {},
+                callbacks: {
+                    label: (item, data) => {
+                        const dataset = data.datasets[item.datasetIndex];
+                        let y = item.yLabel;
+                        let absY = Math.abs(y);
+                        if (absY < 0.001) {
+                            y = Math.round(y * 10000) / 10000;
+                        } else if (absY < 0.01) {
+                            y = Math.round(y * 1000) / 1000;
+                        } else if (absY < 0.1) {
+                            y = Math.round(y * 100) / 100;
+                        } else if (absY < 1) {
+                            y = Math.round(y * 10) / 10;
+                        } else {
+                            y = Math.round(y);
+                        }
+                        return `${dataset.label}: ${y}`;
+                    },
+                },
             },
             scales: {
                 xAxes: [{
@@ -76,13 +94,11 @@ export default class LineChart extends React.Component {
         }; ;
         if (this.props.stacked) {
             options.scales.yAxes[0].stacked = true;
-            options.tooltips.callbacks = {
-                footer: items => {
-                    const total = items.reduce((sum, item) => {
-                        return sum + item.yLabel;
-                    }, 0);
-                    return `Total: ${total}`;
-                },
+            options.tooltips.callbacks.footer = items => {
+                const total = items.reduce((sum, item) => {
+                    return sum + item.yLabel;
+                }, 0);
+                return `Total: ${total}`;
             };
         }
         if (this.props.bounds) {
