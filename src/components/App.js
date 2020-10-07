@@ -117,6 +117,7 @@ const styles = (theme) => ({
     },
     chartSection: {
       height: 400,
+      marginBottom: 60,
     },
 });
 

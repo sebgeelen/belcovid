@@ -107,20 +107,11 @@ export default class Testing extends React.Component {
         };
 
         return (
-            // A react-chart hyper-responsively and continuously fills the available
-            // space of its parent element automatically
-            <div
-                style={{
-                    width: '90%',
-                    height: '300px',
-                }}
-            >
-                <LineChart
-                    datasets={datasets}
-                    yAxes={yAxes}
-                    bounds={bounds}
-                />
-            </div>
+            <LineChart
+                datasets={datasets}
+                yAxes={yAxes}
+                bounds={bounds}
+            />
         );
     }
 

@@ -70,7 +70,7 @@ export default class Charts extends React.Component {
                 <Title>Cases</Title>
 
                 {this.props.data ?
-                    <section id="cases-age" className={this.classes.chartSection} style={{marginBottom: 50}}>
+                    <section id="cases-age" className={this.classes.chartSection}>
                         <h3>New cases, by age group (7-day rolling average)</h3>
                         <CasesByAge data={this.props.data} />
                     </section> :
