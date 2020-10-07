@@ -154,7 +154,7 @@ export function getAveragePoints(points, interval) {
                 }
             }
         }
-        y = y / (n || 1);
+        y = Math.round(y / (n || 1), 2);
         if (!index) y = typeof point.y === 'number' ? point.y : undefined;
         return {
             x: point.x,

@@ -8,10 +8,8 @@ import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import DataTable from './DataTable';
 import Title from './Title';
-import CasesByAgeChart from './charts/CasesByAgeChart';
-import { ZOOM_TOOLTIP } from './charts/Charts';
+import CasesByAge from './charts/CasesByAge';
 import { Skeleton } from '@material-ui/lab';
-import { Tooltip } from '@material-ui/core';
 import News from './News';
 import { provinces } from '../data';
 
@@ -46,12 +44,10 @@ export default class Dashboard extends React.Component {
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12} md={7} lg={7}>
-              <Paper className={this.fixedHeightPaper} style={{overflow: 'hidden'}}>
-                <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                  <Title>New cases, by age group (7-day rolling average) in {provinces[this.props.province]}</Title>
-                </Tooltip>
+              <Paper className={this.classes.paper} style={{overflow: 'hidden'}}>
+                <Title>New cases, by age group (7-day rolling average) in {provinces[this.props.province]}</Title>
                 {this.props.statsData ?
-                  <CasesByAgeChart data={this.props.statsData} /> :
+                  <CasesByAge data={this.props.statsData} width="100%" height="100%"/> :
                   <Skeleton variant="rect" height={'100%'} />
                 }
               </Paper>

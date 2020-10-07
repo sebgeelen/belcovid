@@ -1,9 +1,10 @@
 import React from 'react';
-import CasesByAgeChart from './CasesByAgeChart';
+import CasesByAge from './CasesByAge';
 import LineChart from './LineChart';
 import TestingChart from './TestingChart';
 import RateOfChangeChart from './RateOfChangeChart';
-import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Tooltip } from '@material-ui/core';
+import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Tooltip } from '@material-ui/core';
+import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { provinces } from '../../data';
@@ -78,11 +79,12 @@ export default class Charts extends React.Component {
                 <Title>Cases</Title>
 
                 {this.props.data ?
-                    <section id="cases-age">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>New cases, by age group (7-day rolling average)</h3>
-                        </Tooltip>
-                        <CasesByAgeChart data={this.props.data} startWeek={3} />
+                    <section id="cases-age" style={{height: 400, marginBottom: 10}}>
+                        <h3>New cases, by age group (7-day rolling average)</h3>
+                        <IconButton aria-label="reset" size="small">
+                            <RotateLeftIcon fontSize="inherit" />
+                        </IconButton>
+                        <CasesByAge data={this.props.data} startWeek={3} />
                     </section> :
                     <Skeleton variant="rect" height={200} />
                 }
