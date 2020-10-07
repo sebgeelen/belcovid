@@ -211,3 +211,18 @@ export function prettyDate(date) {
     }
     return `${months[date.getMonth()]} ${date.getDate()}`;
 }
+export function betterRound(n) {
+    let absN = Math.abs(n);
+    if (absN < 0.001) {
+        n = Math.round(n * 10000) / 10000;
+    } else if (absN < 0.01) {
+        n = Math.round(n * 1000) / 1000;
+    } else if (absN < 0.1) {
+        n = Math.round(n * 100) / 100;
+    } else if (absN < 1) {
+        n = Math.round(n * 10) / 10;
+    } else {
+        n = Math.round(n);
+    }
+    return n;
+}

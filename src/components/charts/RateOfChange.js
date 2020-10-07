@@ -1,7 +1,6 @@
 import React from 'react';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
 import LineChart from './LineChart';
-import 'chartjs-plugin-annotation';
 
 export default class RateOfChange extends React.Component {
     render() {

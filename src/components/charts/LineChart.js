@@ -1,6 +1,7 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { lastConsolidatedDataDay, today } from '../../helpers';
+import { betterRound, lastConsolidatedDataDay, today } from '../../helpers';
+import 'chartjs-plugin-annotation';
 
 export default class LineChart extends React.Component {
     options = this._computeOptions();
@@ -30,20 +31,7 @@ export default class LineChart extends React.Component {
                 callbacks: {
                     label: (item, data) => {
                         const dataset = data.datasets[item.datasetIndex];
-                        let y = item.yLabel;
-                        let absY = Math.abs(y);
-                        if (absY < 0.001) {
-                            y = Math.round(y * 10000) / 10000;
-                        } else if (absY < 0.01) {
-                            y = Math.round(y * 1000) / 1000;
-                        } else if (absY < 0.1) {
-                            y = Math.round(y * 100) / 100;
-                        } else if (absY < 1) {
-                            y = Math.round(y * 10) / 10;
-                        } else {
-                            y = Math.round(y);
-                        }
-                        return `${dataset.label}: ${y}`;
+                        return `${dataset.label}: ${betterRound(item.yLabel)}`;
                     },
                 },
             },
@@ -58,7 +46,7 @@ export default class LineChart extends React.Component {
                         autoSkip: true,
                         autoSkipPadding: 10,
                         source: 'auto',
-                        min: new Date('2020-09-01'),
+                        min: new Date('2020-08-30'),
                         max: lastConsolidatedDataDay(),
                     },
                 }],
@@ -91,6 +79,42 @@ export default class LineChart extends React.Component {
                     x: null,
                 },
             },
+            annotation: {
+                annotations: [
+                    {
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x-axis-0',
+                        value: new Date('2020-04-10'),
+                        borderColor: 'red',
+                        borderDash: [10, 10],
+                        borderWidth: 1,
+                        label: {
+                            content: 'Peak of wave 1',
+                            enabled: true,
+                            fontSize: 10,
+                            fontStyle: 'normal',
+                            position: 'top',
+                        },
+                    },
+                    {
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x-axis-0',
+                        value: new Date('2020-09-01'),
+                        borderColor: 'red',
+                        borderDash: [10, 10],
+                        borderWidth: 1,
+                        label: {
+                            content: 'Schools reopening',
+                            enabled: true,
+                            fontSize: 10,
+                            fontStyle: 'normal',
+                            position: 'top',
+                        },
+                    },
+                ]
+            },
         }; ;
         if (this.props.stacked) {
             options.scales.yAxes[0].stacked = true;
@@ -98,7 +122,7 @@ export default class LineChart extends React.Component {
                 const total = items.reduce((sum, item) => {
                     return sum + item.yLabel;
                 }, 0);
-                return `Total: ${total}`;
+                return `Total: ${betterRound(total)}`;
             };
         }
         if (this.props.bounds) {
@@ -123,7 +147,7 @@ export default class LineChart extends React.Component {
             options.scales.yAxes = this.props.yAxes;
         }
         if (this.props.annotations) {
-            options.annotation = { annotations: this.props.annotations };
+            options.annotation.annotations = [...options.annotation.annotations, ...this.props.annotations];
         }
         // Ensure logarithmic type y axes have proper labels.
         for (let i = 0; i < options.scales.yAxes.length; i++) {
