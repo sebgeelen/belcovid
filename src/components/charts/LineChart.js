@@ -1,5 +1,6 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
+import { lastConsolidatedDataDay, today } from '../../helpers';
 
 export default class LineChart extends React.Component {
     options = this._computeOptions();
@@ -40,6 +41,7 @@ export default class LineChart extends React.Component {
                         autoSkipPadding: 10,
                         source: 'auto',
                         min: new Date('2020-09-01'),
+                        max: lastConsolidatedDataDay(),
                     },
                 }],
                 yAxes: [{
@@ -58,7 +60,7 @@ export default class LineChart extends React.Component {
                     x: null,
                 },
                 rangeMax: {
-                    x: null,
+                    x: today(),
                 },
             },
             pan: {

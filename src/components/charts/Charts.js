@@ -2,7 +2,7 @@ import React from 'react';
 import CasesByAge from './CasesByAge';
 import AveragedData from './AveragedData';
 import TestingChart from './TestingChart';
-import RateOfChangeChart from './RateOfChangeChart';
+import RateOfChange from './RateOfChange';
 import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
@@ -105,7 +105,7 @@ export default class Charts extends React.Component {
                             <h3>Rate of change in new cases</h3>
                         </Tooltip>
                         <p><small>How fast is the number of cases rising/falling (in %) ?</small></p>
-                        <RateOfChangeChart
+                        <RateOfChange
                             data={this.props.data.cases}
                             keyToPlot="CASES"
                             chartName="New cases"
@@ -153,11 +153,9 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-hospi">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Rate of change in hospitalized patients</h3>
-                        </Tooltip>
+                        <h3>Rate of change in hospitalized patients</h3>
                         <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
-                        <RateOfChangeChart
+                        <RateOfChange
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
                             chartName="Hospitalized patients"
@@ -205,11 +203,9 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-icu">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Rate of change in patients in ICU</h3>
-                        </Tooltip>
+                        <h3>Rate of change in patients in ICU</h3>
                         <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
-                        <RateOfChangeChart
+                        <RateOfChange
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
                             chartName="Patients in ICU"
@@ -258,11 +254,9 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-mortality">
-                        <Tooltip title={ZOOM_TOOLTIP} placement="bottom-start" arrow>
-                            <h3>Rate of change in mortality</h3>
-                        </Tooltip>
+                        <h3>Rate of change in mortality</h3>
                         <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
-                        <RateOfChangeChart
+                        <RateOfChange
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
                             chartName="Deaths"

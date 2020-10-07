@@ -1,24 +1,17 @@
 import React from 'react';
-import { getAveragePoints, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
-import CovidChart from './CovidChart';
+import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
+import LineChart from './LineChart';
 
-export default class RateOfChangeChart extends React.Component {
-    state = {
-        min: new Date('2020-09-01'),
-        max: lastConsolidatedDataDay(),
-    };
+export default class RateOfChange extends React.Component {
     render() {
         let data = [...this.props.data] || [];
-        if (this.state.min || this.state.max) {
-            data = data.filter(item => {
-                const date = new Date(item.DATE);
-                return (!this.state.min || date >= this.state.min) &&
-                    (!this.state.max || date <= this.state.max);
-            });
-        }
         const dates = new Set(data?.map(item => item.DATE).filter(item => item));
         const points = [];
+        let start;
+        let end;
         for (const date of dates) {
+            if (!start || new Date(date) < start) start = new Date(date);
+            if (!end || new Date(date) > start) end = new Date(date);
             const items = data.filter(item => item.DATE === date);
             const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
             points.push({x: new Date(date), y: patients});
@@ -26,24 +19,32 @@ export default class RateOfChangeChart extends React.Component {
         const rateOfChangePoints = getAveragePoints(points, 7).map((point, index) => {
             return index && this._getRateOfChangePoint(points, index, 2);
         }).filter(d => d && typeof d.y === 'number');
-        const plotData = [
+        const datasets = [
             {
                 label: `Rate of change of ${this.props.chartName.toLowerCase()} (7-day rolling average)`,
                 data: getAveragePoints([...rateOfChangePoints], 7),
+                borderColor: '#4ab5eb',
+                backgroundColor: '#4ab5eb',
+                fill: false,
+                radius: 0,
             },
             {
                 label: 'Trend line',
                 data: getPolynomialRegressionPoints([...rateOfChangePoints], 2),
+                borderColor: '#fc6868',
+                backgroundColor: '#fc6868',
+                fill: false,
+                radius: 0,
             },
         ];
+        const bounds = {
+            x: {
+                min: start,
+                max: end,
+            },
+        };
 
-        return <CovidChart
-            data={plotData}
-            setDataRange={(min, max) => this.setState({ min, max })}
-            secondaryAxisType="linear"
-            min={this.state.min}
-            max={this.state.max}
-        />;
+        return <LineChart datasets={datasets} bounds={bounds} />;
     }
     /**
      * Returns a point of format `{ x: any, y: number }` with `x` being whatever
