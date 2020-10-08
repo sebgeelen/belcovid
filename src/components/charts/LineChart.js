@@ -1,7 +1,31 @@
 import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { betterRound, lastConsolidatedDataDay, today } from '../../helpers';
+import { Chart, Line } from 'react-chartjs-2';
 import 'chartjs-plugin-annotation';
+
+Chart.Tooltip.positioners.custom = (elements, position) => {
+    if (!elements.length) {
+        return false;
+    }
+
+    // Adjust the offset left or right depending on the event position.
+    let offsetX = 0;
+    if (elements[0]._chart.width / 2 > position.x) {
+        offsetX = 100;
+    } else {
+        offsetX = -100;
+    }
+
+    let offsetY = 0;
+    if (elements[0]._chart.height / 2 > position.y) {
+        offsetY = 100;
+    } else {
+        offsetY = -100;
+    }
+    return {
+        x: position.x + offsetX,
+        y: position.y + offsetY,
+    };
+};
 
 export default class LineChart extends React.Component {
     options = this._computeOptions();
@@ -20,7 +44,7 @@ export default class LineChart extends React.Component {
             tooltips: {
                 mode: 'index',
                 intersect: false,
-                position: 'average',
+                position: 'custom',
                 xPadding: 10,
                 yPadding: 10,
                 titleAlign: 'center',
