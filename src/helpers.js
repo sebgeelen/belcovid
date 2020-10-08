@@ -226,3 +226,10 @@ export function betterRound(n) {
     }
     return n;
 }
+export function isMobile(tabletIncluded = true) {
+    if (tabletIncluded) {
+        return window.innerWidth <= 600;
+    } else {
+        return window.innerWidth <= 400;
+    }
+}

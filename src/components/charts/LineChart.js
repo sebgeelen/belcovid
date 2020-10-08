@@ -1,5 +1,6 @@
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
+import { betterRound, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
 
 Chart.Tooltip.positioners.custom = (elements, position) => {
@@ -42,6 +43,7 @@ export default class LineChart extends React.Component {
     _computeOptions() {
         const options = {
             tooltips: {
+                enabled: !isMobile(false),
                 mode: 'index',
                 intersect: false,
                 position: 'custom',
@@ -94,7 +96,7 @@ export default class LineChart extends React.Component {
                 },
             },
             pan: {
-                enabled: true,
+                enabled: !isMobile(),
                 mode: 'x',
                 rangeMin: {
                     x: null,
