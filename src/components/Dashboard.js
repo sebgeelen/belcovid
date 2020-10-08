@@ -47,7 +47,7 @@ export default class Dashboard extends React.Component {
               <Paper className={this.classes.paper} style={{overflow: 'hidden'}}>
                 <Title>New cases, by age group (7-day rolling average) in {provinces[this.props.province]}</Title>
                 {this.props.statsData ?
-                  <CasesByAge data={this.props.statsData} width="100%" height="100%"/> :
+                  <CasesByAge data={this.props.statsData} width="100%" height="100%" tooltip={false}/> :
                   <Skeleton variant="rect" height={'100%'} />
                 }
               </Paper>

@@ -63,6 +63,6 @@ export default class CasesByAge extends React.Component {
                 min: 0,
             },
         };
-        return <StackedAreaTimeChart datasets={datasets} bounds={bounds} />;
+        return <StackedAreaTimeChart datasets={datasets} bounds={bounds} tooltip={this.props.tooltip} />;
     }
 }
