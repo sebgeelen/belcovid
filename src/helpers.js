@@ -233,3 +233,15 @@ export function isMobile(tabletIncluded = true) {
         return window.innerWidth <= 400;
     }
 }
+export function getFromLocalStorage(name) {
+    return window.localStorage?.getItem(name);
+}
+export function setIntoLocalStorage(name, value) {
+    try {
+        if (window.localStorage) {
+            window.localStorage.setItem(name, value);
+        }
+    } catch (e) {
+        console.warn(e);
+    }
+}

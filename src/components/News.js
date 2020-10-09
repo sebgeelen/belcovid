@@ -2,17 +2,18 @@ import React from 'react';
 import { Avatar, Link, List, ListItem, ListItemAvatar, ListItemText, SvgIcon } from '@material-ui/core';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Flags from 'country-flag-icons/react/3x2';
+import { getFromLocalStorage, setIntoLocalStorage } from '../helpers';
 
 export default class News extends React.Component {
     state = {
         languages: (
-            window.localStorage?.getItem('belcovid:news:languages') &&
-            JSON.parse(window.localStorage.getItem('belcovid:news:languages'))
+            getFromLocalStorage('belcovid:news:languages') &&
+            JSON.parse(getFromLocalStorage('belcovid:news:languages'))
         ) || ['en', 'fr', 'nl']
     }
     classes = this.props.classes;
     render() {
-        const lastUpdate = window.localStorage?.getItem('belcovid:update:news');
+        const lastUpdate = getFromLocalStorage('belcovid:update:news');
         const lastUpdateDate = lastUpdate && new Date(lastUpdate);
         return (
             <React.Fragment>
@@ -65,8 +66,6 @@ export default class News extends React.Component {
     }
     _toggleLanguage(ev, languages) {
         this.setState({ languages });
-        if (window.localStorage) {
-            window.localStorage.setItem('belcovid:news:languages', JSON.stringify(languages));
-        }
+        setIntoLocalStorage('belcovid:news:languages', JSON.stringify(languages));
     }
 }

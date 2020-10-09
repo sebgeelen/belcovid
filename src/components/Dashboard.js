@@ -12,16 +12,17 @@ import CasesByAge from './charts/CasesByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
 import { provinces } from '../data';
+import { getFromLocalStorage } from '../helpers';
 
 function Footer() {
-  const lastStatsUpdate = window.localStorage?.getItem('belcovid:update:stats');
+  const lastStatsUpdate = getFromLocalStorage('belcovid:update:stats');
   const lastStatsUpdateDate = lastStatsUpdate && new Date(lastStatsUpdate);
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'All data from '}
       <Link color="inherit" href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</Link>
       {
-        localStorage.getItem('belcovid:update:stats') ?
+        getFromLocalStorage('belcovid:update:stats') ?
           <small onDoubleClick={() => {
             if (window.localStorage) {
               window.localStorage.clear();

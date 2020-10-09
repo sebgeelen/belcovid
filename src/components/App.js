@@ -24,7 +24,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import { getDaysBetween, today } from '../helpers.js';
+import { getDaysBetween, getFromLocalStorage, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
 
 const drawerWidth = 240;
@@ -124,19 +124,19 @@ const styles = (theme) => ({
 class App extends React.Component {
   state = {
     open: false,
-    page: (window.localStorage?.getItem('belcovid:page')) || 'dashboard',
-    province: (window.localStorage?.getItem('belcovid:province')) || 'Belgium',
+    page: (getFromLocalStorage('belcovid:page')) || 'dashboard',
+    province: (getFromLocalStorage('belcovid:province')) || 'Belgium',
     statsData: this._filterStatsData(),
   };
   classes = this.props.classes;
   _isFilteringStatsData = false;
   async componentDidMount() {
-    const lastSaveStats = window.localStorage?.getItem('belcovid:update:stats');
-    const lastSaveNews = window.localStorage?.getItem('belcovid:update:news');
+    const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
+    const lastSaveNews = getFromLocalStorage('belcovid:update:news');
 
     // Update stats data.
     if (lastSaveStats) {
-      const statsData = window.localStorage?.getItem('belcovid:stats');
+      const statsData = getFromLocalStorage('belcovid:stats');
       const lastSaveDate = new Date(lastSaveStats);
       const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
       if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
@@ -150,7 +150,7 @@ class App extends React.Component {
 
     // Update news data.
     if (lastSaveNews) {
-      const newsData = window.localStorage?.getItem('belcovid:news');
+      const newsData = getFromLocalStorage('belcovid:news');
       const lastSaveDate = new Date(lastSaveNews);
       const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / (1000 * 60 * 60);
       if (newsData && lastSaveHours < 1) {
@@ -217,9 +217,7 @@ class App extends React.Component {
                 value={this.state.province}
                 onChange={ev => {
                   const province = ev.target.value;
-                  if (window.localStorage) {
-                    window.localStorage.setItem('belcovid:province', province);
-                  }
+                  setIntoLocalStorage('belcovid:province', province);
                   this.setState({ province });
                 }}
               >
@@ -271,10 +269,8 @@ class App extends React.Component {
   _updateData(name) {
     if (name === 'stats') {
       fetchStatsData().then(data => {
-        if (window.localStorage) {
-          window.localStorage.setItem('belcovid:stats', JSON.stringify(data));
-          window.localStorage.setItem('belcovid:update:stats', today().toISOString());
-        }
+        setIntoLocalStorage('belcovid:stats', JSON.stringify(data));
+        setIntoLocalStorage('belcovid:update:stats', today().toISOString());
         this.setState({ rawStatsData: data });
       });
     } else if (name === 'news') {
@@ -291,10 +287,8 @@ class App extends React.Component {
             data.push(formattedItem);
           }
           this.setState({ newsData: data });
-          if (window.localStorage) {
-            window.localStorage.setItem('belcovid:news', JSON.stringify(data));
-            window.localStorage.setItem('belcovid:update:news', today().toISOString());
-          }
+          setIntoLocalStorage('belcovid:news', JSON.stringify(data));
+          setIntoLocalStorage('belcovid:update:news', today().toISOString());
         });
       }
     }
@@ -319,9 +313,7 @@ class App extends React.Component {
   }
   _goto(page) {
     this.setState({ page });
-    if (window.localStorage) {
-      window.localStorage.setItem('belcovid:page', page);
-    }
+    setIntoLocalStorage('belcovid:page', page);
   }
   _handleDrawerOpen() {
     this.setState({ open: true });
