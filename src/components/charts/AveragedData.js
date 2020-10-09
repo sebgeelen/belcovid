@@ -2,6 +2,7 @@ import React from 'react';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
 import LineChart from './LineChart';
 
+const regressionStart = new Date('2020-08-15');
 export default class AveragedData extends React.Component {
     render() {
         let data = [...this.props.data] || [];
@@ -17,8 +18,10 @@ export default class AveragedData extends React.Component {
             points.push({x: new Date(date), y: patients});
         }
         const averagedPoints = getAveragePoints([...points], 7);
-        const regressionPoints = getPolynomialRegressionPoints([...points], 3);
-        const yValues = [...averagedPoints, ...regressionPoints, points].map(p => p.y).filter(a => a).sort((a, b) => a - b);
+        const regressionPoints = getPolynomialRegressionPoints(averagedPoints.filter(p => {
+            return p.x >= regressionStart;
+        }), 3);
+        const yValues = [...averagedPoints, ...regressionPoints, ...points].map(p => p.y).filter(a => a).sort((a, b) => a - b);
         const datasets = [
             {
                 label: `${this.props.chartName} (weekly average)`,

@@ -2,6 +2,7 @@ import React from 'react';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
 import LineChart from './LineChart';
 
+const regressionStart = new Date('2020-08-15');
 export default class RateOfChange extends React.Component {
     render() {
         let data = [...this.props.data] || [];
@@ -30,7 +31,7 @@ export default class RateOfChange extends React.Component {
             },
             {
                 label: 'Trend line',
-                data: getPolynomialRegressionPoints([...rateOfChangePoints], 2),
+                data: getPolynomialRegressionPoints(rateOfChangePoints.filter(d => d.x >= regressionStart), 2),
                 borderColor: '#fc6868',
                 backgroundColor: '#fc6868',
                 fill: false,

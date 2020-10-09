@@ -2,6 +2,7 @@ import React from 'react';
 import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
 import LineChart from './LineChart';
 
+const regressionStart = new Date('2020-08-15');
 export default class Testing extends React.Component {
     render() {
         let comparativeData = this.props.comparativeData;
@@ -42,7 +43,7 @@ export default class Testing extends React.Component {
             },
             {
                 label: 'Trend line',
-                data: getPolynomialRegressionPoints(points),
+                data: getPolynomialRegressionPoints(points.filter(p => p.x >= regressionStart), 2),
                 borderColor: '#fc6868',
                 backgroundColor: '#fc6868',
                 fill: false,

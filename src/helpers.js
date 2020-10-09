@@ -18,15 +18,15 @@ export const AVAILABLE_BEDS = TOTAL_BEDS - TAKEN_BEDS_PER_DAY;
 export const TOTAL_ICU_BEDS = 2650;
 // source: https://www.vrt.be/vrtnws/en/2020/03/22/health-minister-says-that-an-additional-759-intensive-care-beds/
 
-export function getPolynomialRegressionPoints(data, degree = 1) {
+export function getPolynomialRegressionPoints(data, degree = 2) {
     const regression = PolynomialRegression.read(data, degree);
-        const terms = regression.getTerms();
-        return data.map(point => {
-            return {
-                x: point.x,
-                y: regression.predictY(terms, point.x),
-            };
-        });
+    const terms = regression.getTerms();
+    return data.map(point => {
+        return {
+            x: point.x,
+            y: regression.predictY(terms, point.x),
+        };
+    });
 }
 /**
  * Return a string in the format 'YYYY-mm-dd' from a Date object.
