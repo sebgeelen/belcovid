@@ -14,7 +14,7 @@ import News from './News';
 import { provinces } from '../data';
 
 function Footer() {
-  const lastStatsUpdate = localStorage.getItem('belcovid:update:stats');
+  const lastStatsUpdate = window.localStorage?.getItem('belcovid:update:stats');
   const lastStatsUpdateDate = lastStatsUpdate && new Date(lastStatsUpdate);
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -22,7 +22,11 @@ function Footer() {
       <Link color="inherit" href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</Link>
       {
         localStorage.getItem('belcovid:update:stats') ?
-          <small onDoubleClick={() => localStorage.clear()}> (last update: {lastStatsUpdateDate.toDateString()} at {lastStatsUpdateDate.toLocaleTimeString()})</small> :
+          <small onDoubleClick={() => {
+            if (window.localStorage) {
+              window.localStorage.clear();
+            }
+          }}> (last update: {lastStatsUpdateDate.toDateString()} at {lastStatsUpdateDate.toLocaleTimeString()})</small> :
           ''
       }
       {' • '}

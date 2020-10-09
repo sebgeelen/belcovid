@@ -6,13 +6,13 @@ import Flags from 'country-flag-icons/react/3x2';
 export default class News extends React.Component {
     state = {
         languages: (
-            localStorage.getItem('belcovid:news:languages') &&
-            JSON.parse(localStorage.getItem('belcovid:news:languages'))
+            window.localStorage?.getItem('belcovid:news:languages') &&
+            JSON.parse(window.localStorage.getItem('belcovid:news:languages'))
         ) || ['en', 'fr', 'nl']
     }
     classes = this.props.classes;
     render() {
-        const lastUpdate = localStorage.getItem('belcovid:update:news');
+        const lastUpdate = window.localStorage?.getItem('belcovid:update:news');
         const lastUpdateDate = lastUpdate && new Date(lastUpdate);
         return (
             <React.Fragment>
@@ -65,6 +65,8 @@ export default class News extends React.Component {
     }
     _toggleLanguage(ev, languages) {
         this.setState({ languages });
-        localStorage.setItem('belcovid:news:languages', JSON.stringify(languages));
+        if (window.localStorage) {
+            window.localStorage.setItem('belcovid:news:languages', JSON.stringify(languages));
+        }
     }
 }

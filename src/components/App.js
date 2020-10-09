@@ -124,19 +124,19 @@ const styles = (theme) => ({
 class App extends React.Component {
   state = {
     open: false,
-    page: localStorage.getItem('belcovid:page') || 'dashboard',
-    province: localStorage.getItem('belcovid:province') || 'Belgium',
+    page: (window.localStorage?.getItem('belcovid:page')) || 'dashboard',
+    province: (window.localStorage?.getItem('belcovid:province')) || 'Belgium',
     statsData: this._filterStatsData(),
   };
   classes = this.props.classes;
   _isFilteringStatsData = false;
   async componentDidMount() {
-    const lastSaveStats = localStorage.getItem('belcovid:update:stats');
-    const lastSaveNews = localStorage.getItem('belcovid:update:news');
+    const lastSaveStats = window.localStorage?.getItem('belcovid:update:stats');
+    const lastSaveNews = window.localStorage?.getItem('belcovid:update:news');
 
     // Update stats data.
     if (lastSaveStats) {
-      const statsData = localStorage.getItem('belcovid:stats');
+      const statsData = window.localStorage?.getItem('belcovid:stats');
       const lastSaveDate = new Date(lastSaveStats);
       const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
       if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
@@ -150,7 +150,7 @@ class App extends React.Component {
 
     // Update news data.
     if (lastSaveNews) {
-      const newsData = localStorage.getItem('belcovid:news');
+      const newsData = window.localStorage?.getItem('belcovid:news');
       const lastSaveDate = new Date(lastSaveNews);
       const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / (1000 * 60 * 60);
       if (newsData && lastSaveHours < 1) {
@@ -217,7 +217,9 @@ class App extends React.Component {
                 value={this.state.province}
                 onChange={ev => {
                   const province = ev.target.value;
-                  localStorage.setItem('belcovid:province', province);
+                  if (window.localStorage) {
+                    window.localStorage.setItem('belcovid:province', province);
+                  }
                   this.setState({ province });
                 }}
               >
@@ -269,8 +271,10 @@ class App extends React.Component {
   _updateData(name) {
     if (name === 'stats') {
       fetchStatsData().then(data => {
-        localStorage.setItem('belcovid:stats', JSON.stringify(data));
-        localStorage.setItem('belcovid:update:stats', today().toISOString());
+        if (window.localStorage) {
+          window.localStorage.setItem('belcovid:stats', JSON.stringify(data));
+          window.localStorage.setItem('belcovid:update:stats', today().toISOString());
+        }
         this.setState({ rawStatsData: data });
       });
     } else if (name === 'news') {
@@ -287,8 +291,10 @@ class App extends React.Component {
             data.push(formattedItem);
           }
           this.setState({ newsData: data });
-          localStorage.setItem('belcovid:news', JSON.stringify(data));
-          localStorage.setItem('belcovid:update:news', today().toISOString());
+          if (window.localStorage) {
+            window.localStorage.setItem('belcovid:news', JSON.stringify(data));
+            window.localStorage.setItem('belcovid:update:news', today().toISOString());
+          }
         });
       }
     }
@@ -313,7 +319,9 @@ class App extends React.Component {
   }
   _goto(page) {
     this.setState({ page });
-    localStorage.setItem('belcovid:page', page);
+    if (window.localStorage) {
+      window.localStorage.setItem('belcovid:page', page);
+    }
   }
   _handleDrawerOpen() {
     this.setState({ open: true });
