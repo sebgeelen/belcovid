@@ -1,7 +1,10 @@
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
-import { betterRound, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
+import { betterRound, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
+import { AppBar, Dialog, IconButton, Slide, Toolbar } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
+import Title from '../Title';
 
 Chart.Tooltip.positioners.custom = (elements, position) => {
     if (!elements.length) {
@@ -28,22 +31,80 @@ Chart.Tooltip.positioners.custom = (elements, position) => {
     };
 };
 
+const DialogTransition = React.forwardRef(function DialogTransition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
+
 export default class LineChart extends React.Component {
+    state = {
+        chartImageURI: null,
+        fullscreen: false,
+        asImage: this.props.asImage || false,
+    };
     options = this._computeOptions();
+    chartReference = React.createRef();
     render() {
-        return (
-            <Line
-                data={{
-                    datasets: this.props.datasets,
-                }}
-                options={this.options}
-            />
-        );
+        let contents;
+        if (this.state.asImage && this.state.chartImageURI) {
+            contents = <img
+                src={this.state.chartImageURI}
+                alt={this.props.chartName}
+                style={{width: "90%", height: "90%"}}
+                onClick={this.state.fullscreen ?
+                    () => true :
+                    this.toggleFullscreen.bind(this)}
+            />;
+        } else {
+            contents = (
+                <Line
+                    ref={this.chartReference}
+                    style={{width: "90%", height: "90%"}}
+                    data={{
+                        datasets: this.props.datasets,
+                    }}
+                    options={this.options}
+                />
+            );
+        }
+        if (this.state.fullscreen) {
+            return (
+                <Dialog fullScreen open TransitionComponent={DialogTransition}>
+                    <AppBar>
+                        <Toolbar>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                onClick={this.toggleFullscreen.bind(this)}
+                                aria-label="close"
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                            <Title>{this.props.chartName}</Title>
+                        </Toolbar>
+                    </AppBar>
+                    <main className={this.props.classes.content}>
+                        <div className={this.props.classes?.appBarSpacer} />
+                        <div style={{height: '90vh'}}>
+                            {contents}
+                        </div>
+                    </main>
+                </Dialog>
+            );
+        } else {
+            return contents;
+        }
+    }
+    toggleFullscreen() {
+        const fullscreen = !this.state.fullscreen;
+        this.setState({
+            asImage: fullscreen ? false : this.props.asImage,
+            fullscreen: fullscreen,
+        });
     }
     _computeOptions() {
         const options = {
             tooltips: {
-                enabled: !isMobile(false),
+                enabled: true,
                 mode: 'index',
                 intersect: false,
                 position: 'custom',
@@ -85,6 +146,13 @@ export default class LineChart extends React.Component {
                 }],
             },
             maintainAspectRatio: false,
+            animation: {
+                onComplete: () => {
+                    const chartImageURI = this.chartReference.current.chartInstance.toBase64Image();
+                    this.setState({ chartImageURI });
+                },
+            },
+            // Plugins
             zoom: {
                 enabled: true,
                 mode: 'x',
@@ -96,7 +164,7 @@ export default class LineChart extends React.Component {
                 },
             },
             pan: {
-                enabled: !isMobile(),
+                enabled: true,
                 mode: 'x',
                 rangeMin: {
                     x: null,

@@ -49,10 +49,14 @@ export default class Dashboard extends React.Component {
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12} md={7} lg={7}>
-              <Paper className={this.classes.paper} style={{overflow: 'hidden'}}>
+              <Paper className={this.fixedHeightPaper} style={{overflow: 'hidden'}}>
                 <Title>New cases, by age group (7-day rolling average) in {provinces[this.props.province]}</Title>
                 {this.props.statsData ?
-                  <CasesByAge data={this.props.statsData} width="100%" height="100%" tooltip={false}/> :
+                    <CasesByAge
+                      classes={this.classes}
+                      data={this.props.statsData}
+                      asImage={true}
+                    /> :
                   <Skeleton variant="rect" height={'100%'} />
                 }
               </Paper>

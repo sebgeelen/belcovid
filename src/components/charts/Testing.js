@@ -110,9 +110,11 @@ export default class Testing extends React.Component {
 
         return (
             <LineChart
+                classes={this.props.classes}
                 datasets={datasets}
                 yAxes={yAxes}
                 bounds={bounds}
+                asImage={this.props.asImage}
             />
         );
     }

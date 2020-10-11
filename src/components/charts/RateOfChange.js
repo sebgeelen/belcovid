@@ -55,9 +55,11 @@ export default class RateOfChange extends React.Component {
         }];
 
         return <LineChart
+            classes={this.props.classes}
             datasets={datasets}
             bounds={bounds}
             annotations={annotations}
+            asImage={this.props.asImage}
         />;
     }
     /**

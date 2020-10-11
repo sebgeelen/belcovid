@@ -72,7 +72,11 @@ export default class Charts extends React.Component {
                 {this.props.data ?
                     <section id="cases-age" className={this.classes.chartSection}>
                         <h3>New cases, by age group (7-day rolling average)</h3>
-                        <CasesByAge data={this.props.data} />
+                        <CasesByAge
+                            classes={this.classes}
+                            data={this.props.data}
+                            asImage={true}
+                        />
                     </section> :
                     <Skeleton variant="rect" height={200} />
                 }
@@ -81,9 +85,11 @@ export default class Charts extends React.Component {
                     <section id="positive-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of positive tests</h3>
                         <Testing
+                            classes={this.classes}
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.cases}
                             keyToCompare="CASES"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -94,9 +100,11 @@ export default class Charts extends React.Component {
                         <h3>Rate of change in new cases</h3>
                         <p><small>How fast is the number of cases rising/falling (in %) ?</small></p>
                         <RateOfChange
+                            classes={this.classes}
                             data={this.props.data.cases}
                             keyToPlot="CASES"
                             chartName="New cases"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -117,9 +125,11 @@ export default class Charts extends React.Component {
                     <section id="hospital-patients" className={this.classes.chartSection}>
                         <h3>Patients at the hospital</h3>
                         <AveragedData
+                            classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
                             chartName="Number of patients in the hospital"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -129,9 +139,11 @@ export default class Charts extends React.Component {
                     <section id="hospi-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of simultaneous hospital patients for the amount of tests</h3>
                         <Testing
+                            classes={this.classes}
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -142,9 +154,11 @@ export default class Charts extends React.Component {
                         <h3>Rate of change in hospitalized patients</h3>
                         <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
                         <RateOfChange
+                            classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
                             chartName="Hospitalized patients"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -165,9 +179,11 @@ export default class Charts extends React.Component {
                     <section id="icu-patients" className={this.classes.chartSection}>
                         <h3>Patients in intensive care</h3>
                         <AveragedData
+                            classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
                             chartName="Number of patients in ICU"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -177,9 +193,11 @@ export default class Charts extends React.Component {
                     <section id="icu-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of simultaneous ICU patients for the amount of tests</h3>
                         <Testing
+                            classes={this.classes}
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN_ICU"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -190,9 +208,11 @@ export default class Charts extends React.Component {
                         <h3>Rate of change in patients in ICU</h3>
                         <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
                         <RateOfChange
+                            classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
                             chartName="Patients in ICU"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -212,9 +232,11 @@ export default class Charts extends React.Component {
                     <section id="mortality" className={this.classes.chartSection}>
                         <h3>Number of deaths attributed to Covid-19</h3>
                         <AveragedData
+                            classes={this.classes}
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
                             chartName="Deaths"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -224,9 +246,11 @@ export default class Charts extends React.Component {
                     <section id="mortality-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of mortality for the amount of tests</h3>
                         <Testing
+                            classes={this.classes}
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.mortality}
                             keyToCompare="DEATHS"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
@@ -237,9 +261,11 @@ export default class Charts extends React.Component {
                         <h3>Rate of change in mortality</h3>
                         <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
                         <RateOfChange
+                            classes={this.classes}
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
                             chartName="Deaths"
+                            asImage={true}
                         />
                     </section> :
                     <Skeleton variant="rect" height={200} />
