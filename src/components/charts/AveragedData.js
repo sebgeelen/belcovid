@@ -61,6 +61,7 @@ export default class AveragedData extends React.Component {
         };
         return <LineChart
             classes={this.props.classes}
+            chartName={this.props.chartName}
             datasets={datasets}
             bounds={bounds}
             logarithmic={true}

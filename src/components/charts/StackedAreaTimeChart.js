@@ -28,6 +28,7 @@ export default class StackedAreaTimeChart extends React.Component {
         return (
             <LineChart
                 classes={this.props.classes}
+                chartName={this.props.chartName}
                 datasets={datasets}
                 stacked={true}
                 bounds={this.props.bounds}

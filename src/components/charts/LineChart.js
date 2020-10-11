@@ -2,9 +2,8 @@ import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import { betterRound, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
-import { AppBar, Dialog, IconButton, Slide, Toolbar } from '@material-ui/core';
+import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import Title from '../Title';
 
 Chart.Tooltip.positioners.custom = (elements, position) => {
     if (!elements.length) {
@@ -79,7 +78,9 @@ export default class LineChart extends React.Component {
                             >
                                 <CloseIcon />
                             </IconButton>
-                            <Title>{this.props.chartName}</Title>
+                            <Typography component="h1" variant="h6" color="inherit" noWrap className={this.classes.title}>
+                                {this.props.chartName}
+                            </Typography>
                         </Toolbar>
                     </AppBar>
                     <main className={this.props.classes.content}>

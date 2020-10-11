@@ -65,6 +65,7 @@ export default class CasesByAge extends React.Component {
         };
         return <StackedAreaTimeChart
             classes={this.props.classes}
+            chartName={this.props.chartName}
             datasets={datasets}
             bounds={bounds}
             tooltip={this.props.tooltip}

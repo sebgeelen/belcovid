@@ -75,6 +75,7 @@ export default class Charts extends React.Component {
                         <CasesByAge
                             classes={this.classes}
                             data={this.props.data}
+                            chartName="New cases, by age group (7-day rolling average)"
                             asImage={true}
                         />
                     </section> :
@@ -89,6 +90,7 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.cases}
                             keyToCompare="CASES"
+                            chartName="Percentage of positive tests"
                             asImage={true}
                         />
                     </section> :
@@ -128,7 +130,7 @@ export default class Charts extends React.Component {
                             classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
-                            chartName="Number of patients in the hospital"
+                            chartName="Number of patients at the hospital"
                             asImage={true}
                         />
                     </section> :
@@ -143,6 +145,7 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN"
+                            chartName="Percentage of simultaneous hospital patients for the amount of tests"
                             asImage={true}
                         />
                     </section> :
@@ -197,6 +200,7 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.hospitalisations}
                             keyToCompare="TOTAL_IN_ICU"
+                            chartName="Percentage of simultaneous ICU patients for the amount of tests"
                             asImage={true}
                         />
                     </section> :
@@ -230,12 +234,12 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="mortality" className={this.classes.chartSection}>
-                        <h3>Number of deaths attributed to Covid-19</h3>
+                        <h3>Number of deaths attributed to Covid-19, per day</h3>
                         <AveragedData
                             classes={this.classes}
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
-                            chartName="Deaths"
+                            chartName="Deaths per day"
                             asImage={true}
                         />
                     </section> :
@@ -250,6 +254,7 @@ export default class Charts extends React.Component {
                             testData={this.props.data.tests}
                             comparativeData={this.props.data.mortality}
                             keyToCompare="DEATHS"
+                            chartName="Percentage of mortality for the amount of tests"
                             asImage={true}
                         />
                     </section> :

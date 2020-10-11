@@ -55,6 +55,7 @@ export default class Dashboard extends React.Component {
                     <CasesByAge
                       classes={this.classes}
                       data={this.props.statsData}
+                      chartName="New cases, by age group (7-day rolling average)"
                       asImage={true}
                     /> :
                   <Skeleton variant="rect" height={'100%'} />
