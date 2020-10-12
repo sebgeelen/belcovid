@@ -2,7 +2,7 @@ import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import { betterRound, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
-import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, CardMedia, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
 Chart.Tooltip.positioners.custom = (elements, position) => {
@@ -40,15 +40,18 @@ export default class LineChart extends React.Component {
         fullscreen: false,
         asImage: this.props.asImage || false,
     };
+    classes = this.props.classes
     options = this._computeOptions();
     chartReference = React.createRef();
     render() {
         let contents;
         if (this.state.asImage && this.state.chartImageURI) {
-            contents = <img
-                src={this.state.chartImageURI}
+            contents = <CardMedia
+                component="img"
                 alt={this.props.chartName}
-                style={{width: "90%", height: "90%"}}
+                height="100%"
+                image={this.state.chartImageURI}
+                title={this.props.chartName}
                 onClick={this.state.fullscreen ?
                     () => true :
                     this.toggleFullscreen.bind(this)}
@@ -78,14 +81,14 @@ export default class LineChart extends React.Component {
                             >
                                 <CloseIcon />
                             </IconButton>
-                            <Typography component="h1" variant="h6" color="inherit" noWrap className={this.classes.title}>
+                            <Typography component="h1" variant="h6" color="inherit" noWrap className={this.classes?.title}>
                                 {this.props.chartName}
                             </Typography>
                         </Toolbar>
                     </AppBar>
-                    <main className={this.props.classes.content}>
-                        <div className={this.props.classes?.appBarSpacer} />
-                        <div style={{height: '90vh'}}>
+                    <main className={this.classes?.content}>
+                        <div className={this.classes?.appBarSpacer} />
+                        <div style={{height: '90vh', padding: 5}}>
                             {contents}
                         </div>
                     </main>
@@ -146,6 +149,7 @@ export default class LineChart extends React.Component {
                     },
                 }],
             },
+            responsive: true,
             maintainAspectRatio: false,
             animation: {
                 onComplete: () => {
