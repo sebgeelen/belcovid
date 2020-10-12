@@ -1,6 +1,6 @@
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
-import { betterRound, lastConsolidatedDataDay, today } from '../../helpers';
+import { betterRound, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
 import { AppBar, CardMedia, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -45,6 +45,11 @@ export default class LineChart extends React.Component {
     chartReference = React.createRef();
     render() {
         let contents;
+        if (this.state.fullscreen) {
+            this.options.legend.display = true;
+        } else {
+            this.options.legend.display = !isMobile(false);
+        }
         if (this.state.asImage && this.state.chartImageURI) {
             contents = <CardMedia
                 component="img"
@@ -105,6 +110,9 @@ export default class LineChart extends React.Component {
     }
     _computeOptions() {
         const options = {
+            legend: {
+                display: true,
+            },
             tooltips: {
                 enabled: true,
                 mode: 'index',
