@@ -49,7 +49,7 @@ export default class Dashboard extends React.Component {
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12} md={7} lg={7}>
-              <Paper className={this.fixedHeightPaper} style={{overflow: 'hidden'}}>
+              <Paper className={this.fixedHeightPaper} style={{height: '100%', width: '100%'}}>
                 <Title>New cases, by age group (7-day rolling average) in {provinces[this.props.province]}</Title>
                 {this.props.statsData ?
                     <CasesByAge

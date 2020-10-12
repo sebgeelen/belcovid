@@ -49,7 +49,6 @@ export default class LineChart extends React.Component {
             contents = <CardMedia
                 component="img"
                 alt={this.props.chartName}
-                height="100%"
                 image={this.state.chartImageURI}
                 title={this.props.chartName}
                 onClick={this.state.fullscreen ?
@@ -60,7 +59,6 @@ export default class LineChart extends React.Component {
             contents = (
                 <Line
                     ref={this.chartReference}
-                    style={{width: "90%", height: "90%"}}
                     data={{
                         datasets: this.props.datasets,
                     }}
@@ -88,14 +86,14 @@ export default class LineChart extends React.Component {
                     </AppBar>
                     <main className={this.classes?.content}>
                         <div className={this.classes?.appBarSpacer} />
-                        <div style={{height: '90vh', padding: 5}}>
+                        <div style={{height: '90vh', padding: 5, minWidth: 200, minHeight: 200}}>
                             {contents}
                         </div>
                     </main>
                 </Dialog>
             );
         } else {
-            return contents;
+            return <div style={{minWidth: 200, minHeight: 200, height: '100%'}}>{contents}</div>;
         }
     }
     toggleFullscreen() {
