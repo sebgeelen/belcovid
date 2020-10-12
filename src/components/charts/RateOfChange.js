@@ -18,12 +18,23 @@ export default class RateOfChange extends React.Component {
             points.push({x: new Date(date), y: patients});
         }
         const rateOfChangePoints = getAveragePoints(points, 7).map((point, index) => {
-            return index && this._getRateOfChangePoint(points, index, 2);
+            let y;
+            if (index >= 6) {
+                y = this._getChangeRatio(point.y, points[index - 6].y);
+            }
+            if (y !== undefined) {
+                return {
+                    x: point.x,
+                    y,
+                };
+            } else {
+                return undefined;
+            }
         }).filter(d => d && typeof d.y === 'number');
         const datasets = [
             {
-                label: `Rate of change of ${this.props.chartName.toLowerCase()} (7-day rolling average)`,
-                data: getAveragePoints([...rateOfChangePoints], 7),
+                label: `${this.props.chartName.toLowerCase()} (7-day rolling average)`,
+                data: getAveragePoints(rateOfChangePoints, 7),
                 borderColor: '#4ab5eb',
                 backgroundColor: '#4ab5eb',
                 fill: false,
@@ -64,38 +75,25 @@ export default class RateOfChange extends React.Component {
         />;
     }
     /**
-     * Returns a point of format `{ x: any, y: number }` with `x` being whatever
-     * if is at `points[index]` and `y` being the rate of change (expressed in
-     * %) between `points[index]]` and `points[index - interval + 1]`.
+     * Return the change ratio between two numerical values, in percentage.
      *
-     * @param {object[]} points
-     * @param {number} index
-     * @param {number} interval
-     * @returns {object}
+     * @param {number} newValue
+     * @param {number} oldValue
+     * @returns {number}
      */
-    _getRateOfChangePoint(points, index) {
-        const oldPointY = points[index - 1]?.y;
-        let newPointY = points[index].y;
-        let y;
-        if (!index) {
-            y = 0;
-        } else if (oldPointY) {
-            if (newPointY >= oldPointY) {
-                y = Math.round(100 * ((newPointY / oldPointY) - 1), 2);
+    _getChangeRatio(newValue, oldValue) {
+        if (oldValue === 0) {
+            if (newValue === 0) {
+                // If we come from 0 and stay at 0, the rate of change is 0.
+                return 0;
             } else {
-                y = Math.round(-100 * ((oldPointY / newPointY) - 1), 2);
+                // If we come from 0 and get to a different value, the rate of
+                // change is undefined.
+                return;
             }
-        } else if (newPointY) {
-            // If we come from 0 and get to a value, the rate of change is
-            // undefined.
-            y = undefined;
         } else {
-            // If we come from 0 and stay at 0, the rate of change is 0.
-            y = 0;
+            const sign = newValue > oldValue ? 1 : -1;
+            return sign * 100 * ((newValue / oldValue) - 1);
         }
-        return {
-            x: points[index].x,
-            y: y,
-        };
     }
 }

@@ -99,13 +99,15 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-cases" className={this.classes.chartSection}>
-                        <h3>Rate of change in new cases</h3>
-                        <p><small>How fast is the number of cases rising/falling (in %) ?</small></p>
+                        <h3>Week by week change of new cases</h3>
+                        <p><small>How fast is the number of cases rising/falling (in %) ?<br/>
+                            <i>(The percentage change in number of new cases between the last 7 days
+                                and the 7 days before that).</i></small></p>
                         <RateOfChange
                             classes={this.classes}
                             data={this.props.data.cases}
                             keyToPlot="CASES"
-                            chartName="New cases"
+                            chartName="Week by week change of new cases"
                             asImage={true}
                         />
                     </section> :
@@ -154,13 +156,13 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-hospi" className={this.classes.chartSection}>
-                        <h3>Rate of change in hospitalized patients</h3>
+                        <h3>Week by week change of hospitalized patients</h3>
                         <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN"
-                            chartName="Hospitalized patients"
+                            chartName="Week by week change of hospitalized patients"
                             asImage={true}
                         />
                     </section> :
@@ -209,13 +211,13 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-icu" className={this.classes.chartSection}>
-                        <h3>Rate of change in patients in ICU</h3>
+                        <h3>Week by week change of patients in ICU</h3>
                         <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
                             data={this.props.data.hospitalisations}
                             keyToPlot="TOTAL_IN_ICU"
-                            chartName="Patients in ICU"
+                            chartName="Week by week change of patients in ICU"
                             asImage={true}
                         />
                     </section> :
@@ -263,13 +265,13 @@ export default class Charts extends React.Component {
 
                 {this.props.data ?
                     <section id="rate-of-change-mortality" className={this.classes.chartSection}>
-                        <h3>Rate of change in mortality</h3>
+                        <h3>Week by week change of mortality</h3>
                         <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
                             data={this.props.data.mortality}
                             keyToPlot="DEATHS"
-                            chartName="Deaths"
+                            chartName="Week by week change of mortality"
                             asImage={true}
                         />
                     </section> :
