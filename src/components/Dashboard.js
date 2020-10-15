@@ -11,7 +11,7 @@ import Title from './Title';
 import CasesByAge from './charts/CasesByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
-import { provinces } from '../data';
+import { PROVINCES } from '../data';
 import { getFromLocalStorage } from '../helpers';
 
 function Footer() {
@@ -50,7 +50,7 @@ export default class Dashboard extends React.Component {
             {/* Chart */}
             <Grid item xs={12} md={7} lg={7}>
               <Paper className={this.fixedHeightPaper} style={{height: '100%', width: '100%'}}>
-                <Title>New cases, by age group (7-day rolling average) in {provinces[this.props.province]}</Title>
+                <Title>New cases, by age group (7-day rolling average) in {PROVINCES[this.props.province]}</Title>
                 {this.props.statsData ?
                     <CasesByAge
                       classes={this.classes}

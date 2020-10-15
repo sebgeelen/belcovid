@@ -1,11 +1,10 @@
-import { lastConsolidatedDataDay } from "./helpers";
-import Parser from 'rss-parser';
+    import Parser from 'rss-parser';
 
 const parser = new Parser();
-const proxy = 'https://cors-anywhere.herokuapp.com/';
-const urls = {
+const PROXY = 'https://cors-anywhere.herokuapp.com/';
+const URLS = {
     stats: {
-        hospitalisations: 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json',
+        hospitalizations: 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json',
         tests: 'https://epistat.sciensano.be/Data/COVID19BE_tests.json',
         cases: 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.json',
         mortality: 'https://epistat.sciensano.be/Data/COVID19BE_MORT.json',
@@ -55,7 +54,7 @@ const urls = {
         },
     ]
 };
-export const provinces = {
+export const PROVINCES = {
     'Belgium': 'Belgium',
     'Antwerpen': 'Antwerpen',
     'OostVlaanderen': 'Oost Vlaanderen',
@@ -68,13 +67,34 @@ export const provinces = {
     'Namur': 'Namur',
     'BrabantWallon': 'Brabant Wallon',
     'Brussels': 'Brussels Capital',
-  };
-export async function fetchData(url, filtered = true) {
-    return url && (await fetch(url)).json();
+};
+export const AGE_GROUPS = [
+    '0-9',
+    '10-19',
+    '20-29',
+    '30-39',
+    '40-49',
+    '50-59',
+    '60-69',
+    '70-79',
+    '80-89',
+    '90+',
+    'Age unknown'
+];
+
+export function fetchData(key) {
+    const url = URLS.stats[key];
+    if (url) {
+        return fetch(url).then(data => {
+            return data.json();
+        }).then(jsonData => {
+            return [key, jsonData];
+        });
+    }
 }
 const covidKeywordsRegex = /corona|covid|sars/g;
-export async function fetchRssData(url, filtered = true) {
-    return parser.parseURL(proxy + url).then(feed => {
+export function fetchRssData(url, filtered = true) {
+    return parser.parseURL(PROXY + url).then(feed => {
         if (filtered) {
             return feed.items.filter(a => {
                 return covidKeywordsRegex.test(a.title.toLowerCase()) ||
@@ -86,21 +106,16 @@ export async function fetchRssData(url, filtered = true) {
         }
     });
 }
-export async function fetchStatsData(filtered = true) {
-    const data = {};
-    for (const key of Object.keys(urls.stats)) {
-        const fetched = await fetchData(urls.stats[key]);
-        if (filtered) {
-            const max = lastConsolidatedDataDay();
-            data[key] = fetched.filter(item => new Date(item.DATE) <= max);
-        } else {
-            data[key] = fetched;
-        }
+export function fetchStatsData() {
+    let dataPromises = [];
+    for (const key of Object.keys(URLS.stats)) {
+        const dataPromise = fetchData(key);
+        dataPromises.push(dataPromise);
     }
-    return data;
+    return dataPromises;
 }
 export function fetchNewsData() {
-    const sources = urls.news;
+    const sources = URLS.news;
     let dataPromises = [];
     for (const source of sources) {
         dataPromises.push({ ...source, promise: fetchRssData(source.rss)});

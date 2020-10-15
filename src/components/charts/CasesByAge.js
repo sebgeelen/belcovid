@@ -2,20 +2,7 @@ import React from 'react';
 import { getAveragePoints } from '../../helpers';
 import 'chartjs-plugin-zoom';
 import StackedAreaTimeChart from './StackedAreaTimeChart';
-
-const AGE_GROUPS = [
-    '0-9',
-    '10-19',
-    '20-29',
-    '30-39',
-    '40-49',
-    '50-59',
-    '60-69',
-    '70-79',
-    '80-89',
-    '90+',
-    'Age unknown'
-];
+import { AGE_GROUPS } from '../../data';
 
 export default class CasesByAge extends React.Component {
     _isZoomingOut = false;
