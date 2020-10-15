@@ -47,7 +47,29 @@ export function getIsoDate(date) {
 export function getDateFrom(date, daysFromDate) {
     date = new Date(date); // clone to avoid side effects
     const newDate = new Date(date.setDate(date.getDate() + daysFromDate));
-    return newDate;
+    return normalizeDate(newDate);
+}
+/**
+ * Return a new date object with the same date as the given date object, but no
+ * time.
+ *
+ * @param {Date} date
+ * @returns {Date}
+ */
+export function normalizeDate(date) {
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
+    return normalizedDate;
+}
+/**
+ * Return true if the two given dates are the same, ignoring time.
+ *
+ * @param {Date} date
+ * @param {Date} otherDate
+ * @returns {boolean}
+ */
+export function areDateSame(date, otherDate) {
+    return normalizeDate(date).getTime() === normalizeDate(otherDate).getTime();
 }
 /**
  * Return an array of objects filtered so as to keep only the objects that have

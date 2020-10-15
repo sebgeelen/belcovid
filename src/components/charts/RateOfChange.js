@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
+import { getDateFrom, getPolynomialRegressionPoints, normalizeDate } from '../../helpers';
 import LineChart from './LineChart';
 
 const regressionStart = new Date('2020-08-15');
@@ -7,7 +7,7 @@ export default class RateOfChange extends React.Component {
     render() {
         let data = [...this.props.data] || [];
         const dates = new Set(data?.map(item => item.DATE).filter(item => item));
-        const points = [];
+        const points = new Map();
         let start;
         let end;
         for (const date of dates) {
@@ -15,12 +15,30 @@ export default class RateOfChange extends React.Component {
             if (!end || new Date(date) > start) end = new Date(date);
             const items = data.filter(item => item.DATE === date);
             const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
-            points.push({x: new Date(date), y: patients});
+            points.set(normalizeDate(new Date(date)).getTime(), patients);
         }
-        const rateOfChangePoints = getAveragePoints(points, 7).map((point, index) => {
+        const weeklyPoints = [];
+        let pointIndex = 0;
+        for (const date of points.keys()) {
+            if (pointIndex >= 6) {
+                let y = 0;
+                let comparativeDate = new Date(date);
+                for (let i = 0; i < 7; i++) {
+                    const value = points.get(comparativeDate.getTime());
+                    y += value;
+                    comparativeDate = normalizeDate(getDateFrom(new Date(comparativeDate), -1));
+                }
+                weeklyPoints.push({
+                    x: new Date(date),
+                    y,
+                });
+            }
+            pointIndex++;
+        }
+        const rateOfChangePoints = weeklyPoints.map((point, index) => {
             let y;
-            if (index >= 6) {
-                y = this._getChangeRatio(point.y, points[index - 6].y);
+            if (index >= 6 && weeklyPoints[index - 6]) {
+                y = this._getChangeRatio(point.y, weeklyPoints[index - 6].y);
             }
             if (y !== undefined) {
                 return {
@@ -33,8 +51,8 @@ export default class RateOfChange extends React.Component {
         }).filter(d => d && typeof d.y === 'number');
         const datasets = [
             {
-                label: `${this.props.chartName.toLowerCase()} (7-day rolling average)`,
-                data: getAveragePoints(rateOfChangePoints, 7),
+                label: this.props.chartName,
+                data: rateOfChangePoints,
                 borderColor: '#4ab5eb',
                 backgroundColor: '#4ab5eb',
                 fill: false,
