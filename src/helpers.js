@@ -96,33 +96,18 @@ export function sumByKey(data, key) {
     return data.map(item => item[key]).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
 }
 /**
- * Return the sum of the numerical values on the given properties of each object
- * in an array that has a 'DATE' property (as a string in the format
- * 'YYYY-mm-dd') matching the given date.
- * Eg: `sumByKey([{a: 1, DATE: '2020-07-05'}, {a: 2}], new Date('2020-07-05'), 'a')` will return 1.
- *
- * @param {object[]} data
- * @param {Date} date
- * @param {string} key
- * @returns {number}
- */
-export function sumByKeyAtDate(data, date, key) {
-    const dataAtDate = filterByDate(data, date);
-    return sumByKey(dataAtDate, key);
-}
-/**
  * Return the average over the given interval (as a number of days from a given
- * date or as a start and an end date) of the numerical values on the given
- * properties of each object in an array that has a 'DATE' property (as a string
- * in the format 'YYYY-mm-dd') matching the dates in the given interval.
+ * date or as a start and an end date) of the numerical values of each object in
+ * an array that has a 'DATE' property (as a string in the format 'YYYY-mm-dd')
+ * matching the dates in the given interval.
  *
  * @param {object[]} data
  * @param {Date} startDate
  * @param {Date | number} endDateOrInterval
- * @param {string} key
+ * @param {string} [ageGroup]
  * @returns {number}
  */
-export function getAverageOver(data, startDate, endDateOrInterval, key) {
+export function getAverageOver(data, startDate, endDateOrInterval, ageGroup) {
     // Get the start and end dates of the interval.
     let endDate;
     if (typeof endDateOrInterval === 'number') {
@@ -140,13 +125,14 @@ export function getAverageOver(data, startDate, endDateOrInterval, key) {
     let date = startDate;
     const values = [];
     do {
-        // eslint-disable-next-line no-loop-func
-        const hasValue = data.find(d => {
-            return d.DATE === getIsoDate(date) && typeof d[key] === 'number';
-        });
+        let value = data[getIsoDate(date)];
+        if (typeof value === 'object') {
+            value = value[ageGroup || 'total'];
+        }
+        const hasValue = typeof value === 'number';
         if (hasValue) {
             // Only add to the array the dates that could be found in the data.
-            values.push(sumByKeyAtDate(data, date, key));
+            values.push(value);
         }
         date = getDateFrom(date, +1);
     } while (date && new Date(getIsoDate(date)) <= new Date(getIsoDate(endDate)));

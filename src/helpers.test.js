@@ -3,7 +3,6 @@ import {
     getDateFrom,
     filterByDate,
     sumByKey,
-    sumByKeyAtDate,
     getAverageOver,
     getAveragePoints,
     getDaysBetween,
@@ -68,31 +67,6 @@ describe('helpers', () => {
             expect(sumByKey(data, 'a')).toBe(6);
             expect(sumByKey(data, 'b')).toBe(11.5);
             expect(sumByKey(data, 'c')).toBe(19);
-        });
-    });
-    describe('sumByKeyAtDate', () => {
-        test('should return 0', () => {
-            const data = [
-                { a: 1, b: 2, c: 19, DATE: '2020-05-06' },
-                { a: 5, b: 9 },
-            ];
-            expect(sumByKeyAtDate(data, new Date('2020-05-07'), 'c')).toBe(0);
-        });
-        test('should return the numbervalue of a property', () => {
-            const data = [
-                { a: 1, b: 2, c: 19.5, DATE: '2020-05-07' },
-                { a: 5, b: 9, c: 20.4 },
-                { a: 5, b: 9, c: 31.8, DATE: '2020-05-06' },
-            ];
-            expect(sumByKeyAtDate(data, new Date('2020-05-07'), 'c')).toBe(19.5);
-        });
-        test('should add together number properties on objects in an array', () => {
-            const data = [
-                { a: 1, b: 2, c: 19.5, DATE: '2020-05-07' },
-                { a: 5, b: 9, DATE: '2020-05-07' },
-                { a: 5, b: 9, c: 42, DATE: '2020-05-07' },
-            ];
-            expect(sumByKeyAtDate(data, new Date('2020-05-07'), 'c')).toBe(61.5);
         });
     });
     describe('getAverageOver', () => {

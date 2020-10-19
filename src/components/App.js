@@ -184,27 +184,15 @@ class App extends React.Component {
             this._updateData('news');
         }
     }
-    // async componentWillUpdate(nextProps, nextState) {
-    //     if (
-    //         !this._isFilteringStatsData && (
-    //             this.state.rawStatsData !== nextState.rawStatsData ||
-    //             !nextState.statsData ||
-    //             this.state.province !== nextState.province
-    //         )
-    //     ) {
-    //         this._isFilteringStatsData = true;
-    //         await this.setState({statsData: this._filterStatsData(nextState.rawStatsData, nextState.province)});
-    //         this._isFilteringStatsData = false;
-    //     }
-    //     return true;
-    // }
     render() {
         let main;
         switch (this.state.page) {
             case 'dashboard':
                 main = <Dashboard
                     classes={this.classes}
-                    cases={this.state.cases?.[this.state.province]}
+                    allCasesData={this.state.cases}
+                    totalHospitalizations={this.state.totalHospitalizations?.Belgium}
+                    totalICU={this.state.totalICU?.Belgium}
                     newsData={this.state.newsData}
                     province={this.state.province}
                 />;
