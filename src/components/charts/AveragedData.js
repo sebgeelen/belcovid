@@ -5,19 +5,20 @@ import LineChart from './LineChart';
 const regressionStart = new Date('2020-08-15');
 export default class AveragedData extends React.Component {
     render() {
-        let data = [...this.props.data] || [];
-        const dates = new Set(data?.map(item => item.DATE).filter(item => item));
+        let data = this.props.data;
         const points = [];
         let start;
         let end;
-        for (const date of dates) {
+        for (const date of Object.keys(data)) {
             if (!start || new Date(date) < start) start = new Date(date);
             if (!end || new Date(date) > start) end = new Date(date);
-            const items = data.filter(item => item.DATE === date);
-            const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
-            points.push({x: new Date(date), y: patients});
+            const items = data[date];
+            points.push({
+                x: new Date(date),
+                y: typeof items === 'object' ? items.total : items,
+            });
         }
-        const averagedPoints = getAveragePoints([...points], 7);
+        const averagedPoints = getAveragePoints(points, 7);
         const regressionPoints = getPolynomialRegressionPoints(averagedPoints.filter(p => {
             return p.x >= regressionStart;
         }), 3);

@@ -5,17 +5,18 @@ import LineChart from './LineChart';
 const regressionStart = new Date('2020-08-15');
 export default class RateOfChange extends React.Component {
     render() {
-        let data = [...this.props.data] || [];
-        const dates = new Set(data?.map(item => item.DATE).filter(item => item));
+        let data = this.props.data;
         const points = new Map();
         let start;
         let end;
-        for (const date of dates) {
+        for (const date of Object.keys(data)) {
             if (!start || new Date(date) < start) start = new Date(date);
             if (!end || new Date(date) > start) end = new Date(date);
-            const items = data.filter(item => item.DATE === date);
-            const patients = items.reduce((a, b) => a + b[this.props.keyToPlot], 0) || 0;
-            points.set(normalizeDate(new Date(date)).getTime(), patients);
+            const items = data[date];
+            points.set(
+                normalizeDate(new Date(date)).getTime(),
+                typeof items === 'object' ? items.total : items,
+            );
         }
         const weeklyPoints = [];
         let pointIndex = 0;

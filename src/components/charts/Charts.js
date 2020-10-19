@@ -89,6 +89,7 @@ export default class Charts extends React.Component {
                             classes={this.classes}
                             testData={this.props.tests}
                             comparativeData={this.props.cases}
+                            comparativeDataName="Cases"
                             chartName="Percentage of positive tests"
                             asImage={true}
                         />
@@ -143,6 +144,7 @@ export default class Charts extends React.Component {
                             classes={this.classes}
                             testData={this.props.tests}
                             comparativeData={this.props.totalHospitalisations}
+                            comparativeDataName="Hospital patients"
                             chartName="Percentage of simultaneous hospital patients for the amount of tests"
                             asImage={true}
                         />
@@ -195,6 +197,7 @@ export default class Charts extends React.Component {
                             classes={this.classes}
                             testData={this.props.tests}
                             comparativeData={this.props.totalICU}
+                            comparativeDataName="ICU patients"
                             chartName="Percentage of simultaneous ICU patients for the amount of tests"
                             asImage={true}
                         />
@@ -246,6 +249,7 @@ export default class Charts extends React.Component {
                             classes={this.classes}
                             testData={this.props.tests}
                             comparativeData={this.props.mortality}
+                            comparativeDataName="Mortality"
                             chartName="Percentage of mortality for the amount of tests"
                             asImage={true}
                         />

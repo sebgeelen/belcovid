@@ -7,33 +7,37 @@ export default class Testing extends React.Component {
     render() {
         let comparativeData = this.props.comparativeData;
         let testData = this.props.testData;
-        const dates = this._getDates(comparativeData);
+        const dates = Object.keys(comparativeData);
         const points = [];
         const rawComparativePoints = [];
         const rawTestPoints = [];
-        let itemsYesterday = [];
         let start;
         let end;
         for (const date of dates) {
             if (!start || new Date(date) < start) start = new Date(date);
             if (!end || new Date(date) > start) end = new Date(date);
-            const comparisons = comparativeData.filter(item => item.DATE === date);
-            const tests = testData.filter(item => item.DATE === date);
-            const totalTests = tests.reduce((a, b) => a + b.TESTS_ALL, 0);
-            const testsYesterday = itemsYesterday.reduce((a, b) => a + b.TESTS_ALL, 0) || 0;
-            const testsToday = totalTests - testsYesterday;
-            if (testsToday) {
-                const comparisonsToday = comparisons.reduce((a, b) => a + b[this.props.keyToCompare], 0) || 0;
-                const formattedDate = new Date(date);
-                rawTestPoints.push({ x: formattedDate, y: testsToday });
-                rawComparativePoints.push({ x: formattedDate, y: comparisonsToday });
-                points.push({ x: formattedDate, y: 100 * comparisonsToday / testsToday });
+            let dataToday = comparativeData[date];
+            if (typeof dataToday === 'object') {
+                dataToday = comparativeData[date].total;
             }
-            itemsYesterday = [...comparisons];
+            const testsToday = testData[date];
+            const formattedDate = new Date(date);
+            rawTestPoints.push({
+                x: formattedDate,
+                y: testsToday,
+            });
+            rawComparativePoints.push({
+                x: formattedDate,
+                y: dataToday,
+            });
+            points.push({
+                x: formattedDate,
+                y: 100 * dataToday / testsToday,
+            });
         }
         const datasets = [
             {
-                label: `% ${this.props.keyToCompare.toLowerCase()} / test (7d rolling average)`,
+                label: `${this.props.chartName}`,
                 data: getAveragePoints(points, 7),
                 borderColor: '#4ab5eb',
                 backgroundColor: '#4ab5eb',
@@ -51,7 +55,7 @@ export default class Testing extends React.Component {
                 yAxisID: 'left-y-axis'
             },
             {
-                label: `% ${this.props.keyToCompare.toLowerCase()} / tests`,
+                label: `${this.props.chartName}`,
                 data: points,
                 borderColor: '#decf3f',
                 backgroundColor: '#decf3f',
@@ -60,7 +64,7 @@ export default class Testing extends React.Component {
                 yAxisID: 'left-y-axis'
             },
             {
-                label: `${this.props.keyToCompare.toLowerCase()}`,
+                label: `${this.props.comparativeDataName}`,
                 data: rawComparativePoints,
                 borderColor: '#846A6A',
                 backgroundColor: '#846A6A',
@@ -118,9 +122,5 @@ export default class Testing extends React.Component {
                 asImage={this.props.asImage}
             />
         );
-    }
-
-    _getDates(data) {
-        return new Set(data.map(item => item.DATE).filter(item => item));
     }
 }
