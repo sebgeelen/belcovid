@@ -11,8 +11,8 @@ import { PROVINCES } from '../../data';
 export default class Charts extends React.Component {
     state = {
         cases: false,
-        hospitalizations: false,
-        icu: false,
+        totalHospitalizations: false,
+        totalICU: false,
         mortality: false,
     }
     classes = this.props.classes;
@@ -31,11 +31,11 @@ export default class Charts extends React.Component {
                                 label="Cases"
                             />
                             <FormControlLabel
-                                control={<Checkbox checked={this.state.hospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
+                                control={<Checkbox checked={this.state.totalHospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
                                 label="Hospitalizations"
                             />
                             <FormControlLabel
-                                control={<Checkbox checked={this.state.icu} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
+                                control={<Checkbox checked={this.state.totalICU} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
                                 label="Intensive Care Units"
                             />
                             <Tooltip title="Mortality data cannot be filtered per province.">
@@ -54,8 +54,8 @@ export default class Charts extends React.Component {
                         </FormGroup>
                     </FormControl>
                     { this.state.cases && this.Cases() }
-                    { this.state.hospitalizations && this.Hospitalizations() }
-                    { this.state.icu && this.Icu() }
+                    { this.state.totalHospitalizations && this.Hospitalizations() }
+                    { this.state.totalICU && this.Icu() }
                     { this.state.mortality && this.Mortality() }
                 </Container>
             </main>
@@ -69,12 +69,12 @@ export default class Charts extends React.Component {
                 <div style={{ marginTop: 20 }} />
                 <Title>Cases</Title>
 
-                {this.props.data ?
+                {this.props.cases ?
                     <section id="cases-age" className={this.classes.chartSection}>
                         <h3>New cases, by age group (7-day rolling average)</h3>
                         <CasesByAge
                             classes={this.classes}
-                            data={this.props.data}
+                            data={this.props.cases}
                             chartName="New cases, by age group (7-day rolling average)"
                             asImage={true}
                         />
@@ -82,14 +82,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.cases && this.props.tests ?
                     <section id="positive-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of positive tests</h3>
                         <Testing
                             classes={this.classes}
-                            testData={this.props.data.tests}
-                            comparativeData={this.props.data.cases}
-                            keyToCompare="CASES"
+                            testData={this.props.tests}
+                            comparativeData={this.props.cases}
                             chartName="Percentage of positive tests"
                             asImage={true}
                         />
@@ -97,7 +96,7 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.cases ?
                     <section id="rate-of-change-cases" className={this.classes.chartSection}>
                         <h3>Week by week change of new cases</h3>
                         <p><small>How fast is the number of cases rising/falling (in %) ?<br/>
@@ -105,8 +104,7 @@ export default class Charts extends React.Component {
                                 and the 7 days before that).</i></small></p>
                         <RateOfChange
                             classes={this.classes}
-                            data={this.props.data.cases}
-                            keyToPlot="CASES"
+                            data={this.props.cases}
                             chartName="Week by week change of new cases"
                             asImage={true}
                         />
@@ -125,13 +123,12 @@ export default class Charts extends React.Component {
                 <Title id="hospi">Hospitalizations</Title>
                 <p><small>We count here in number of patients that are hospitalized <i>simultaneously</i> (not just new admissions).</small></p>
 
-                {this.props.data ?
+                {this.props.totalHospitalizations ?
                     <section id="hospital-patients" className={this.classes.chartSection}>
                         <h3>Patients at the hospital</h3>
                         <AveragedData
                             classes={this.classes}
-                            data={this.props.data.hospitalisations}
-                            keyToPlot="TOTAL_IN"
+                            data={this.props.totalHospitalizations}
                             chartName="Number of patients at the hospital"
                             asImage={true}
                         />
@@ -139,14 +136,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.totalHospitalizations && this.props.tests ?
                     <section id="hospi-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of simultaneous hospital patients for the amount of tests</h3>
                         <Testing
                             classes={this.classes}
-                            testData={this.props.data.tests}
-                            comparativeData={this.props.data.hospitalisations}
-                            keyToCompare="TOTAL_IN"
+                            testData={this.props.tests}
+                            comparativeData={this.props.totalHospitalisations}
                             chartName="Percentage of simultaneous hospital patients for the amount of tests"
                             asImage={true}
                         />
@@ -154,14 +150,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.totalHospitalisations ?
                     <section id="rate-of-change-hospi" className={this.classes.chartSection}>
                         <h3>Week by week change of hospitalized patients</h3>
                         <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
-                            data={this.props.data.hospitalisations}
-                            keyToPlot="TOTAL_IN"
+                            data={this.props.totalHospitalisations}
                             chartName="Week by week change of hospitalized patients"
                             asImage={true}
                         />
@@ -180,13 +175,12 @@ export default class Charts extends React.Component {
                 <Title id="icu">Intensive Care Units</Title>
                 <p><small>We count here in number of patients that are <i>simultaneously</i> in ICU (not just new admissions).</small></p>
 
-                {this.props.data ?
+                {this.props.totalICU ?
                     <section id="icu-patients" className={this.classes.chartSection}>
                         <h3>Patients in intensive care</h3>
                         <AveragedData
                             classes={this.classes}
-                            data={this.props.data.hospitalisations}
-                            keyToPlot="TOTAL_IN_ICU"
+                            data={this.props.totalICU}
                             chartName="Number of patients in ICU"
                             asImage={true}
                         />
@@ -194,14 +188,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.totalICU && this.props.tests ?
                     <section id="icu-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of simultaneous ICU patients for the amount of tests</h3>
                         <Testing
                             classes={this.classes}
-                            testData={this.props.data.tests}
-                            comparativeData={this.props.data.hospitalisations}
-                            keyToCompare="TOTAL_IN_ICU"
+                            testData={this.props.tests}
+                            comparativeData={this.props.totalICU}
                             chartName="Percentage of simultaneous ICU patients for the amount of tests"
                             asImage={true}
                         />
@@ -209,14 +202,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.totalICU ?
                     <section id="rate-of-change-icu" className={this.classes.chartSection}>
                         <h3>Week by week change of patients in ICU</h3>
                         <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
-                            data={this.props.data.hospitalisations}
-                            keyToPlot="TOTAL_IN_ICU"
+                            data={this.props.totalICU}
                             chartName="Week by week change of patients in ICU"
                             asImage={true}
                         />
@@ -234,13 +226,12 @@ export default class Charts extends React.Component {
                 <div style={{ marginTop: 20 }} />
                 <Title id="mortality">Mortality</Title>
 
-                {this.props.data ?
+                {this.props.mortality ?
                     <section id="mortality" className={this.classes.chartSection}>
                         <h3>Number of deaths attributed to Covid-19, per day</h3>
                         <AveragedData
                             classes={this.classes}
-                            data={this.props.data.mortality}
-                            keyToPlot="DEATHS"
+                            data={this.props.mortality}
                             chartName="Deaths per day"
                             asImage={true}
                         />
@@ -248,14 +239,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.mortality && this.props.tests ?
                     <section id="mortality-test-rate" className={this.classes.chartSection}>
                         <h3>Percentage of mortality for the amount of tests</h3>
                         <Testing
                             classes={this.classes}
-                            testData={this.props.data.tests}
-                            comparativeData={this.props.data.mortality}
-                            keyToCompare="DEATHS"
+                            testData={this.props.tests}
+                            comparativeData={this.props.mortality}
                             chartName="Percentage of mortality for the amount of tests"
                             asImage={true}
                         />
@@ -263,14 +253,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.data ?
+                {this.props.mortality ?
                     <section id="rate-of-change-mortality" className={this.classes.chartSection}>
                         <h3>Week by week change of mortality</h3>
                         <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
-                            data={this.props.data.mortality}
-                            keyToPlot="DEATHS"
+                            data={this.props.mortality}
                             chartName="Week by week change of mortality"
                             asImage={true}
                         />

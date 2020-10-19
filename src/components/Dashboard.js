@@ -51,10 +51,10 @@ export default class Dashboard extends React.Component {
             <Grid item xs={12} md={7} lg={7}>
               <Paper className={this.fixedHeightPaper} style={{height: '100%', width: '100%'}}>
                 <Title>New cases, by age group (7-day rolling average) in {PROVINCES[this.props.province]}</Title>
-                {this.props.statsData ?
+                {this.props.cases ?
                     <CasesByAge
                       classes={this.classes}
-                      data={this.props.statsData}
+                      data={this.props.cases}
                       chartName="New cases, by age group (7-day rolling average)"
                       asImage={true}
                     /> :

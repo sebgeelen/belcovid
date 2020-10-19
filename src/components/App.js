@@ -204,12 +204,7 @@ class App extends React.Component {
             case 'dashboard':
                 main = <Dashboard
                     classes={this.classes}
-                    cases={this.state.cases}
-                    totalHospitalizations={this.state.totalHospitalizations}
-                    totalICU={this.state.totalICU}
-                    mortality={this.state.mortality}
-                    tests={this.state.tests}
-                    statsData={this.state.statsData}
+                    cases={this.state.cases?.[this.state.province]}
                     newsData={this.state.newsData}
                     province={this.state.province}
                 />;
@@ -217,7 +212,11 @@ class App extends React.Component {
             case 'charts':
                 main = <Charts
                     classes={this.classes}
-                    data={this.state.statsData}
+                    cases={this.state.cases?.[this.state.province]}
+                    totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
+                    totalICU={this.state.totalICU?.[this.state.province]}
+                    mortality={this.state.mortality?.[this.state.province]}
+                    tests={this.state.tests?.[this.state.province]}
                     province={this.state.province}
                 />;
                 break;
