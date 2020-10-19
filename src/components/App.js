@@ -128,7 +128,6 @@ class App extends React.Component {
         province: (getFromLocalStorage('belcovid:province')) || 'Belgium',
     };
     classes = this.props.classes;
-    _isFilteringStatsData = false;
 
     async componentDidMount() {
         const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
@@ -136,15 +135,38 @@ class App extends React.Component {
 
         // Update stats data.
         if (lastSaveStats) {
-            const statsData = getFromLocalStorage('belcovid:stats');
             const lastSaveDate = new Date(lastSaveStats);
             const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
-            if (statsData && getDaysBetween(lastSaveDate, today()) === 0 && lastSaveHours < 12) {
-                this.setState({ rawStatsData: JSON.parse(statsData) });
-            } else {
+            const areStatsExpired = getDaysBetween(lastSaveDate, today()) !== 0 || lastSaveHours >= 12;
+            if (areStatsExpired) {
+                // Data are too old: update.
+                // eslint-disable-next-line no-console
+                console.log('epidemiological data expired. Updating...');
                 this._updateData('stats');
+            } else {
+                const statsToSet = {};
+                let areStatsMissing = false;
+                for (const key of ['cases', 'totalHospitalizations', 'totalICU', 'mortality', 'tests']) {
+                    const statsData = getFromLocalStorage('belcovid:' + key);
+                    if (statsData) {
+                        statsToSet[key] = JSON.parse(statsData);
+                    } else {
+                        // Some stats are missing: update.
+                        areStatsMissing = true;
+                        break;
+                    }
+                }
+                if (areStatsMissing) {
+                    // eslint-disable-next-line no-console
+                    console.log('Some epidemiological data was not saved properly. Updating...');
+                    this._updateData('stats');
+                } else {
+                    this.setState(statsToSet);
+                }
             }
         } else {
+            // eslint-disable-next-line no-console
+            console.log('Fetching epidemiological data for the first time...');
             this._updateData('stats');
         }
 
@@ -322,7 +344,6 @@ class App extends React.Component {
                 });
             }
             Promise.all(dataPromises).then(() => {
-                console.log(this.state);
                 setIntoLocalStorage('belcovid:update:stats', today().toISOString());
             });
         } else if (name === 'news') {
