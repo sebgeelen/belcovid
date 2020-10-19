@@ -33,6 +33,8 @@ function Footer() {
       {' • '}
       <Link color="inherit" href="https://www.info-coronavirus.be/" target="_blank" rel="noopener noreferrer">Official national information on Covid-19</Link>
       {'.'}
+      <br/>
+      <small>Data is truncated to exclude the last 4 days because that data is not yet consolidated.</small>
     </Typography>
   );
 }

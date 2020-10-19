@@ -24,7 +24,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import { getDaysBetween, getFromLocalStorage, setIntoLocalStorage, today } from '../helpers.js';
+import { getDaysBetween, getFromLocalStorage, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
 
 const drawerWidth = 240;
@@ -412,10 +412,12 @@ class App extends React.Component {
             object[province] = {};
             return object;
         }, {});
+        const limitDay = lastConsolidatedDataDay();
         for (const item of values) {
             const province = item.PROVINCE || 'Belgium';
             const date = item.DATE;
-            if (!date) continue;
+            // Ignore days for which the data is not yet consolidated.
+            if (!date || new Date(date) > limitDay) continue;
 
             const value = +item[dataKey];
             if (withAgeGroups) {
