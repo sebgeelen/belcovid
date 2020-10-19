@@ -43,14 +43,20 @@ export default class LineChart extends React.Component {
     classes = this.props.classes
     options = this._computeOptions();
     chartReference = React.createRef();
+    _lastDatasets = null;
+    _recomputeImage = false;
     render() {
         let contents;
+        if (!this._lastDatasets || this.props.datasets !== this._lastDatasets) {
+            this._recomputeImage = true;
+        }
+        this._lastDatasets = this.props.datasets;
         if (this.state.fullscreen) {
             this.options.legend.display = true;
         } else {
             this.options.legend.display = !isMobile(false);
         }
-        if (this.state.asImage && this.state.chartImageURI) {
+        if (!this._recomputeImage && this.state.asImage && this.state.chartImageURI) {
             contents = <CardMedia
                 component="img"
                 alt={this.props.chartName}
@@ -159,8 +165,18 @@ export default class LineChart extends React.Component {
             maintainAspectRatio: false,
             animation: {
                 onComplete: () => {
-                    const chartImageURI = this.chartReference.current.chartInstance.toBase64Image();
-                    this.setState({ chartImageURI });
+                    if (this.state.asImage) {
+                        // Only recompute the image if that was specifically
+                        // requested or we haven't computed it yet.
+                        if (this._recomputeImage || !this.state.chartImageURI) {
+                            const chartImageURI = this.chartReference.current.chartInstance.toBase64Image();
+                            this._recomputeImage = false;
+                            this.setState({ chartImageURI });
+                        } else {
+                            this._recomputeImage = false;
+                            this.setState({ asImage: this.state.asImage });
+                        }
+                    }
                 },
             },
             // Plugins
