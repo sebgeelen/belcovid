@@ -11,8 +11,8 @@ import { PROVINCES } from '../../data';
 export default class Charts extends React.Component {
     state = {
         cases: false,
-        totalHospitalizations: false,
-        totalICU: false,
+        hospitalizations: false,
+        icu: false,
         mortality: false,
     }
     classes = this.props.classes;
@@ -31,11 +31,11 @@ export default class Charts extends React.Component {
                                 label="Cases"
                             />
                             <FormControlLabel
-                                control={<Checkbox checked={this.state.totalHospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
+                                control={<Checkbox checked={this.state.hospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
                                 label="Hospitalizations"
                             />
                             <FormControlLabel
-                                control={<Checkbox checked={this.state.totalICU} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
+                                control={<Checkbox checked={this.state.icu} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
                                 label="Intensive Care Units"
                             />
                             <Tooltip title="Mortality data cannot be filtered per province.">
@@ -54,8 +54,8 @@ export default class Charts extends React.Component {
                         </FormGroup>
                     </FormControl>
                     { this.state.cases && this.Cases() }
-                    { this.state.totalHospitalizations && this.Hospitalizations() }
-                    { this.state.totalICU && this.Icu() }
+                    { this.state.hospitalizations && this.Hospitalizations() }
+                    { this.state.icu && this.Icu() }
                     { this.state.mortality && this.Mortality() }
                 </Container>
             </main>
@@ -143,7 +143,7 @@ export default class Charts extends React.Component {
                         <Testing
                             classes={this.classes}
                             testData={this.props.tests}
-                            comparativeData={this.props.totalHospitalisations}
+                            comparativeData={this.props.totalHospitalizations}
                             comparativeDataName="Hospital patients"
                             chartName="Percentage of simultaneous hospital patients for the amount of tests"
                             asImage={true}
@@ -152,13 +152,13 @@ export default class Charts extends React.Component {
                     <Skeleton variant="rect" height={200} />
                 }
 
-                {this.props.totalHospitalisations ?
+                {this.props.totalHospitalizations ?
                     <section id="rate-of-change-hospi" className={this.classes.chartSection}>
                         <h3>Week by week change of hospitalized patients</h3>
                         <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
                         <RateOfChange
                             classes={this.classes}
-                            data={this.props.totalHospitalisations}
+                            data={this.props.totalHospitalizations}
                             chartName="Week by week change of hospitalized patients"
                             asImage={true}
                         />
