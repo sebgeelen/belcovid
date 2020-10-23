@@ -11,7 +11,7 @@ import Title from './Title';
 import CasesByAge from './charts/CasesByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
-import { PROVINCES } from '../data';
+import { AGE_GROUPS_CASES, PROVINCES } from '../data';
 import { getFromLocalStorage } from '../helpers';
 
 function Footer() {
@@ -59,6 +59,7 @@ export default class Dashboard extends React.Component {
                       data={this.props.allCasesData[this.props.province]}
                       chartName="New cases, by age group (7-day rolling average)"
                       asImage={true}
+                      ageGroups={AGE_GROUPS_CASES}
                     /> :
                   <Skeleton variant="rect" height={'100%'} />
                 }

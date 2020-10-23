@@ -68,7 +68,7 @@ export const PROVINCES = {
     'BrabantWallon': 'Brabant Wallon',
     'Brussels': 'Brussels Capital',
 };
-export const AGE_GROUPS = [
+export const AGE_GROUPS_CASES = [
     '0-9',
     '10-19',
     '20-29',
@@ -79,6 +79,15 @@ export const AGE_GROUPS = [
     '70-79',
     '80-89',
     '90+',
+    'Age unknown'
+];
+export const AGE_GROUPS_MORTALITY = [
+    '0-24',
+    '25-44',
+    '45-64',
+    '65-74',
+    '75-84',
+    '85+',
     'Age unknown'
 ];
 

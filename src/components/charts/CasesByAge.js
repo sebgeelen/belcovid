@@ -2,12 +2,11 @@ import React from 'react';
 import { casesAnnotations, getAveragePoints } from '../../helpers';
 import 'chartjs-plugin-zoom';
 import StackedAreaTimeChart from './StackedAreaTimeChart';
-import { AGE_GROUPS } from '../../data';
 
 export default class CasesByAge extends React.Component {
     render() {
         let casesData = this.props.data;
-        const points = AGE_GROUPS.reduce((points, group) => {
+        const points = this.props.ageGroups.reduce((points, group) => {
             points[group] = [];
             return points;
         }, {});
@@ -17,14 +16,14 @@ export default class CasesByAge extends React.Component {
         for (const date of Object.keys(casesData)) {
             if (!start || new Date(date) < start) start = new Date(date);
             if (!end || new Date(date) > end) end = new Date(date);
-            for (const group of AGE_GROUPS) {
+            for (const group of this.props.ageGroups) {
                 points[group].push({
                     x: new Date(date),
                     y: casesData[date][group],
                 });
             }
         }
-        const datasets = AGE_GROUPS.map(group => {
+        const datasets = this.props.ageGroups.map(group => {
             return {
                 label: `${group}`,
                 data: getAveragePoints(points[group], 7),

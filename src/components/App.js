@@ -2,7 +2,13 @@ import React from 'react';
 import clsx from 'clsx';
 import Dashboard from './Dashboard.js';
 import Charts from './charts/Charts.js';
-import { fetchStatsData, fetchNewsData, PROVINCES, AGE_GROUPS } from '../data';
+import {
+    fetchStatsData,
+    fetchNewsData,
+    PROVINCES,
+    AGE_GROUPS_CASES,
+    AGE_GROUPS_MORTALITY
+} from '../data';
 import {
     AppBar,
     CssBaseline,
@@ -357,11 +363,11 @@ class App extends React.Component {
     }
     _normalizeData(key, values) {
         let dataKey;
-        let withAgeGroups = false;
+        let ageGroups;
         switch (key) {
             case 'cases': {
                 dataKey = 'CASES';
-                withAgeGroups = true;
+                ageGroups = AGE_GROUPS_CASES;
                 break;
             }
             case 'hospitalizations': {
@@ -380,7 +386,7 @@ class App extends React.Component {
             }
             case 'mortality': {
                 dataKey = 'DEATHS';
-                withAgeGroups = true;
+                ageGroups = AGE_GROUPS_MORTALITY;
                 break;
             }
             case 'tests': {
@@ -402,18 +408,18 @@ class App extends React.Component {
             if (!date || new Date(date) > limitDay) continue;
 
             const value = +item[dataKey];
-            if (withAgeGroups) {
+            if (ageGroups) {
                 const ageGroup = item.AGEGROUP || 'Age unknown';
                 if (!data[province][date]) {
                     // Initialize the age group values.
-                    data[province][date] = AGE_GROUPS.reduce((groupsObject, groupName) => {
+                    data[province][date] = ageGroups.reduce((groupsObject, groupName) => {
                         groupsObject[groupName] = 0;
                         return groupsObject;
                     }, {});
                 }
                 if (!data.Belgium[date]) {
                     // Initialize the age group values for Belgium.
-                    data.Belgium[date] = AGE_GROUPS.reduce((groupsObject, groupName) => {
+                    data.Belgium[date] = ageGroups.reduce((groupsObject, groupName) => {
                         groupsObject[groupName] = 0;
                         return groupsObject;
                     }, {});

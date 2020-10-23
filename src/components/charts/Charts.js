@@ -6,7 +6,7 @@ import RateOfChange from './RateOfChange';
 import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
-import { PROVINCES } from '../../data';
+import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, PROVINCES } from '../../data';
 import { casesAnnotations } from '../../helpers';
 
 const stuff = {
@@ -14,6 +14,7 @@ const stuff = {
         average: {
             title: 'New cases, by age group (7-day rolling average)',
             annotations: casesAnnotations,
+            ageGroups: AGE_GROUPS_CASES,
         },
         testing: {
             title: 'Test positivity ratio',
@@ -69,7 +70,8 @@ const stuff = {
     },
     mortality: {
         average: {
-            title: 'Mortality',
+            title: 'Mortality, by age group (7-day rolling average)',
+            ageGroups: AGE_GROUPS_MORTALITY,
         },
         testing: {
             title: 'Percentage of mortality per test',
@@ -152,7 +154,7 @@ export default class Charts extends React.Component {
         let chart;
         switch (this.state.chartType) {
             case 'average': {
-                if (variableName === 'cases') {
+                if (chartInfo.ageGroups) {
                     chart = (
                         <CasesByAge
                             classes={this.classes}
@@ -160,6 +162,7 @@ export default class Charts extends React.Component {
                             annotations={chartInfo.annotations}
                             chartName={chartInfo.title}
                             asImage={true}
+                            ageGroups={chartInfo.ageGroups}
                         />
                     );
                 } else {
