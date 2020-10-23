@@ -3,7 +3,7 @@ import CasesByAge from './CasesByAge';
 import AveragedData from './AveragedData';
 import Testing from './Testing';
 import RateOfChange from './RateOfChange';
-import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, Tooltip } from '@material-ui/core';
+import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { PROVINCES } from '../../data';
@@ -11,10 +11,7 @@ import { casesAnnotations } from '../../helpers';
 
 export default class Charts extends React.Component {
     state = {
-        cases: false,
-        hospitalizations: false,
-        icu: false,
-        mortality: false,
+        mainVariable: undefined,
     }
     classes = this.props.classes;
 
@@ -24,40 +21,28 @@ export default class Charts extends React.Component {
                 <div className={this.classes.appBarSpacer} />
                 <Container maxWidth="lg" className={this.classes.container}>
                     <Title>Charts for {PROVINCES[this.props.province]}</Title>
-                    <FormControl component="fieldset" className={this.classes.formControl}>
-                        <FormLabel component="legend">Main variable</FormLabel>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={<Checkbox checked={this.state.cases} onChange={this._toggleVariable.bind(this, 'cases')} name="cases" />}
-                                label="Cases"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox checked={this.state.hospitalizations} onChange={this._toggleVariable.bind(this, 'hospitalizations')} name="hospitalizations" />}
-                                label="Hospitalizations"
-                            />
-                            <FormControlLabel
-                                control={<Checkbox checked={this.state.icu} onChange={this._toggleVariable.bind(this, 'icu')} name="icu" />}
-                                label="Intensive Care Units"
-                            />
-                            <Tooltip title="Mortality data cannot be filtered per province.">
-                                <FormControlLabel
-                                    control={
-                                            <Checkbox
-                                                checked={this.state.mortality}
-                                                onChange={this._toggleVariable.bind(this, 'mortality')}
-                                                name="mortality"
-                                                disabled={this.props.province !== 'Belgium'}
-                                            />
-                                        }
-                                    label="Mortality"
-                                />
-                            </Tooltip>
-                        </FormGroup>
+                    <FormControl component="fieldset" className={this.classes.formControl} style={{width: "100%"}}>
+                        <Grid container spacing={6} justify="center">
+                            <Grid item xs>
+                                <FormLabel component="legend">Main variable</FormLabel>
+                                <RadioGroup onChange={ (ev) => this.setState({ mainVariable: ev.target.value }) }>
+                                    <FormControlLabel control={<Radio />} value="cases" label="Cases" />
+                                    <FormControlLabel control={<Radio />} value="hospitalizations" label="Hospitalizations" />
+                                    <FormControlLabel control={<Radio />} value="icu" label="Intensive Care Units" />
+                                    <Tooltip title="Mortality data cannot be filtered per province.">
+                                        <FormControlLabel
+                                            control={<Radio />} value="mortality" label="Mortality"
+                                            disabled={this.props.province !== 'Belgium'}
+                                        />
+                                    </Tooltip>
+                                </RadioGroup>
+                            </Grid>
+                        </Grid>
                     </FormControl>
-                    { this.state.cases && this.Cases() }
-                    { this.state.hospitalizations && this.Hospitalizations() }
-                    { this.state.icu && this.Icu() }
-                    { this.state.mortality && this.Mortality() }
+                    { this.state.mainVariable === 'cases' && this.Cases() }
+                    { this.state.mainVariable === 'hospitalizations' && this.Hospitalizations() }
+                    { this.state.mainVariable === 'icu' && this.Icu() }
+                    { this.state.mainVariable === 'mortality' && this.Mortality() }
                 </Container>
             </main>
         );
@@ -275,8 +260,5 @@ export default class Charts extends React.Component {
                 }
             </React.Fragment>
         );
-    }
-    _toggleVariable(variable) {
-        this.setState({ [variable]: !this.state[variable] });
     }
 }
