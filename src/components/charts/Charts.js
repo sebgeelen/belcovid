@@ -9,7 +9,7 @@ import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, PROVINCES } from '../../data';
 import { casesAnnotations as testingAnnotations } from '../../helpers';
 
-const stuff = {
+const dataInfo = {
     cases: {
         average: {
             title: 'New cases, by age group (7-day rolling average)',
@@ -150,7 +150,7 @@ export default class Charts extends React.Component {
         );
     }
     getChart() {
-        const variableInfo = stuff[this.state.mainVariable];
+        const variableInfo = dataInfo[this.state.mainVariable];
         const chartInfo = variableInfo[this.state.chartType];
         const variableName = this.state.mainVariable;
         const data = this.props[variableName];
