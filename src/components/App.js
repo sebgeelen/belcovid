@@ -355,24 +355,6 @@ class App extends React.Component {
             });
         }
     }
-    _filterStatsData(rawStatsData, province) {
-        if (province === 'Belgium') {
-            return rawStatsData;
-        } else if (rawStatsData) {
-            const data = {};
-            for (const name of Object.keys(rawStatsData)) {
-                if (name === 'mortality') {
-                    // The mortality dataset doesn't have the data per province.
-                    data[name] = rawStatsData[name];
-                } else {
-                    data[name] = rawStatsData[name].filter(data => {
-                        return data.PROVINCE === province;
-                    });
-                }
-            }
-            return data;
-        }
-    }
     _normalizeData(key, values) {
         let dataKey;
         let withAgeGroups = false;
