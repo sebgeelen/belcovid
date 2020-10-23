@@ -9,9 +9,88 @@ import { Skeleton } from '@material-ui/lab';
 import { PROVINCES } from '../../data';
 import { casesAnnotations } from '../../helpers';
 
+const stuff = {
+    cases: {
+        average: {
+            title: 'New cases, by age group (7-day rolling average)',
+            annotations: casesAnnotations,
+        },
+        testing: {
+            title: 'Test positivity ratio',
+            annotations: casesAnnotations,
+        },
+        change: {
+            title: 'Week by week change of new cases',
+            description: (
+                <React.Fragment>
+                    How fast is the number of cases rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of new cases between the last 7 days
+                        and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+            annotations: casesAnnotations,
+        },
+    },
+    totalHospitalizations: {
+        average: {
+            title: 'Patients at the hospital',
+        },
+        testing: {
+            title: 'Percentage of patients at the hospital per test',
+        },
+        change: {
+            title: 'Week by week change of hospitalized patients',
+            description: (
+                <React.Fragment>
+                    How fast is the number of patients at the hospital rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of patients at the hospital between the last
+                        7 days and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+        },
+    },
+    totalICU: {
+        average: {
+            title: 'Patients in intensive care',
+        },
+        testing: {
+            title: 'Percentage of patients in intensive care per test',
+        },
+        change: {
+            title: 'Week by week change of patients in intensive care',
+            description: (
+                <React.Fragment>
+                    How fast is the number of patients in ICU rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of patients in intensive care between the
+                        last 7 days and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+        },
+    },
+    mortality: {
+        average: {
+            title: 'Mortality',
+        },
+        testing: {
+            title: 'Percentage of mortality per test',
+        },
+        change: {
+            title: 'Week by week change of mortality',
+            description: (
+                <React.Fragment>
+                    How fast is the mortality rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of mortality between the
+                        last 7 days and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+        },
+    },
+};
+
 export default class Charts extends React.Component {
     state = {
-        mainVariable: undefined,
+        mainVariable: 'cases',
+        chartType: 'average',
     }
     classes = this.props.classes;
 
@@ -25,10 +104,13 @@ export default class Charts extends React.Component {
                         <Grid container spacing={6} justify="center">
                             <Grid item xs>
                                 <FormLabel component="legend">Main variable</FormLabel>
-                                <RadioGroup onChange={ (ev) => this.setState({ mainVariable: ev.target.value }) }>
+                                <RadioGroup
+                                    value={this.state.mainVariable}
+                                    onChange={ (ev) => this.setState({ mainVariable: ev.target.value }) }
+                                >
                                     <FormControlLabel control={<Radio />} value="cases" label="Cases" />
-                                    <FormControlLabel control={<Radio />} value="hospitalizations" label="Hospitalizations" />
-                                    <FormControlLabel control={<Radio />} value="icu" label="Intensive Care Units" />
+                                    <FormControlLabel control={<Radio />} value="totalHospitalizations" label="Hospitalizations" />
+                                    <FormControlLabel control={<Radio />} value="totalICU" label="Intensive Care Units" />
                                     <Tooltip title="Mortality data cannot be filtered per province.">
                                         <FormControlLabel
                                             control={<Radio />} value="mortality" label="Mortality"
@@ -37,227 +119,105 @@ export default class Charts extends React.Component {
                                     </Tooltip>
                                 </RadioGroup>
                             </Grid>
+                            <Grid item xs>
+                                <FormLabel component="legend">Chart type</FormLabel>
+                                <RadioGroup
+                                    value={this.state.chartType}
+                                    onChange={ (ev) => this.setState({ chartType: ev.target.value }) }
+                                >
+                                    <FormControlLabel control={<Radio />} value="average" label="7-day rolling average" />
+                                    <FormControlLabel control={<Radio />} value="testing" label="Testing ratio" />
+                                    <FormControlLabel control={<Radio />} value="change" label="Rate of change" />
+                                </RadioGroup>
+                            </Grid>
                         </Grid>
                     </FormControl>
-                    { this.state.mainVariable === 'cases' && this.Cases() }
-                    { this.state.mainVariable === 'hospitalizations' && this.Hospitalizations() }
-                    { this.state.mainVariable === 'icu' && this.Icu() }
-                    { this.state.mainVariable === 'mortality' && this.Mortality() }
+                    {
+                        this.state.mainVariable && this.state.chartType &&
+                            <section id="chart">
+                                { this.getChart() }
+                            </section>
+                    }
                 </Container>
             </main>
         );
     }
-    Cases() {
-        return (
-            <React.Fragment>
-                <div style={{ marginTop: 20 }} />
-                <Divider variant="middle" />
-                <div style={{ marginTop: 20 }} />
-                <Title>Cases</Title>
-
-                {this.props.cases ?
-                    <section id="cases-age" className={this.classes.chartSection}>
-                        <h3>New cases, by age group (7-day rolling average)</h3>
+    getChart() {
+        const chartInfo = stuff[this.state.mainVariable][this.state.chartType];
+        const variableName = this.state.mainVariable;
+        const data = this.props[variableName];
+        if (!data) {
+            return <Skeleton variant="rect" height={200} />;
+        }
+        let chart;
+        switch (this.state.chartType) {
+            case 'average': {
+                if (variableName === 'cases') {
+                    chart = (
                         <CasesByAge
                             classes={this.classes}
-                            data={this.props.cases}
-                            chartName="New cases, by age group (7-day rolling average)"
+                            data={data}
+                            annotations={chartInfo.annotations}
+                            chartName={chartInfo.title}
                             asImage={true}
                         />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-
-                {this.props.cases && this.props.tests ?
-                    <section id="positive-test-rate" className={this.classes.chartSection}>
-                        <h3>Percentage of positive tests</h3>
-                        <Testing
+                    );
+                } else {
+                    chart = (
+                        <AveragedData
                             classes={this.classes}
-                            testData={this.props.tests}
-                            comparativeData={this.props.cases}
-                            comparativeDataName="Cases"
-                            chartName="Percentage of positive tests"
-                            annotations={casesAnnotations}
+                            data={data}
+                            chartName={chartInfo.title}
+                            annotations={chartInfo.annotations}
                             asImage={true}
                         />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
+                    );
                 }
-
-                {this.props.cases ?
-                    <section id="rate-of-change-cases" className={this.classes.chartSection}>
-                        <h3>Week by week change of new cases</h3>
-                        <p><small>How fast is the number of cases rising/falling (in %) ?<br/>
-                            <i>(The percentage change in number of new cases between the last 7 days
-                                and the 7 days before that).</i></small></p>
-                        <RateOfChange
-                            classes={this.classes}
-                            data={this.props.cases}
-                            chartName="Week by week change of new cases"
-                            annotations={casesAnnotations}
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-            </React.Fragment>
-        );
-    }
-    Hospitalizations() {
+                break;
+            }
+            case 'testing': {
+                const formattedDataName = variableName.charAt(0).toUpperCase() + variableName.slice(1);
+                chart = (
+                    <Testing
+                        classes={this.classes}
+                        testData={this.props.tests}
+                        comparativeData={data}
+                        comparativeDataName={formattedDataName}
+                        chartName={chartInfo.title}
+                        annotations={chartInfo.annotations}
+                        asImage={true}
+                    />
+                );
+                break;
+            }
+            case 'change': {
+                chart = (
+                    <RateOfChange
+                        classes={this.classes}
+                        data={data}
+                        chartName={chartInfo.title}
+                        annotations={chartInfo.annotations}
+                        asImage={true}
+                    />
+                );
+                break;
+            }
+            default: break;
+        }
         return (
             <React.Fragment>
                 <div style={{ marginTop: 20 }} />
                 <Divider variant="middle" />
                 <div style={{ marginTop: 20 }} />
-                <Title id="hospi">Hospitalizations</Title>
-                <p><small>We count here in number of patients that are hospitalized <i>simultaneously</i> (not just new admissions).</small></p>
-
-                {this.props.totalHospitalizations ?
-                    <section id="hospital-patients" className={this.classes.chartSection}>
-                        <h3>Patients at the hospital</h3>
-                        <AveragedData
-                            classes={this.classes}
-                            data={this.props.totalHospitalizations}
-                            chartName="Number of patients at the hospital"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
+                <Title id="icu">{chartInfo.title}</Title>
+                {
+                    chartInfo.description &&
+                    <p><small>{chartInfo.description}</small></p>
                 }
 
-                {this.props.totalHospitalizations && this.props.tests ?
-                    <section id="hospi-test-rate" className={this.classes.chartSection}>
-                        <h3>Percentage of simultaneous hospital patients for the amount of tests</h3>
-                        <Testing
-                            classes={this.classes}
-                            testData={this.props.tests}
-                            comparativeData={this.props.totalHospitalizations}
-                            comparativeDataName="Hospital patients"
-                            chartName="Percentage of simultaneous hospital patients for the amount of tests"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-
-                {this.props.totalHospitalizations ?
-                    <section id="rate-of-change-hospi" className={this.classes.chartSection}>
-                        <h3>Week by week change of hospitalized patients</h3>
-                        <p><small>How fast is the number of patients at the hospital rising/falling (in %) ?</small></p>
-                        <RateOfChange
-                            classes={this.classes}
-                            data={this.props.totalHospitalizations}
-                            chartName="Week by week change of hospitalized patients"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-            </React.Fragment>
-        );
-    }
-    Icu() {
-        return (
-            <React.Fragment>
-                <div style={{ marginTop: 20 }} />
-                <Divider variant="middle" />
-                <div style={{ marginTop: 20 }} />
-                <Title id="icu">Intensive Care Units</Title>
-                <p><small>We count here in number of patients that are <i>simultaneously</i> in ICU (not just new admissions).</small></p>
-
-                {this.props.totalICU ?
-                    <section id="icu-patients" className={this.classes.chartSection}>
-                        <h3>Patients in intensive care</h3>
-                        <AveragedData
-                            classes={this.classes}
-                            data={this.props.totalICU}
-                            chartName="Number of patients in ICU"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-
-                {this.props.totalICU && this.props.tests ?
-                    <section id="icu-test-rate" className={this.classes.chartSection}>
-                        <h3>Percentage of simultaneous ICU patients for the amount of tests</h3>
-                        <Testing
-                            classes={this.classes}
-                            testData={this.props.tests}
-                            comparativeData={this.props.totalICU}
-                            comparativeDataName="ICU patients"
-                            chartName="Percentage of simultaneous ICU patients for the amount of tests"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-
-                {this.props.totalICU ?
-                    <section id="rate-of-change-icu" className={this.classes.chartSection}>
-                        <h3>Week by week change of patients in ICU</h3>
-                        <p><small>How fast is the number of patients in ICU rising/falling (in %) ?</small></p>
-                        <RateOfChange
-                            classes={this.classes}
-                            data={this.props.totalICU}
-                            chartName="Week by week change of patients in ICU"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-            </React.Fragment>
-        );
-    }
-    Mortality() {
-        return (
-            <React.Fragment>
-                <div style={{ marginTop: 20 }} />
-                <Divider variant="middle" />
-                <div style={{ marginTop: 20 }} />
-                <Title id="mortality">Mortality</Title>
-
-                {this.props.mortality ?
-                    <section id="mortality" className={this.classes.chartSection}>
-                        <h3>Number of deaths attributed to Covid-19, per day</h3>
-                        <AveragedData
-                            classes={this.classes}
-                            data={this.props.mortality}
-                            chartName="Deaths per day"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-
-                {this.props.mortality && this.props.tests ?
-                    <section id="mortality-test-rate" className={this.classes.chartSection}>
-                        <h3>Percentage of mortality for the amount of tests</h3>
-                        <Testing
-                            classes={this.classes}
-                            testData={this.props.tests}
-                            comparativeData={this.props.mortality}
-                            comparativeDataName="Mortality"
-                            chartName="Percentage of mortality for the amount of tests"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
-
-                {this.props.mortality ?
-                    <section id="rate-of-change-mortality" className={this.classes.chartSection}>
-                        <h3>Week by week change of mortality</h3>
-                        <p><small>How fast is the mortality rising/falling (in %) ?</small></p>
-                        <RateOfChange
-                            classes={this.classes}
-                            data={this.props.mortality}
-                            chartName="Week by week change of mortality"
-                            asImage={true}
-                        />
-                    </section> :
-                    <Skeleton variant="rect" height={200} />
-                }
+                <div className={this.classes.chartSection}>
+                    { chart }
+                </div>
             </React.Fragment>
         );
     }
