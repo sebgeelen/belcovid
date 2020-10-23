@@ -7,18 +7,18 @@ import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Rad
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, PROVINCES } from '../../data';
-import { casesAnnotations } from '../../helpers';
+import { casesAnnotations as testingAnnotations } from '../../helpers';
 
 const stuff = {
     cases: {
         average: {
             title: 'New cases, by age group (7-day rolling average)',
-            annotations: casesAnnotations,
+            annotations: testingAnnotations,
             ageGroups: AGE_GROUPS_CASES,
         },
         testing: {
             title: 'Test positivity ratio',
-            annotations: casesAnnotations,
+            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of new cases',
@@ -29,7 +29,7 @@ const stuff = {
                         and the 7 days before that).</i>
                 </React.Fragment>
             ),
-            annotations: casesAnnotations,
+            annotations: testingAnnotations,
         },
     },
     totalHospitalizations: {
@@ -38,6 +38,7 @@ const stuff = {
         },
         testing: {
             title: 'Percentage of patients at the hospital per test',
+            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of hospitalized patients',
@@ -56,6 +57,7 @@ const stuff = {
         },
         testing: {
             title: 'Percentage of patients in intensive care per test',
+            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of patients in intensive care',
@@ -75,6 +77,7 @@ const stuff = {
         },
         testing: {
             title: 'Percentage of mortality per test',
+            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of mortality',
