@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import DataTable from './DataTable';
 import Title from './Title';
-import CasesByAge from './charts/CasesByAge';
+import ChartByAge from './charts/ChartByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
 import { AGE_GROUPS_CASES, PROVINCES } from '../data';
@@ -54,7 +54,7 @@ export default class Dashboard extends React.Component {
               <Paper className={this.fixedHeightPaper} style={{height: '100%', width: '100%'}}>
                 <Title>New cases, by age group (7-day rolling average) in {PROVINCES[this.props.province]}</Title>
                 {this.props.allCasesData ?
-                    <CasesByAge
+                    <ChartByAge
                       classes={this.classes}
                       data={this.props.allCasesData[this.props.province]}
                       chartName="New cases, by age group (7-day rolling average)"

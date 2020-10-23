@@ -1,9 +1,9 @@
 import React from 'react';
-import { casesAnnotations, getAveragePoints } from '../../helpers';
+import { getAveragePoints } from '../../helpers';
 import 'chartjs-plugin-zoom';
 import StackedAreaTimeChart from './StackedAreaTimeChart';
 
-export default class CasesByAge extends React.Component {
+export default class ChartByAge extends React.Component {
     render() {
         let casesData = this.props.data;
         const points = this.props.ageGroups.reduce((points, group) => {
@@ -43,7 +43,7 @@ export default class CasesByAge extends React.Component {
             chartName={this.props.chartName}
             datasets={datasets}
             bounds={bounds}
-            annotations={casesAnnotations}
+            annotations={this.props.annotations}
             tooltip={this.props.tooltip}
             asImage={this.props.asImage}
         />;

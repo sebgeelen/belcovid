@@ -1,5 +1,5 @@
 import React from 'react';
-import CasesByAge from './CasesByAge';
+import ChartByAge from './ChartByAge';
 import AveragedData from './AveragedData';
 import Testing from './Testing';
 import RateOfChange from './RateOfChange';
@@ -156,7 +156,7 @@ export default class Charts extends React.Component {
             case 'average': {
                 if (chartInfo.ageGroups) {
                     chart = (
-                        <CasesByAge
+                        <ChartByAge
                             classes={this.classes}
                             data={data}
                             annotations={chartInfo.annotations}
