@@ -33,6 +33,7 @@ const stuff = {
         },
     },
     totalHospitalizations: {
+        description: 'This concerns the number of patients that are hospitalized on a given day, not only the new admissions.',
         average: {
             title: 'Patients at the hospital',
         },
@@ -52,6 +53,7 @@ const stuff = {
         },
     },
     totalICU: {
+        description: 'This concerns the number of patients that are in intensive care on a given day, not only the new admissions.',
         average: {
             title: 'Patients in intensive care',
         },
@@ -148,7 +150,8 @@ export default class Charts extends React.Component {
         );
     }
     getChart() {
-        const chartInfo = stuff[this.state.mainVariable][this.state.chartType];
+        const variableInfo = stuff[this.state.mainVariable];
+        const chartInfo = variableInfo[this.state.chartType];
         const variableName = this.state.mainVariable;
         const data = this.props[variableName];
         if (!data) {
@@ -216,6 +219,10 @@ export default class Charts extends React.Component {
                 <Divider variant="middle" />
                 <div style={{ marginTop: 20 }} />
                 <Title id="icu">{chartInfo.title}</Title>
+                {
+                    variableInfo.description &&
+                    <p><small>{variableInfo.description}</small></p>
+                }
                 {
                     chartInfo.description &&
                     <p><small>{chartInfo.description}</small></p>
