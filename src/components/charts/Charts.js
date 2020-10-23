@@ -7,6 +7,7 @@ import { Checkbox, Container, Divider, FormControl, FormControlLabel, FormGroup,
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { PROVINCES } from '../../data';
+import { casesAnnotations } from '../../helpers';
 
 export default class Charts extends React.Component {
     state = {
@@ -91,6 +92,7 @@ export default class Charts extends React.Component {
                             comparativeData={this.props.cases}
                             comparativeDataName="Cases"
                             chartName="Percentage of positive tests"
+                            annotations={casesAnnotations}
                             asImage={true}
                         />
                     </section> :
@@ -107,6 +109,7 @@ export default class Charts extends React.Component {
                             classes={this.classes}
                             data={this.props.cases}
                             chartName="Week by week change of new cases"
+                            annotations={casesAnnotations}
                             asImage={true}
                         />
                     </section> :

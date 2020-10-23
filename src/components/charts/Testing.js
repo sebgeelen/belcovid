@@ -119,6 +119,7 @@ export default class Testing extends React.Component {
                 datasets={datasets}
                 yAxes={yAxes}
                 bounds={bounds}
+                annotations={this.props.annotations}
                 asImage={this.props.asImage}
             />
         );

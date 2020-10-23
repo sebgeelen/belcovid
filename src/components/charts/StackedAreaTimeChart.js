@@ -31,6 +31,7 @@ export default class StackedAreaTimeChart extends React.Component {
                 chartName={this.props.chartName}
                 datasets={datasets}
                 stacked={true}
+                annotations={this.props.annotations}
                 bounds={this.props.bounds}
                 tooltip={this.props.tooltip}
                 asImage={this.props.asImage}

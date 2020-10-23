@@ -94,7 +94,7 @@ export default class RateOfChange extends React.Component {
             chartName={this.props.chartName}
             datasets={datasets}
             bounds={bounds}
-            annotations={annotations}
+            annotations={[...(this.props.annotations || []), ...annotations]}
             asImage={this.props.asImage}
         />;
     }

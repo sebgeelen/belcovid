@@ -18,6 +18,25 @@ export const AVAILABLE_BEDS = TOTAL_BEDS - TAKEN_BEDS_PER_DAY;
 export const TOTAL_ICU_BEDS = 2650;
 // source: https://www.vrt.be/vrtnws/en/2020/03/22/health-minister-says-that-an-additional-759-intensive-care-beds/
 
+export const casesAnnotations = [{
+    type: 'line',
+    mode: 'vertical',
+    scaleID: 'x-axis-0',
+    value: new Date('2020-10-19'),
+    borderColor: 'grey',
+    borderDash: [10, 10],
+    borderWidth: .5,
+    label: {
+        backgroundColor: 'rgba(128, 128, 128, 0.3)',
+        fontColor: 'black',
+        content: 'Testing downscaled',
+        enabled: true,
+        fontSize: 9,
+        fontStyle: 'normal',
+        position: 'top',
+    },
+}];
+
 export function getPolynomialRegressionPoints(data, degree = 2) {
     const regression = PolynomialRegression.read(data, degree);
     const terms = regression.getTerms();

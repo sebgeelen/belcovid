@@ -211,7 +211,7 @@ export default class LineChart extends React.Component {
                         borderDash: [10, 10],
                         borderWidth: 1,
                         label: {
-                            content: 'Peak of wave 1',
+                            content: 'Peak 1',
                             enabled: true,
                             fontSize: 10,
                             fontStyle: 'normal',
@@ -227,7 +227,7 @@ export default class LineChart extends React.Component {
                         borderDash: [10, 10],
                         borderWidth: 1,
                         label: {
-                            content: 'Schools reopening',
+                            content: 'Schools open',
                             enabled: true,
                             fontSize: 10,
                             fontStyle: 'normal',
