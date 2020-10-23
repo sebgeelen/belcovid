@@ -1,8 +1,8 @@
-const { default: RateOfChangeChart } = require("./components/charts/RateOfChangeChart");
+const { default: RateOfChange } = require("./components/charts/RateOfChange");
 
 describe('RateOfChangeChart', () => {
-    const rateComponent = new RateOfChangeChart();
-    describe('_getRateOfChangePoint', () => {
+    const rateComponent = new RateOfChange();
+    describe('_getChangeRatio', () => {
         test('should get a constant rate of 0%', () => {
             const data = [
                 { x: 1, y: 1},
@@ -13,13 +13,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 1},
                 { x: 1, y: 1},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: 0});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(0);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(0);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(0);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(0);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(0);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(0);
         });
         test('should get a constant rate of 100%', () => {
             const data = [
@@ -31,13 +31,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 32},
                 { x: 1, y: 64},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: 100});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: 100});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: 100});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: 100});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: 100});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: 100});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(100);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(100);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(100);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(100);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(100);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(100);
         });
         test('should get a constant rate of -100%', () => {
             const data = [
@@ -49,13 +49,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 2},
                 { x: 1, y: 1},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: -100});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: -100});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: -100});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: -100});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: -100});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: -100});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(-100);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(-100);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(-100);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(-100);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(-100);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(-100);
         });
         test('should get a constant rate of 50%', () => {
             const data = [
@@ -67,13 +67,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 7.59375},
                 { x: 1, y: 11.390625},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: 50});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: 50});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: 50});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: 50});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: 50});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: 50});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(50);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(50);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(50);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(50);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(50);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(50);
         });
         test('should get a constant rate of -50%', () => {
             const data = [
@@ -85,13 +85,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 1.5},
                 { x: 1, y: 1},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: -50});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: -50});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: -50});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: -50});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: -50});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: -50});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(-50);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(-50);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(-50);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(-50);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(-50);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(-50);
         });
         test('should get a rate that constantly increases by 10%', () => {
             const data = [
@@ -103,13 +103,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 3.6036},
                 { x: 1, y: 5.76576},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: 10});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: 20});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: 30});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: 40});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: 50});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: 60});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(10);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(20);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(30);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(40);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(50);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(60);
         });
         test('should get a rate that constantly decreases by 10%', () => {
             const data = [
@@ -121,13 +121,13 @@ describe('RateOfChangeChart', () => {
                 { x: 1, y: 1.1},
                 { x: 1, y: 1},
             ];
-            expect(rateComponent._getRateOfChangePoint(data, 0, 2)).toEqual({ x: 1, y: 0});
-            expect(rateComponent._getRateOfChangePoint(data, 1, 2)).toEqual({ x: 1, y: -60});
-            expect(rateComponent._getRateOfChangePoint(data, 2, 2)).toEqual({ x: 1, y: -50});
-            expect(rateComponent._getRateOfChangePoint(data, 3, 2)).toEqual({ x: 1, y: -40});
-            expect(rateComponent._getRateOfChangePoint(data, 4, 2)).toEqual({ x: 1, y: -30});
-            expect(rateComponent._getRateOfChangePoint(data, 5, 2)).toEqual({ x: 1, y: -20});
-            expect(rateComponent._getRateOfChangePoint(data, 6, 2)).toEqual({ x: 1, y: -10});
+            expect(rateComponent._getChangeRatio(data[0].y, undefined)).toEqual(undefined);
+            expect(rateComponent._getChangeRatio(data[1].y, data[0].y)).toEqual(-60);
+            expect(rateComponent._getChangeRatio(data[2].y, data[1].y)).toEqual(-50);
+            expect(rateComponent._getChangeRatio(data[3].y, data[2].y)).toEqual(-40);
+            expect(rateComponent._getChangeRatio(data[4].y, data[3].y)).toEqual(-30);
+            expect(rateComponent._getChangeRatio(data[5].y, data[4].y)).toEqual(-20);
+            expect(rateComponent._getChangeRatio(data[6].y, data[5].y)).toEqual(-10);
         });
     });
 });

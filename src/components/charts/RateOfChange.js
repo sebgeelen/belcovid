@@ -1,5 +1,10 @@
 import React from 'react';
-import { getDateFrom, getPolynomialRegressionPoints, normalizeDate } from '../../helpers';
+import {
+    betterRound,
+    getDateFrom,
+    getPolynomialRegressionPoints,
+    normalizeDate
+} from '../../helpers';
 import LineChart from './LineChart';
 
 const regressionStart = new Date('2020-08-15');
@@ -101,18 +106,17 @@ export default class RateOfChange extends React.Component {
      * @returns {number}
      */
     _getChangeRatio(newValue, oldValue) {
-        if (oldValue === 0) {
-            if (newValue === 0) {
-                // If we come from 0 and stay at 0, the rate of change is 0.
-                return 0;
-            } else {
-                // If we come from 0 and get to a different value, the rate of
-                // change is undefined.
-                return;
-            }
+        if (oldValue === newValue) {
+            return 0;
+        } else if (!oldValue) {
+            // If we come from 0 and get to a different value, the rate of
+            // change is undefined.
+            return;
+        } else if (newValue > oldValue) {
+            return betterRound(100 * ((newValue / oldValue) - 1));
         } else {
-            const sign = newValue > oldValue ? 1 : -1;
-            return sign * 100 * ((newValue / oldValue) - 1);
+            // If the value went down, the result should be negative.
+            return betterRound(-100 * ((oldValue / newValue) - 1));
         }
     }
 }
