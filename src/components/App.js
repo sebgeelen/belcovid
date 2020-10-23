@@ -17,9 +17,6 @@ import {
     FormControl,
     IconButton,
     List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     MenuItem,
     Select,
     Toolbar,
@@ -32,6 +29,8 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import { getDaysBetween, getFromLocalStorage, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import ListItemLink from './ListItemLink.js';
 
 const drawerWidth = 240;
 const styles = (theme) => ({
@@ -130,7 +129,6 @@ const styles = (theme) => ({
 class App extends React.Component {
     state = {
         open: false,
-        page: (getFromLocalStorage('belcovid:page')) || 'dashboard',
         province: (getFromLocalStorage('belcovid:province')) || 'Belgium',
     };
     classes = this.props.classes;
@@ -191,134 +189,114 @@ class App extends React.Component {
         }
     }
     render() {
-        let main;
-        switch (this.state.page) {
-            case 'dashboard':
-                main = <Dashboard
-                    classes={this.classes}
-                    allCasesData={this.state.cases}
-                    totalHospitalizations={this.state.totalHospitalizations?.Belgium}
-                    totalICU={this.state.totalICU?.Belgium}
-                    newsData={this.state.newsData}
-                    province={this.state.province}
-                />;
-                break;
-            case 'charts':
-                main = <Charts
-                    classes={this.classes}
-                    cases={this.state.cases?.[this.state.province]}
-                    totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
-                    totalICU={this.state.totalICU?.[this.state.province]}
-                    mortality={this.state.mortality?.[this.state.province]}
-                    tests={this.state.tests?.[this.state.province]}
-                    province={this.state.province}
-                />;
-                break;
-            default:
-                main = null;
-        }
         return (
             <div className={this.classes.root}>
                 <CssBaseline />
-                <AppBar
-                    position="absolute"
-                    className={
-                        clsx(
-                            this.classes.appBar,
-                            this.state.open && this.classes.appBarShift
-                        )
-                    }
-                >
-                    <Toolbar className={this.classes.toolbar}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={this._handleDrawerOpen.bind(this)}
-                            className={
-                                clsx(
-                                    this.classes.menuButton,
-                                    this.state.open && this.classes.menuButtonHidden
-                                )
-                            }
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            className={this.classes.title}
-                        >
-                            BelCovid
-                        </Typography>
-                        <FormControl className={this.classes.formControl}>
-                            <Select
-                                id="province-select"
-                                value={this.state.province}
-                                onChange={ev => {
-                                    const province = ev.target.value;
-                                    setIntoLocalStorage('belcovid:province', province);
-                                    this.setState({ province });
-                                }}
+                <BrowserRouter>
+                    <AppBar
+                        position="absolute"
+                        className={
+                            clsx(
+                                this.classes.appBar,
+                                this.state.open && this.classes.appBarShift
+                            )
+                        }
+                    >
+                        <Toolbar className={this.classes.toolbar}>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={this._handleDrawerOpen.bind(this)}
+                                className={
+                                    clsx(
+                                        this.classes.menuButton,
+                                        this.state.open && this.classes.menuButtonHidden
+                                    )
+                                }
                             >
-                                { Object.keys(PROVINCES).map(key => {
-                                    return (
-                                        <MenuItem
-                                            value={key}
-                                            key={key}
-                                        >
-                                            {PROVINCES[key]}
-                                        </MenuItem>
-                                    );
-                                }) }
-                            </Select>
-                        </FormControl>
-                    </Toolbar>
-                </AppBar>
-                <Drawer
-                    variant="permanent"
-                    classes={{
-                        paper: clsx(
-                            this.classes.drawerPaper,
-                            !this.state.open && this.classes.drawerPaperClose
-                        ),
-                    }}
-                    open={this.state.open}
-                >
-                    <div className={this.classes.toolbarIcon}>
-                        <IconButton
-                            onClick={this._handleDrawerClose.bind(this)}
-                        >
-                            <ChevronLeftIcon />
-                        </IconButton>
-                    </div>
-                    <Divider />
-                    <List>
-                        <ListItem
-                            button
-                            selected={this.state.page === 'dashboard'}
-                            onClick={this._goto.bind(this, 'dashboard')}
-                        >
-                            <ListItemIcon>
-                                <DashboardIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Dashboard" />
-                        </ListItem>
-                        <ListItem
-                            button
-                            selected={this.state.page === 'charts'}
-                            onClick={this._goto.bind(this, 'charts')}
-                        >
-                            <ListItemIcon>
-                                <BarChartIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Charts" />
-                        </ListItem>
-                    </List>
-                </Drawer>
-                {main}
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography
+                                component="h1"
+                                variant="h6"
+                                color="inherit"
+                                noWrap
+                                className={this.classes.title}
+                            >
+                                BelCovid
+                            </Typography>
+                            <FormControl className={this.classes.formControl}>
+                                <Select
+                                    id="province-select"
+                                    value={this.state.province}
+                                    onChange={ev => {
+                                        const province = ev.target.value;
+                                        setIntoLocalStorage('belcovid:province', province);
+                                        this.setState({ province });
+                                    }}
+                                >
+                                    { Object.keys(PROVINCES).map(key => {
+                                        return (
+                                            <MenuItem
+                                                value={key}
+                                                key={key}
+                                            >
+                                                {PROVINCES[key]}
+                                            </MenuItem>
+                                        );
+                                    }) }
+                                </Select>
+                            </FormControl>
+                        </Toolbar>
+                    </AppBar>
+                    <Drawer
+                        variant="permanent"
+                        classes={{
+                            paper: clsx(
+                                this.classes.drawerPaper,
+                                !this.state.open && this.classes.drawerPaperClose
+                            ),
+                        }}
+                        open={this.state.open}
+                    >
+                        <div className={this.classes.toolbarIcon}>
+                            <IconButton
+                                onClick={this._handleDrawerClose.bind(this)}
+                            >
+                                <ChevronLeftIcon />
+                            </IconButton>
+                        </div>
+                        <Divider />
+                        <List>
+                            <ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
+                            <ListItemLink to="/charts" primary="Charts" icon={<BarChartIcon />} />
+                        </List>
+                    </Drawer>
+                    <Switch>
+                        <Route path="/charts">
+                            <Charts
+                                classes={this.classes}
+                                cases={this.state.cases?.[this.state.province]}
+                                totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
+                                totalICU={this.state.totalICU?.[this.state.province]}
+                                mortality={this.state.mortality?.[this.state.province]}
+                                tests={this.state.tests?.[this.state.province]}
+                                province={this.state.province}
+                            />
+                        </Route>
+                        <Route path="/">
+                            <Dashboard
+                                classes={this.classes}
+                                allCasesData={this.state.cases}
+                                totalHospitalizations={this.state.totalHospitalizations?.Belgium}
+                                totalICU={this.state.totalICU?.Belgium}
+                                newsData={this.state.newsData}
+                                province={this.state.province}
+                            />
+                        </Route>
+                    </Switch>
+                </BrowserRouter>
             </div>
         );
     }
@@ -454,10 +432,6 @@ class App extends React.Component {
             }
         }
         return { [key]: data };
-    }
-    _goto(page) {
-        this.setState({ page });
-        setIntoLocalStorage('belcovid:page', page);
     }
     _handleDrawerOpen() {
         this.setState({ open: true });
