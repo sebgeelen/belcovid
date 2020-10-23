@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 
 export default function ListItemLink(props) {
     const { icon, primary, to } = props;
@@ -16,10 +16,11 @@ export default function ListItemLink(props) {
         },
         [to],
     );
+    const match = useRouteMatch({ path: to, exact: true });
 
     return (
         <li>
-            <ListItem button component={renderLink}>
+            <ListItem button component={renderLink} selected={!!match}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
                 <ListItemText primary={primary} />
             </ListItem>
