@@ -279,7 +279,7 @@ class App extends React.Component {
                     </div>
                     <Divider />
                     <List>
-                        <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} />
+                        <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} exact />
                         <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
                     </List>
                 </Drawer>

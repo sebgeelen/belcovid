@@ -16,7 +16,7 @@ export default function ListItemLink(props) {
         },
         [to],
     );
-    const match = useRouteMatch({ path: to, exact });
+    const match = useRouteMatch({ path: to.replace(/\?.*$/, ''), exact });
 
     return (
         <li>
