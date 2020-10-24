@@ -268,7 +268,7 @@ class App extends React.Component {
                     </div>
                     <Divider />
                     <List>
-                        <ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} />
+                        <ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} exact />
                         <ListItemLink to="/charts" primary="Charts" icon={<BarChartIcon />} />
                     </List>
                 </Drawer>

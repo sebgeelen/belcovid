@@ -4,7 +4,7 @@ import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 
 export default function ListItemLink(props) {
-    const { icon, primary, to } = props;
+    const { icon, primary, to, exact } = props;
 
     const renderLink = React.useMemo(
         () => {
@@ -16,7 +16,7 @@ export default function ListItemLink(props) {
         },
         [to],
     );
-    const match = useRouteMatch({ path: to, exact: true });
+    const match = useRouteMatch({ path: to, exact });
 
     return (
         <li>
