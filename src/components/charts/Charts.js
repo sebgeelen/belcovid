@@ -33,7 +33,7 @@ const dataInfo = {
             annotations: testingAnnotations,
         },
     },
-    totalHospitalizations: {
+    hospitalizations: {
         description: 'This concerns the number of patients that are hospitalized on a given day, not only the new admissions.',
         average: {
             title: 'Patients at the hospital',
@@ -53,7 +53,7 @@ const dataInfo = {
             ),
         },
     },
-    totalICU: {
+    icu: {
         description: 'This concerns the number of patients that are in intensive care on a given day, not only the new admissions.',
         average: {
             title: 'Patients in intensive care',
@@ -130,20 +130,20 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/totalHospitalizations/${this.state.chartType}`}
+                                                    to={`/charts/hospitalizations/${this.state.chartType}`}
                                                 />
                                             }
-                                            value="totalHospitalizations"
+                                            value="hospitalizations"
                                             label="Hospitalizations"
                                         />
                                         <FormControlLabel
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/totalICU/${this.state.chartType}`}
+                                                    to={`/charts/icu/${this.state.chartType}`}
                                                 />
                                             }
-                                            value="totalICU"
+                                            value="icu"
                                             label="Intensive Care Units"
                                         />
                                         <Tooltip title="Mortality data cannot be filtered per province.">
@@ -224,6 +224,10 @@ export default class Charts extends React.Component {
         if (!variableInfo) return;
         const chartInfo = variableInfo[chartType];
         if (!chartInfo) return;
+        let dataName = mainVariable;
+        if (dataName === 'hospitalizations') dataName = 'totalHospitalizations';
+        if (dataName === 'icu') dataName = 'totalICU';
+        const data = this.props[dataName];
         if (!data) {
             return <Skeleton variant="rect" height={200} />;
         }
