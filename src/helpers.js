@@ -216,7 +216,7 @@ export function today() {
  * @returns {Date}
  */
 export function lastConsolidatedDataDay() {
-    return getDateFrom(today(), -4);
+    return getDateFrom(today(), -3);
 }
 const months = [
     'Jan',
