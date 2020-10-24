@@ -8,6 +8,7 @@ import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, PROVINCES } from '../../data';
 import { casesAnnotations as testingAnnotations } from '../../helpers';
+import { BrowserRouter, Link as RouterLink, Route, Switch } from 'react-router-dom';
 
 const dataInfo = {
     cases: {
@@ -107,58 +108,126 @@ export default class Charts extends React.Component {
                 <div className={this.classes.appBarSpacer} />
                 <Container maxWidth="lg" className={this.classes.container}>
                     <Title>Charts for {PROVINCES[this.props.province]}</Title>
-                    <FormControl component="fieldset" className={this.classes.formControl} style={{width: "100%"}}>
-                        <Grid container spacing={6} justify="center">
-                            <Grid item xs>
-                                <FormLabel component="legend">Main variable</FormLabel>
-                                <RadioGroup
-                                    value={this.state.mainVariable}
-                                    onChange={ (ev) => this.setState({ mainVariable: ev.target.value }) }
-                                >
-                                    <FormControlLabel control={<Radio />} value="cases" label="Cases" />
-                                    <FormControlLabel control={<Radio />} value="totalHospitalizations" label="Hospitalizations" />
-                                    <FormControlLabel control={<Radio />} value="totalICU" label="Intensive Care Units" />
-                                    <Tooltip title="Mortality data cannot be filtered per province.">
+                    <BrowserRouter>
+                        <FormControl component="fieldset" className={this.classes.formControl} style={{width: "100%"}}>
+                            <Grid container spacing={6} justify="center">
+                                <Grid item xs>
+                                    <FormLabel component="legend">Main variable</FormLabel>
+                                    <RadioGroup
+                                        value={this.state.mainVariable}
+                                        onChange={ (ev) => this.setState({ mainVariable: ev.target.value }) }
+                                    >
                                         <FormControlLabel
-                                            control={<Radio />} value="mortality" label="Mortality"
-                                            disabled={this.props.province !== 'Belgium'}
+                                            control={
+                                                <Radio
+                                                    component={RouterLink}
+                                                    to={`/charts/cases/${this.state.chartType}`}
+                                                />
+                                            }
+                                            value="cases"
+                                            label="Cases" />
+                                        <FormControlLabel
+                                            control={
+                                                <Radio
+                                                    component={RouterLink}
+                                                    to={`/charts/totalHospitalizations/${this.state.chartType}`}
+                                                />
+                                            }
+                                            value="totalHospitalizations"
+                                            label="Hospitalizations"
                                         />
-                                    </Tooltip>
-                                </RadioGroup>
+                                        <FormControlLabel
+                                            control={
+                                                <Radio
+                                                    component={RouterLink}
+                                                    to={`/charts/totalICU/${this.state.chartType}`}
+                                                />
+                                            }
+                                            value="totalICU"
+                                            label="Intensive Care Units"
+                                        />
+                                        <Tooltip title="Mortality data cannot be filtered per province.">
+                                            <FormControlLabel
+                                                control={
+                                                    <Radio
+                                                        component={RouterLink}
+                                                        to={`/charts/mortality/${this.state.chartType}`}
+                                                    />
+                                                }
+                                                value="mortality"
+                                                label="Mortality"
+                                                disabled={this.props.province !== 'Belgium'}
+                                            />
+                                        </Tooltip>
+                                    </RadioGroup>
+                                </Grid>
+                                <Grid item xs>
+                                    <FormLabel component="legend">Chart type</FormLabel>
+                                    <RadioGroup
+                                        value={this.state.chartType}
+                                        onChange={ (ev) => this.setState({ chartType: ev.target.value }) }
+                                    >
+                                        <FormControlLabel
+                                            control={
+                                                <Radio
+                                                    component={RouterLink}
+                                                    to={`/charts/${this.state.mainVariable}/average`}
+                                                />
+                                            }
+                                            value="average"
+                                            label="7-day rolling average"
+                                        />
+                                        <FormControlLabel
+                                            control={
+                                                <Radio
+                                                    component={RouterLink}
+                                                    to={`/charts/${this.state.mainVariable}/testing`}
+                                                />
+                                            }
+                                            value="testing"
+                                            label="Testing ratio"
+                                        />
+                                        <FormControlLabel
+                                            control={
+                                                <Radio
+                                                    component={RouterLink}
+                                                    to={`/charts/${this.state.mainVariable}/change`}
+                                                />
+                                            }
+                                            value="change"
+                                            label="Rate of change"
+                                        />
+                                    </RadioGroup>
+                                </Grid>
                             </Grid>
-                            <Grid item xs>
-                                <FormLabel component="legend">Chart type</FormLabel>
-                                <RadioGroup
-                                    value={this.state.chartType}
-                                    onChange={ (ev) => this.setState({ chartType: ev.target.value }) }
-                                >
-                                    <FormControlLabel control={<Radio />} value="average" label="7-day rolling average" />
-                                    <FormControlLabel control={<Radio />} value="testing" label="Testing ratio" />
-                                    <FormControlLabel control={<Radio />} value="change" label="Rate of change" />
-                                </RadioGroup>
-                            </Grid>
-                        </Grid>
-                    </FormControl>
-                    {
-                        this.state.mainVariable && this.state.chartType &&
-                            <section id="chart">
-                                { this.getChart() }
-                            </section>
-                    }
+                        </FormControl>
+                        <section id="chart">
+                            <Switch>
+                                <Route path="/charts/:mainVariable/:chartType">
+                                    {this.getChart.bind(this)}
+                                </Route>
+                                <Route path="/charts">
+                                    {this.getChart.bind(this)}
+                                </Route>
+                            </Switch>
+                        </section>
+                    </BrowserRouter>
                 </Container>
             </main>
         );
     }
-    getChart() {
-        const variableInfo = dataInfo[this.state.mainVariable];
-        const chartInfo = variableInfo[this.state.chartType];
-        const variableName = this.state.mainVariable;
-        const data = this.props[variableName];
+    getChart({history, location, match}) {
+        const params = match.params;
+        const mainVariable = params.mainVariable || this.state.mainVariable;
+        const chartType = params.chartType || this.state.chartType;
+        const variableInfo = dataInfo[mainVariable];
+        const chartInfo = variableInfo[chartType];
+        const data = this.props[mainVariable];
         if (!data) {
             return <Skeleton variant="rect" height={200} />;
         }
         let chart;
-        switch (this.state.chartType) {
+        switch (chartType) {
             case 'average': {
                 if (chartInfo.ageGroups) {
                     chart = (
@@ -185,7 +254,7 @@ export default class Charts extends React.Component {
                 break;
             }
             case 'testing': {
-                const formattedDataName = variableName.charAt(0).toUpperCase() + variableName.slice(1);
+                const formattedDataName = mainVariable.charAt(0).toUpperCase() + mainVariable.slice(1);
                 chart = (
                     <Testing
                         classes={this.classes}
