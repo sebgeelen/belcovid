@@ -307,7 +307,7 @@ class App extends React.Component {
                     </Route>
                 </Switch>
                 {
-                    isMobile() &&
+                    isMobile() && navigator.share &&
                     <Fab
                         size="small"
                         color="primary"
