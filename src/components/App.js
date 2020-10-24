@@ -16,6 +16,7 @@ import {
     CssBaseline,
     Divider,
     Drawer,
+    Fab,
     FormControl,
     IconButton,
     List,
@@ -29,10 +30,11 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import { getDaysBetween, getFromLocalStorage, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
+import { getDaysBetween, getFromLocalStorage, isMobile, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import ListItemLink from './ListItemLink.js';
+import ShareIcon from '@material-ui/icons/Share';
 
 const drawerWidth = 240;
 const styles = (theme) => ({
@@ -304,8 +306,37 @@ class App extends React.Component {
                         />
                     </Route>
                 </Switch>
+                {
+                    isMobile() &&
+                    <Fab
+                        size="small"
+                        color="primary"
+                        aria-label="share"
+                        style={{
+                            position: 'absolute',
+                            bottom: 30,
+                            right: 30,
+                        }}
+                        onClick={this._share.bind(this)}
+                    >
+                        <ShareIcon/>
+                    </Fab>
+                }
             </div>
         );
+    }
+    _share() {
+        if (navigator.share) {
+            navigator
+              .share({
+                title: `BelCovid`,
+                text: `Take a look at this data about Covid in ${provinceString(this.state.province)}.`,
+                url: document.location.href,
+              })
+              .catch(error => {
+                console.error('Something went wrong.', error);
+              });
+          }
     }
     _updateData(name) {
         if (name === 'stats') {
