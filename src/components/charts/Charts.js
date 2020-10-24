@@ -221,8 +221,9 @@ export default class Charts extends React.Component {
         const mainVariable = params.mainVariable || this.state.mainVariable;
         const chartType = params.chartType || this.state.chartType;
         const variableInfo = dataInfo[mainVariable];
+        if (!variableInfo) return;
         const chartInfo = variableInfo[chartType];
-        const data = this.props[mainVariable];
+        if (!chartInfo) return;
         if (!data) {
             return <Skeleton variant="rect" height={200} />;
         }
