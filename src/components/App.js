@@ -7,7 +7,9 @@ import {
     fetchNewsData,
     PROVINCES,
     AGE_GROUPS_CASES,
-    AGE_GROUPS_MORTALITY
+    AGE_GROUPS_MORTALITY,
+    provinceString,
+    provinceKey
 } from '../data';
 import {
     AppBar,
@@ -131,7 +133,7 @@ class App extends React.Component {
     state = {
         open: false,
         province: (Object.keys(PROVINCES).includes(this.provinceFromPath) && this.provinceFromPath)
-            || 'Belgium',
+            || 'be',
     };
     classes = this.props.classes;
 
@@ -244,11 +246,11 @@ class App extends React.Component {
                                                 state: {
                                                     ...this.state,
                                                     ...{
-                                                        province: Object.keys(PROVINCES).includes(key) ? key : 'Belgium',
+                                                        province: Object.keys(PROVINCES).includes(key) ? key : 'be',
                                                     }},
                                             }}
                                         >
-                                            {PROVINCES[key]}
+                                            {provinceString(key)}
                                         </MenuItem>
                                     );
                                 }) }
@@ -275,7 +277,7 @@ class App extends React.Component {
                     </div>
                     <Divider />
                     <List>
-                        <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} exact />
+                        <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} />
                         <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
                     </List>
                 </Drawer>
@@ -295,8 +297,8 @@ class App extends React.Component {
                         <Dashboard
                             classes={this.classes}
                             allCasesData={this.state.cases}
-                            totalHospitalizations={this.state.totalHospitalizations?.Belgium}
-                            totalICU={this.state.totalICU?.Belgium}
+                            totalHospitalizations={this.state.totalHospitalizations?.be}
+                            totalICU={this.state.totalICU?.be}
                             newsData={this.state.newsData}
                             province={this.state.province}
                         />
@@ -385,7 +387,7 @@ class App extends React.Component {
         }, {});
         const limitDay = lastConsolidatedDataDay();
         for (const item of values) {
-            const province = item.PROVINCE || 'Belgium';
+            const province = (item.PROVINCE && provinceKey(item.PROVINCE)) || 'be';
             const date = item.DATE;
             // Ignore days for which the data is not yet consolidated.
             if (!date || new Date(date) > limitDay) continue;
@@ -400,9 +402,9 @@ class App extends React.Component {
                         return groupsObject;
                     }, {});
                 }
-                if (!data.Belgium[date]) {
+                if (!data.be[date]) {
                     // Initialize the age group values for Belgium.
-                    data.Belgium[date] = ageGroups.reduce((groupsObject, groupName) => {
+                    data.be[date] = ageGroups.reduce((groupsObject, groupName) => {
                         groupsObject[groupName] = 0;
                         return groupsObject;
                     }, {});
@@ -415,15 +417,15 @@ class App extends React.Component {
                 data[province][date].total = totalValue + value;
                 // Add to totals for Belgium at date.
                 if (province !== 'Belgium') {
-                    if (!data.Belgium[date]) {
-                        data.Belgium[date] = {};
+                    if (!data.be[date]) {
+                        data.be[date] = {};
                     }
                     // Add to total for Belgium at date for age group.
-                    const belgiumValue = data.Belgium[date][ageGroup] || 0;
-                    data.Belgium[date][ageGroup] = belgiumValue + value;
+                    const belgiumValue = data.be[date][ageGroup] || 0;
+                    data.be[date][ageGroup] = belgiumValue + value;
                     // Add to total for Belgium at date.
-                    const belgiumTotal = data.Belgium[date].total || 0;
-                    data.Belgium[date].total = belgiumTotal + value;
+                    const belgiumTotal = data.be[date].total || 0;
+                    data.be[date].total = belgiumTotal + value;
                 }
             } else {
                 const provinceValue = data[province][date] || 0;
@@ -431,8 +433,8 @@ class App extends React.Component {
                 data[province][date] = provinceValue + value;
                 // Add to total for Belgium at date.
                 if (province !== 'Belgium') {
-                    const belgiumValue = data.Belgium[date] || 0;
-                    data.Belgium[date] = belgiumValue + value;
+                    const belgiumValue = data.be[date] || 0;
+                    data.be[date] = belgiumValue + value;
                 }
             }
         }

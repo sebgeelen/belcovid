@@ -55,19 +55,24 @@ const URLS = {
     ]
 };
 export const PROVINCES = {
-    'Belgium': 'Belgium',
-    'Antwerpen': 'Antwerpen',
-    'OostVlaanderen': 'Oost Vlaanderen',
-    'VlaamsBrabant': 'Vlaams Brabant',
-    'Limburg': 'Limburg',
-    'WestVlaanderen': 'West Vlaanderen',
-    'Hainaut': 'Hainaut',
-    'Liège': 'Liège',
-    'Luxembourg': 'Luxembourg',
-    'Namur': 'Namur',
-    'BrabantWallon': 'Brabant Wallon',
-    'Brussels': 'Brussels Capital',
+    be: 'Belgium',
+    ant: 'Antwerpen',
+    ovl: 'OostVlaanderen',
+    vbr: 'VlaamsBrabant',
+    lim: 'Limburg',
+    wvl: 'WestVlaanderen',
+    hnt: 'Hainaut',
+    lge: 'Liège',
+    lux: 'Luxembourg',
+    nam: 'Namur',
+    brw: 'BrabantWallon',
+    bxl: 'Brussels',
 };
+// Reverse of the above object.
+const _PROVINCE_KEYS = Object.keys(PROVINCES).reduce((obj, key) => {
+    obj[PROVINCES[key]] = key;
+    return obj;
+}, {});
 export const AGE_GROUPS_CASES = [
     '0-9',
     '10-19',
@@ -91,6 +96,12 @@ export const AGE_GROUPS_MORTALITY = [
     'Age unknown'
 ];
 
+export function provinceString(provinceKey) {
+    return PROVINCES[provinceKey].replace(/([A-Z])/g, ' $1').trim();
+}
+export function provinceKey(provinceString) {
+    return _PROVINCE_KEYS[provinceString];
+}
 export function fetchData(key) {
     const url = URLS.stats[key];
     if (url) {

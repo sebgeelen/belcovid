@@ -11,7 +11,7 @@ import Title from './Title';
 import ChartByAge from './charts/ChartByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
-import { PROVINCES } from '../data';
+import { provinceString } from '../data';
 import { getFromLocalStorage } from '../helpers';
 import { dataInfo } from './charts/Charts';
 
@@ -54,7 +54,7 @@ export default class Dashboard extends React.Component {
             {/* Chart */}
             <Grid item xs={12} md={7} lg={7}>
               <Paper className={this.fixedHeightPaper} style={{height: '100%', width: '100%'}}>
-                <Title>New cases, by age group (7-day rolling average) in {PROVINCES[this.props.province]}</Title>
+                <Title>New cases, by age group (7-day rolling average) in {provinceString(this.props.province)}</Title>
                 {this.props.allCasesData ?
                     <ChartByAge
                       classes={this.classes}
@@ -81,7 +81,7 @@ export default class Dashboard extends React.Component {
                 <Title>Today in Belgium</Title>
                 {this.props.allCasesData || this.props.totalHospitalizations || this.props.totalICU ?
                   <DataTable
-                    cases={this.props.allCasesData?.Belgium}
+                    cases={this.props.allCasesData?.be}
                     totalHospitalizations={this.props.totalHospitalizations}
                     totalICU={this.props.totalICU}
                   /> :

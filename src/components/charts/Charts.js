@@ -6,7 +6,7 @@ import RateOfChange from './RateOfChange';
 import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
-import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, PROVINCES } from '../../data';
+import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, provinceString } from '../../data';
 import { casesAnnotations as testingAnnotations } from '../../helpers';
 import { BrowserRouter, Link as RouterLink, Route, Switch } from 'react-router-dom';
 
@@ -107,7 +107,7 @@ export default class Charts extends React.Component {
             <main className={this.classes.content}>
                 <div className={this.classes.appBarSpacer} />
                 <Container maxWidth="lg" className={this.classes.container}>
-                    <Title>Charts for {PROVINCES[this.props.province]}</Title>
+                    <Title>Charts for {provinceString(this.props.province)}</Title>
                     <BrowserRouter>
                         <FormControl component="fieldset" className={this.classes.formControl} style={{width: "100%"}}>
                             <Grid container spacing={6} justify="center">
