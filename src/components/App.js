@@ -29,7 +29,7 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import { getDaysBetween, getFromLocalStorage, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
-import { Route, Switch } from 'react-router-dom';
+import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import ListItemLink from './ListItemLink.js';
 
 const drawerWidth = 240;
@@ -127,9 +127,11 @@ const styles = (theme) => ({
 });
 
 class App extends React.Component {
+    provinceFromPath = window.location.search.substring(1);
     state = {
         open: false,
-        province: (getFromLocalStorage('belcovid:province')) || 'Belgium',
+        province: (Object.keys(PROVINCES).includes(this.provinceFromPath) && this.provinceFromPath)
+            || 'Belgium',
     };
     classes = this.props.classes;
 
@@ -229,17 +231,22 @@ class App extends React.Component {
                             <Select
                                 id="province-select"
                                 value={this.state.province}
-                                onChange={ev => {
-                                    const province = ev.target.value;
-                                    setIntoLocalStorage('belcovid:province', province);
-                                    this.setState({ province });
-                                }}
+                                onChange={ev => this.setState({ province: ev.target.value })}
                             >
                                 { Object.keys(PROVINCES).map(key => {
                                     return (
                                         <MenuItem
                                             value={key}
                                             key={key}
+                                            component={RouterLink}
+                                            to={{
+                                                search: key,
+                                                state: {
+                                                    ...this.state,
+                                                    ...{
+                                                        province: Object.keys(PROVINCES).includes(key) ? key : 'Belgium',
+                                                    }},
+                                            }}
                                         >
                                             {PROVINCES[key]}
                                         </MenuItem>
@@ -268,8 +275,8 @@ class App extends React.Component {
                     </div>
                     <Divider />
                     <List>
-                        <ListItemLink to="/" primary="Dashboard" icon={<DashboardIcon />} exact />
-                        <ListItemLink to="/charts" primary="Charts" icon={<BarChartIcon />} />
+                        <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} exact />
+                        <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
                     </List>
                 </Drawer>
                 <Switch>

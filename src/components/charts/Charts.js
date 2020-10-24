@@ -97,8 +97,8 @@ const dataInfo = {
 
 export default class Charts extends React.Component {
     state = {
-        mainVariable: window.location.pathname.split('/')[2] || 'cases',
-        chartType: window.location.pathname.split('/')[3] || 'average',
+        mainVariable: window.location.pathname.split('/')[3] || 'cases',
+        chartType: window.location.pathname.split('/')[4] || 'average',
     }
     classes = this.props.classes;
 
@@ -121,7 +121,7 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/cases/${this.state.chartType}`}
+                                                    to={`/charts/cases/${this.state.chartType}${window.location.search}`}
                                                 />
                                             }
                                             value="cases"
@@ -130,7 +130,7 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/hospitalizations/${this.state.chartType}`}
+                                                    to={`/charts/hospitalizations/${this.state.chartType}${window.location.search}`}
                                                 />
                                             }
                                             value="hospitalizations"
@@ -140,7 +140,7 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/icu/${this.state.chartType}`}
+                                                    to={`/charts/icu/${this.state.chartType}${window.location.search}`}
                                                 />
                                             }
                                             value="icu"
@@ -151,7 +151,7 @@ export default class Charts extends React.Component {
                                                 control={
                                                     <Radio
                                                         component={RouterLink}
-                                                        to={`/charts/mortality/${this.state.chartType}`}
+                                                        to={`/charts/mortality/${this.state.chartType}${window.location.search}`}
                                                     />
                                                 }
                                                 value="mortality"
@@ -171,7 +171,7 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/${this.state.mainVariable}/average`}
+                                                    to={`/charts/${this.state.mainVariable}/average${window.location.search}`}
                                                 />
                                             }
                                             value="average"
@@ -181,7 +181,7 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/${this.state.mainVariable}/testing`}
+                                                    to={`/charts/${this.state.mainVariable}/testing${window.location.search}`}
                                                 />
                                             }
                                             value="testing"
@@ -191,7 +191,7 @@ export default class Charts extends React.Component {
                                             control={
                                                 <Radio
                                                     component={RouterLink}
-                                                    to={`/charts/${this.state.mainVariable}/change`}
+                                                    to={`/charts/${this.state.mainVariable}/change${window.location.search}`}
                                                 />
                                             }
                                             value="change"
