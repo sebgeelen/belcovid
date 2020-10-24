@@ -20,7 +20,7 @@ export default function ListItemLink(props) {
 
     return (
         <li>
-            <ListItem button component={renderLink} selected={!!match}>
+            <ListItem button component={match ? null : renderLink} selected={!!match}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
                 <ListItemText primary={primary} />
             </ListItem>
