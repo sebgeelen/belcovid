@@ -11,8 +11,9 @@ import Title from './Title';
 import ChartByAge from './charts/ChartByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
-import { AGE_GROUPS_CASES, PROVINCES } from '../data';
+import { PROVINCES } from '../data';
 import { getFromLocalStorage } from '../helpers';
+import { dataInfo } from './charts/Charts';
 
 function Footer() {
   const lastStatsUpdate = getFromLocalStorage('belcovid:update:stats');
@@ -44,6 +45,7 @@ export default class Dashboard extends React.Component {
   fixedHeightPaper = clsx(this.classes.paper, this.classes.fixedHeight);
 
   render() {
+    const chartInfo = dataInfo.cases.average;
     return (
       <main className={this.classes.content}>
         <div className={this.classes.appBarSpacer} />
@@ -57,9 +59,10 @@ export default class Dashboard extends React.Component {
                     <ChartByAge
                       classes={this.classes}
                       data={this.props.allCasesData[this.props.province]}
-                      chartName="New cases, by age group (7-day rolling average)"
+                      annotations={chartInfo.annotations}
+                      chartName={chartInfo.title}
                       asImage={true}
-                      ageGroups={AGE_GROUPS_CASES}
+                      ageGroups={chartInfo.ageGroups}
                     /> :
                   <Skeleton variant="rect" height={'100%'} />
                 }

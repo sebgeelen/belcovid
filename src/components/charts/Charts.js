@@ -10,7 +10,7 @@ import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, PROVINCES } from '../../data';
 import { casesAnnotations as testingAnnotations } from '../../helpers';
 import { BrowserRouter, Link as RouterLink, Route, Switch } from 'react-router-dom';
 
-const dataInfo = {
+export const dataInfo = {
     cases: {
         average: {
             title: 'New cases, by age group (7-day rolling average)',
