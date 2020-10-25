@@ -177,16 +177,19 @@ export default class Charts extends React.Component {
                                             value="average"
                                             label="7-day rolling average"
                                         />
-                                        <FormControlLabel
-                                            control={
-                                                <Radio
-                                                    component={RouterLink}
-                                                    to={`/charts/${this.state.mainVariable}/testing${window.location.search}`}
-                                                />
-                                            }
-                                            value="testing"
-                                            label="Testing ratio"
-                                        />
+                                        <Tooltip title="Testing positivity should only be viewed in relationship with case numbers.">
+                                            <FormControlLabel
+                                                control={
+                                                    <Radio
+                                                        component={RouterLink}
+                                                        to={`/charts/${this.state.mainVariable}/testing${window.location.search}`}
+                                                    />
+                                                }
+                                                value="testing"
+                                                label="Testing ratio"
+                                                disabled={this.state.mainVariable !== 'cases'}
+                                            />
+                                        </Tooltip>
                                         <FormControlLabel
                                             control={
                                                 <Radio
