@@ -97,8 +97,8 @@ export const dataInfo = {
 
 export default class Charts extends React.Component {
     state = {
-        mainVariable: window.location.pathname.split('/')[3] || 'cases',
-        chartType: window.location.pathname.split('/')[4] || 'average',
+        mainVariable: window.location.pathname.split('/')[2] || 'cases',
+        chartType: window.location.pathname.split('/')[3] || 'average',
     }
     classes = this.props.classes;
 
