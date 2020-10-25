@@ -156,7 +156,7 @@ export default class Charts extends React.Component {
                                                 }
                                                 value="mortality"
                                                 label="Mortality"
-                                                disabled={this.props.province !== 'Belgium'}
+                                                disabled={this.props.province !== 'be'}
                                             />
                                         </Tooltip>
                                     </RadioGroup>
