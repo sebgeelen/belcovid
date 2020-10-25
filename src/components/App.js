@@ -13,6 +13,8 @@ import {
 } from '../data';
 import {
     AppBar,
+    Box,
+    Container,
     CssBaseline,
     Divider,
     Drawer,
@@ -32,11 +34,35 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import { getDaysBetween, getFromLocalStorage, isMobile, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
-import { Link as RouterLink, Route, Switch } from 'react-router-dom';
+import { Link, Link as RouterLink, Route, Switch } from 'react-router-dom';
 import ListItemLink from './ListItemLink.js';
 import ShareIcon from '@material-ui/icons/Share';
 
 const drawerWidth = 240;
+function Footer() {
+    const lastStatsUpdate = getFromLocalStorage('belcovid:update:stats');
+    const lastStatsUpdateDate = lastStatsUpdate && new Date(lastStatsUpdate);
+    return (
+        <Typography variant="body2" color="textSecondary" align="center">
+            {'All data from '}
+            <Link color="inherit" href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</Link>
+            {
+            getFromLocalStorage('belcovid:update:stats') ?
+                <small onDoubleClick={() => {
+                if (window.localStorage) {
+                    window.localStorage.clear();
+                }
+                }}> (last update: {lastStatsUpdateDate.toDateString()} at {lastStatsUpdateDate.toLocaleTimeString()})</small> :
+                ''
+            }
+            {' • '}
+            <Link color="inherit" href="https://www.info-coronavirus.be/" target="_blank" rel="noopener noreferrer">Official national information on Covid-19</Link>
+            {'.'}
+            <br/>
+            <small>Data is truncated to exclude the last 4 days because that data is not yet consolidated.</small>
+        </Typography>
+    );
+}
 const styles = (theme) => ({
     root: {
         display: 'flex',
@@ -283,29 +309,37 @@ class App extends React.Component {
                         <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
                     </List>
                 </Drawer>
-                <Switch>
-                    <Route path="/charts">
-                        <Charts
-                            classes={this.classes}
-                            cases={this.state.cases?.[this.state.province]}
-                            totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
-                            totalICU={this.state.totalICU?.[this.state.province]}
-                            mortality={this.state.mortality?.[this.state.province]}
-                            tests={this.state.tests?.[this.state.province]}
-                            province={this.state.province}
-                        />
-                    </Route>
-                    <Route path="/">
-                        <Dashboard
-                            classes={this.classes}
-                            allCasesData={this.state.cases}
-                            totalHospitalizations={this.state.totalHospitalizations?.be}
-                            totalICU={this.state.totalICU?.be}
-                            newsData={this.state.newsData}
-                            province={this.state.province}
-                        />
-                    </Route>
-                </Switch>
+                <main className={this.classes.content}>
+                    <div className={this.classes.appBarSpacer} />
+                    <Container maxWidth="lg" className={this.classes.container}>
+                        <Switch>
+                            <Route path="/charts">
+                                <Charts
+                                    classes={this.classes}
+                                    cases={this.state.cases?.[this.state.province]}
+                                    totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
+                                    totalICU={this.state.totalICU?.[this.state.province]}
+                                    mortality={this.state.mortality?.[this.state.province]}
+                                    tests={this.state.tests?.[this.state.province]}
+                                    province={this.state.province}
+                                />
+                            </Route>
+                            <Route path="/">
+                                <Dashboard
+                                    classes={this.classes}
+                                    allCasesData={this.state.cases}
+                                    totalHospitalizations={this.state.totalHospitalizations?.be}
+                                    totalICU={this.state.totalICU?.be}
+                                    newsData={this.state.newsData}
+                                    province={this.state.province}
+                                />
+                            </Route>
+                        </Switch>
+                        <Box pt={4}>
+                            <Footer />
+                        </Box>
+                    </Container>
+                </main>
                 {
                     isMobile() && navigator.share &&
                     <Fab
