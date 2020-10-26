@@ -280,7 +280,7 @@ export default class Charts extends React.Component {
                 data = this.props.totalHospitalizations;
                 break;
             case 'icu':
-                data = this.propstotalICU;
+                data = this.props.totalICU;
                 break;
             case 'incidence':
                 data = this._getIncidenceData();
