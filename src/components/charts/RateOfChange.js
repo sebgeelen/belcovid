@@ -1,9 +1,8 @@
 import React from 'react';
 import {
     betterRound,
-    getDateFrom,
+    getWeeklyData,
     getPolynomialRegressionPoints,
-    normalizeDate
 } from '../../helpers';
 import LineChart from './LineChart';
 
@@ -11,35 +10,13 @@ const regressionStart = new Date('2020-08-15');
 export default class RateOfChange extends React.Component {
     render() {
         let data = this.props.data;
-        const points = new Map();
-        let start;
-        let end;
-        for (const date of Object.keys(data)) {
-            if (!start || new Date(date) < start) start = new Date(date);
-            if (!end || new Date(date) > start) end = new Date(date);
-            const items = data[date];
-            points.set(
-                normalizeDate(new Date(date)).getTime(),
-                typeof items === 'object' ? items.total : items,
-            );
-        }
+        const weeklyData = getWeeklyData(data);
         const weeklyPoints = [];
-        let pointIndex = 0;
-        for (const date of points.keys()) {
-            if (pointIndex >= 6) {
-                let y = 0;
-                let comparativeDate = new Date(date);
-                for (let i = 0; i < 7; i++) {
-                    const value = points.get(comparativeDate.getTime());
-                    y += value;
-                    comparativeDate = normalizeDate(getDateFrom(new Date(comparativeDate), -1));
-                }
-                weeklyPoints.push({
-                    x: new Date(date),
-                    y,
-                });
-            }
-            pointIndex++;
+        for (const date of Object.keys(weeklyData)) {
+            weeklyPoints.push({
+                x: new Date(date),
+                y: weeklyData[date].total,
+            });
         }
         const rateOfChangePoints = weeklyPoints.map((point, index) => {
             let y;
@@ -73,10 +50,11 @@ export default class RateOfChange extends React.Component {
                 radius: 0,
             },
         ];
+        const dates = Object.keys(data);
         const bounds = {
             x: {
-                min: start,
-                max: end,
+                min: new Date(dates[0]),
+                max: new Date(dates[dates.length - 1]),
             },
         };
         const annotations = [{

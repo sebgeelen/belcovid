@@ -14,8 +14,9 @@ const colors = [
     "#247ba0",
     "#f2a359"
 ];
-export default class StackedAreaTimeChart extends React.Component {
+export default class AreaTimeChart extends React.Component {
     render() {
+        const stacked = typeof this.props.stacked === 'boolean' ? this.props.stacked : true;
         const datasets = this.props.datasets.map((dataset, index) => {
             return {
                 ...dataset,
@@ -29,8 +30,8 @@ export default class StackedAreaTimeChart extends React.Component {
             <LineChart
                 classes={this.props.classes}
                 chartName={this.props.chartName}
-                datasets={datasets}
-                stacked={true}
+                datasets={[...datasets]}
+                stacked={stacked}
                 annotations={this.props.annotations}
                 bounds={this.props.bounds}
                 tooltip={this.props.tooltip}

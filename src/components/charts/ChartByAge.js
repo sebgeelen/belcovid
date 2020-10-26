@@ -1,7 +1,7 @@
 import React from 'react';
 import { getAveragePoints } from '../../helpers';
 import 'chartjs-plugin-zoom';
-import StackedAreaTimeChart from './StackedAreaTimeChart';
+import AreaTimeChart from './AreaTimeChart';
 
 export default class ChartByAge extends React.Component {
     render() {
@@ -38,7 +38,7 @@ export default class ChartByAge extends React.Component {
                 min: 0,
             },
         };
-        return <StackedAreaTimeChart
+        return <AreaTimeChart
             classes={this.props.classes}
             chartName={this.props.chartName}
             datasets={datasets}
@@ -46,6 +46,7 @@ export default class ChartByAge extends React.Component {
             annotations={this.props.annotations}
             tooltip={this.props.tooltip}
             asImage={this.props.asImage}
+            stacked={this.props.stacked}
         />;
     }
 }

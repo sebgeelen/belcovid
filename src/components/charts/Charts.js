@@ -3,12 +3,13 @@ import ChartByAge from './ChartByAge';
 import AveragedData from './AveragedData';
 import Testing from './Testing';
 import RateOfChange from './RateOfChange';
-import { Divider, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip } from '@material-ui/core';
+import { Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, provinceString } from '../../data';
-import { casesAnnotations as testingAnnotations } from '../../helpers';
+import { casesAnnotations as testingAnnotations, getWeeklyData } from '../../helpers';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
+import { populationData } from '../../populationData';
 
 export const dataInfo = {
     cases: {
@@ -16,6 +17,7 @@ export const dataInfo = {
             title: 'New cases, by age group (7-day rolling average)',
             annotations: testingAnnotations,
             ageGroups: AGE_GROUPS_CASES,
+            stacked: true,
         },
         testing: {
             title: 'Test positivity ratio',
@@ -33,14 +35,47 @@ export const dataInfo = {
             annotations: testingAnnotations,
         },
     },
+    incidence: {
+        description: (
+            <React.Fragment>Population data
+                from <Link href={'https://population.un.org/wpp/Download' +
+                    '/Files/1_Indicators%20(Standard)/CSV_FILES/' +
+                    'WPP2019_PopulationBySingleAgeSex_1950-2019.csv'}>
+                    United Nations, 2019
+                </Link>.
+            </React.Fragment>
+        ),
+        average: {
+            title: 'Incidence, by age group (14 days, per 100k inhabitants)',
+            annotations: testingAnnotations,
+            ageGroups: (() => {
+                const groups = [...AGE_GROUPS_CASES];
+                groups.pop();
+                groups.push('total');
+                return groups;
+            })(),
+            stacked: false,
+        },
+        testing: {
+            title: 'Test/incidence ratio',
+            annotations: testingAnnotations,
+        },
+        change: {
+            title: 'Week by week change of incidence',
+            description: (
+                <React.Fragment>
+                    How fast is the incidence rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of new cases between the last 7 days
+                        and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+            annotations: testingAnnotations,
+        },
+    },
     hospitalizations: {
         description: 'This concerns the number of patients that are hospitalized on a given day, not only the new admissions.',
         average: {
             title: 'Patients at the hospital',
-        },
-        testing: {
-            title: 'Percentage of patients at the hospital per test',
-            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of hospitalized patients',
@@ -58,10 +93,6 @@ export const dataInfo = {
         average: {
             title: 'Patients in intensive care',
         },
-        testing: {
-            title: 'Percentage of patients in intensive care per test',
-            annotations: testingAnnotations,
-        },
         change: {
             title: 'Week by week change of patients in intensive care',
             description: (
@@ -77,10 +108,7 @@ export const dataInfo = {
         average: {
             title: 'Mortality, by age group (7-day rolling average)',
             ageGroups: AGE_GROUPS_MORTALITY,
-        },
-        testing: {
-            title: 'Percentage of mortality per test',
-            annotations: testingAnnotations,
+            stacked: true,
         },
         change: {
             title: 'Week by week change of mortality',
@@ -123,6 +151,19 @@ export default class Charts extends React.Component {
                                     }
                                     value="cases"
                                     label="Cases" />
+                                <Tooltip title="Incidence data cannot be filtered per province.">
+                                    <FormControlLabel
+                                        control={
+                                            <Radio
+                                                component={RouterLink}
+                                                to={`/charts/incidence/${this.state.chartType}${window.location.search}`}
+                                            />
+                                        }
+                                        value="incidence"
+                                        label="Incidence"
+                                        disabled={this.props.province !== 'be'}
+                                    />
+                                </Tooltip>
                                 <FormControlLabel
                                     control={
                                         <Radio
@@ -172,7 +213,7 @@ export default class Charts extends React.Component {
                                         />
                                     }
                                     value="average"
-                                    label="7-day rolling average"
+                                    label="Rolling average"
                                 />
                                 <Tooltip title="Testing positivity should only be viewed in relationship with case numbers.">
                                     <FormControlLabel
@@ -222,10 +263,20 @@ export default class Charts extends React.Component {
         if (!variableInfo) return;
         const chartInfo = variableInfo[chartType];
         if (!chartInfo) return;
-        let dataName = mainVariable;
-        if (dataName === 'hospitalizations') dataName = 'totalHospitalizations';
-        if (dataName === 'icu') dataName = 'totalICU';
-        const data = this.props[dataName];
+        let data;
+        switch (mainVariable) {
+            case 'hospitalizations':
+                data = this.props.totalHospitalizations;
+                break;
+            case 'icu':
+                data = this.propstotalICU;
+                break;
+            case 'incidence':
+                data = this._getIncidenceData();
+                break;
+            default:
+                data = this.props[mainVariable];
+        }
         if (!data) {
             return <Skeleton variant="rect" height={200} />;
         }
@@ -241,6 +292,7 @@ export default class Charts extends React.Component {
                             chartName={chartInfo.title}
                             asImage={true}
                             ageGroups={chartInfo.ageGroups}
+                            stacked={chartInfo.stacked}
                         />
                     );
                 } else {
@@ -305,5 +357,28 @@ export default class Charts extends React.Component {
                 </div>
             </React.Fragment>
         );
+    }
+    // TODO: make weeks and reference parametrable by chart or user.
+    _getIncidenceData(weeks = 2, reference = 100000) {
+        if (!this.props.cases) return;
+        const data = {};
+        const weeklyCases = getWeeklyData(this.props.cases, weeks);
+        for (const date of Object.keys(weeklyCases)) {
+            if (!data[date]) {
+                data[date] = {};
+            }
+            const casesAtDate = weeklyCases[date];
+            for (const ageGroup of Object.keys(casesAtDate)) {
+                const cases = casesAtDate[ageGroup];
+                let incidence;
+                if (ageGroup === 'Age unknown') {
+                    incidence = 0;
+                } else {
+                    incidence = (reference * cases) / populationData[ageGroup];
+                }
+                data[date][ageGroup] = incidence;
+            }
+        }
+        return data;
     }
 }

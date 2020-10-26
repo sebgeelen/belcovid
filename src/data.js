@@ -1,4 +1,5 @@
     import Parser from 'rss-parser';
+import { rawPopulationData } from './populationData';
 
 const parser = new Parser();
 const PROXY = 'https://cors-anywhere.herokuapp.com/';
@@ -141,4 +142,34 @@ export function fetchNewsData() {
         dataPromises.push({ ...source, promise: fetchRssData(source.rss)});
     }
     return dataPromises;
+}
+// Keeping this for the record.
+// eslint-disable-next-line no-unused-vars
+function _normalizePopulationData() {
+    const points = AGE_GROUPS_CASES.reduce((points, group) => {
+        points[group] = 0;
+        return points;
+    }, {});
+    const ageMap = [];
+    for (var i = 0; i < 125; i++) {
+        if (i >= 0 && i <= 9) ageMap.push('0-9');
+        if (i >= 10 && i <= 19) ageMap.push('10-19');
+        if (i >= 20 && i <= 29) ageMap.push('20-29');
+        if (i >= 30 && i <= 39) ageMap.push('30-39');
+        if (i >= 40 && i <= 49) ageMap.push('40-49');
+        if (i >= 50 && i <= 59) ageMap.push('50-59');
+        if (i >= 60 && i <= 69) ageMap.push('60-69');
+        if (i >= 70 && i <= 79) ageMap.push('70-79');
+        if (i >= 80 && i <= 89) ageMap.push('80-89');
+        if (i >= 90) ageMap.push('90+');
+    }
+    for (const d of rawPopulationData) {
+        const age = +d.AgeGrpStart + +d.AgeGrpSpan - 1;
+        points[ageMap[age]] = (points[ageMap[age]] || 0) + (+d.PopTotal * 1000);
+    }
+    points.total = Object.values(points).reduce((a, b) => a + b, 0);
+    return Object.keys(points).reduce((p, group) => {
+        p[group] = Math.round(points[group] * 100) / 100;
+        return p;
+    }, {});
 }
