@@ -243,6 +243,8 @@ export default class LineChart extends React.Component {
                 }, 0);
                 return `Total: ${betterRound(total)}`;
             };
+        } else {
+            this.options.scales.yAxes[0].stacked = false;
         }
         if (this.props.bounds) {
             if (this.props.bounds.x?.min !== undefined) {
