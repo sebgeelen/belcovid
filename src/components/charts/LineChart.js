@@ -41,7 +41,7 @@ export default class LineChart extends React.Component {
         asImage: this.props.asImage || false,
     };
     classes = this.props.classes
-    options = this._computeOptions();
+    options = this._defaultOptions();
     chartReference = React.createRef();
     _lastDatasets = null;
     _recomputeImage = false;
@@ -51,11 +51,7 @@ export default class LineChart extends React.Component {
             this._recomputeImage = true;
         }
         this._lastDatasets = this.props.datasets;
-        if (this.state.fullscreen) {
-            this.options.legend.display = true;
-        } else {
-            this.options.legend.display = !isMobile(false);
-        }
+        this._adaptOptions();
         if (!this._recomputeImage && this.state.asImage && this.state.chartImageURI) {
             contents = <CardMedia
                 component="img"
@@ -114,8 +110,8 @@ export default class LineChart extends React.Component {
             fullscreen: fullscreen,
         });
     }
-    _computeOptions() {
-        const options = {
+    _defaultOptions() {
+        return {
             legend: {
                 display: true,
             },
@@ -236,10 +232,12 @@ export default class LineChart extends React.Component {
                     },
                 ]
             },
-        }; ;
+        };
+    }
+    _adaptOptions() {
         if (this.props.stacked) {
-            options.scales.yAxes[0].stacked = true;
-            options.tooltips.callbacks.footer = items => {
+            this.options.scales.yAxes[0].stacked = true;
+            this.options.tooltips.callbacks.footer = items => {
                 const total = items.reduce((sum, item) => {
                     return sum + item.yLabel;
                 }, 0);
@@ -248,43 +246,47 @@ export default class LineChart extends React.Component {
         }
         if (this.props.bounds) {
             if (this.props.bounds.x?.min !== undefined) {
-                options.zoom.rangeMin.x = this.props.bounds.x.min;
+                this.options.zoom.rangeMin.x = this.props.bounds.x.min;
             }
             if (this.props.bounds.x?.max !== undefined) {
-                options.scales.xAxes[0].ticks.max = this.props.bounds.x.max;
-                options.zoom.rangeMax.x = this.props.bounds.x.max;
+                this.options.scales.xAxes[0].ticks.max = this.props.bounds.x.max;
+                this.options.zoom.rangeMax.x = this.props.bounds.x.max;
             }
             if (this.props.bounds.y?.min !== undefined) {
-                options.scales.yAxes[0].ticks.min = this.props.bounds.y.min;
+                this.options.scales.yAxes[0].ticks.min = this.props.bounds.y.min;
             }
             if (this.props.bounds.y?.max !== undefined) {
-                options.scales.yAxes[0].ticks.max = this.props.bounds.y.max;
+                this.options.scales.yAxes[0].ticks.max = this.props.bounds.y.max;
             }
         }
         if (this.props.logarithmic) {
-            options.scales.yAxes[0].type = 'logarithmic';
+            this.options.scales.yAxes[0].type = 'logarithmic';
         }
         if (this.props.yAxes) {
-            options.scales.yAxes = this.props.yAxes;
+            this.options.scales.yAxes = this.props.yAxes;
         }
         if (this.props.annotations) {
-            options.annotation.annotations = [...options.annotation.annotations, ...this.props.annotations];
+            this.options.annotation.annotations = [...this.options.annotation.annotations, ...this.props.annotations];
         }
         if (this.props.tooltip === false) {
-            options.tooltips.enabled = false;
+            this.options.tooltips.enabled = false;
         }
         // Ensure logarithmic type y axes have proper labels.
-        for (let i = 0; i < options.scales.yAxes.length; i++) {
-            const yAxis = options.scales.yAxes[i];
+        for (let i = 0; i < this.options.scales.yAxes.length; i++) {
+            const yAxis = this.options.scales.yAxes[i];
             if (yAxis.type === 'logarithmic') {
-                if (!options.scales.yAxes[i].ticks) {
-                    options.scales.yAxes[i].ticks = {};
+                if (!this.options.scales.yAxes[i].ticks) {
+                    this.options.scales.yAxes[i].ticks = {};
                 }
                 // Pass tick values as a string into Number contructor to format
                 // them.
-                options.scales.yAxes[i].ticks.callback = value => '' + Number(value.toString());
+                this.options.scales.yAxes[i].ticks.callback = value => '' + Number(value.toString());
             }
         }
-        return options;
+        if (this.state.fullscreen) {
+            this.options.legend.display = true;
+        } else {
+            this.options.legend.display = !isMobile(false);
+        }
     }
 }

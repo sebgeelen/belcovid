@@ -23,7 +23,7 @@ export default class AreaTimeChart extends React.Component {
                 borderColor: colors[index],
                 radius: 0,
                 backgroundColor: colors[index],
-                fill: true,
+                fill: stacked,
             };
         });
         return (
