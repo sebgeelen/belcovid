@@ -288,5 +288,13 @@ export default class LineChart extends React.Component {
         } else {
             this.options.legend.display = !isMobile(false);
         }
+        if (this.props.ticksCallbacks) {
+            if (this.props.ticksCallbacks.x) {
+                this.options.scales.xAxes[0].ticks.callback = this.props.ticksCallbacks.x;
+            }
+            if (this.props.ticksCallbacks.y) {
+                this.options.scales.yAxes[0].ticks.callback = this.props.ticksCallbacks.y;
+            }
+        }
     }
 }

@@ -55,6 +55,9 @@ export const dataInfo = {
                 return groups;
             })(),
             stacked: false,
+            ticksCallbacks: {
+                y: value => `${value} / 100k`,
+            },
         },
         testing: {
             title: 'Test/incidence ratio',
@@ -293,6 +296,7 @@ export default class Charts extends React.Component {
                             asImage={true}
                             ageGroups={chartInfo.ageGroups}
                             stacked={chartInfo.stacked}
+                            ticksCallbacks={chartInfo.ticksCallbacks}
                         />
                     );
                 } else {

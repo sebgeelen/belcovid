@@ -91,7 +91,7 @@ export default class Testing extends React.Component {
                     autoSkip: true,
                     autoSkipPadding: 10,
                     source: 'auto',
-                    callback: value => value + '%',
+                    callback: value => value + ' %',
                 },
             },
             {
