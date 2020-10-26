@@ -13,9 +13,10 @@ export default class RateOfChange extends React.Component {
         const weeklyData = getWeeklyData(data);
         const weeklyPoints = [];
         for (const date of Object.keys(weeklyData)) {
+            const value = weeklyData[date];
             weeklyPoints.push({
                 x: new Date(date),
-                y: weeklyData[date].total,
+                y: typeof value === 'object' ? value.total : value,
             });
         }
         const rateOfChangePoints = weeklyPoints.map((point, index) => {
