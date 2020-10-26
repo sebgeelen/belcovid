@@ -298,5 +298,27 @@ export default class LineChart extends React.Component {
                 this.options.scales.yAxes[0].ticks.callback = this.props.ticksCallbacks.y;
             }
         }
+        if (this.props.labelStrings) {
+            if (this.props.labelStrings.x) {
+                const current = this.options.scales.xAxes[0].scaleLabel || {};
+                this.options.scales.xAxes[0].scaleLabel = {
+                    ...current,
+                    labelString: this.props.labelStrings.x,
+                    display: true,
+                    fontSize: 10,
+                    lineHeight: .5,
+                };
+            }
+            if (this.props.labelStrings.y) {
+                const current = this.options.scales.yAxes[0].scaleLabel || {};
+                this.options.scales.yAxes[0].scaleLabel = {
+                    ...current,
+                    labelString: this.props.labelStrings.y,
+                    display: true,
+                    fontSize: 10,
+                    lineHeight: .5,
+                };
+            }
+        }
     }
 }

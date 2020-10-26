@@ -37,6 +37,7 @@ export default class AreaTimeChart extends React.Component {
                 tooltip={this.props.tooltip}
                 asImage={this.props.asImage}
                 ticksCallbacks={this.props.ticksCallbacks}
+                labelStrings={this.props.labelStrings}
             />
         );
     }

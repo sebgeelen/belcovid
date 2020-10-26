@@ -74,7 +74,7 @@ export default class RateOfChange extends React.Component {
             bounds={bounds}
             annotations={[...(this.props.annotations || []), ...annotations]}
             asImage={this.props.asImage}
-            ticksCallbacks={{ y: value => `${value > 0 ? '+' : ''}${value} %/week` }}
+            labelStrings={{y: '% / week'}}
         />;
     }
     /**

@@ -21,6 +21,7 @@ import {
     Fab,
     FormControl,
     IconButton,
+    Link,
     List,
     MenuItem,
     Select,
@@ -34,7 +35,7 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import { getDaysBetween, getFromLocalStorage, isMobile, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
-import { Link, Link as RouterLink, Route, Switch } from 'react-router-dom';
+import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import ListItemLink from './ListItemLink.js';
 import ShareIcon from '@material-ui/icons/Share';
 

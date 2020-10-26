@@ -48,6 +48,7 @@ export default class ChartByAge extends React.Component {
             asImage={this.props.asImage}
             stacked={this.props.stacked}
             ticksCallbacks={this.props.ticksCallbacks}
+            labelStrings={this.props.labelStrings}
         />;
     }
 }

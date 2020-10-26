@@ -18,6 +18,9 @@ export const dataInfo = {
             annotations: testingAnnotations,
             ageGroups: AGE_GROUPS_CASES,
             stacked: true,
+            labelStrings: {
+                y: 'new cases',
+            },
         },
         testing: {
             title: 'Test positivity ratio',
@@ -55,13 +58,9 @@ export const dataInfo = {
                 return groups;
             })(),
             stacked: false,
-            ticksCallbacks: {
-                y: value => `${value} / 100k`,
+            labelStrings: {
+                y: 'cases / 100k',
             },
-        },
-        testing: {
-            title: 'Test/incidence ratio',
-            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of incidence',
@@ -79,6 +78,9 @@ export const dataInfo = {
         description: 'This concerns the number of patients that are hospitalized on a given day, not only the new admissions.',
         average: {
             title: 'Patients at the hospital',
+            labelStrings: {
+                y: 'total hospital patients',
+            },
         },
         change: {
             title: 'Week by week change of hospitalized patients',
@@ -95,6 +97,9 @@ export const dataInfo = {
         description: 'This concerns the number of patients that are in intensive care on a given day, not only the new admissions.',
         average: {
             title: 'Patients in intensive care',
+            labelStrings: {
+                y: 'total ICU patients',
+            },
         },
         change: {
             title: 'Week by week change of patients in intensive care',
@@ -112,6 +117,9 @@ export const dataInfo = {
             title: 'Mortality, by age group (7-day rolling average)',
             ageGroups: AGE_GROUPS_MORTALITY,
             stacked: true,
+            labelStrings: {
+                y: 'new deaths',
+            },
         },
         change: {
             title: 'Week by week change of mortality',
@@ -297,6 +305,7 @@ export default class Charts extends React.Component {
                             ageGroups={chartInfo.ageGroups}
                             stacked={chartInfo.stacked}
                             ticksCallbacks={chartInfo.ticksCallbacks}
+                            labelStrings={chartInfo.labelStrings}
                         />
                     );
                 } else {
@@ -307,6 +316,7 @@ export default class Charts extends React.Component {
                             chartName={chartInfo.title}
                             annotations={chartInfo.annotations}
                             asImage={true}
+                            labelStrings={chartInfo.labelStrings}
                         />
                     );
                 }

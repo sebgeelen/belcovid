@@ -67,6 +67,7 @@ export default class AveragedData extends React.Component {
             bounds={bounds}
             logarithmic={true}
             asImage={this.props.asImage}
+            labelStrings={this.props.labelStrings}
         />;
     }
 }
