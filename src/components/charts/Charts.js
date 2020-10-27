@@ -41,10 +41,10 @@ export const dataInfo = {
     incidence: {
         description: (
             <React.Fragment>Population data
-                from <Link href={'https://population.un.org/wpp/Download' +
-                    '/Files/1_Indicators%20(Standard)/CSV_FILES/' +
-                    'WPP2019_PopulationBySingleAgeSex_1950-2019.csv'}>
-                    United Nations, 2019
+                from <Link href={'https://statbel.fgov.be/en/open-data/' +
+                    'population-place-residence-nationality-marital-status-' +
+                    'age-and-sex-10'} target="_blank">
+                    StatBel, 2019
                 </Link>.
             </React.Fragment>
         ),
@@ -162,19 +162,16 @@ export default class Charts extends React.Component {
                                     }
                                     value="cases"
                                     label="Cases" />
-                                <Tooltip title="Incidence data cannot be filtered per province.">
-                                    <FormControlLabel
-                                        control={
-                                            <Radio
-                                                component={RouterLink}
-                                                to={`/charts/incidence/${this.state.chartType}${window.location.search}`}
-                                            />
-                                        }
-                                        value="incidence"
-                                        label="Incidence"
-                                        disabled={this.props.province !== 'be'}
-                                    />
-                                </Tooltip>
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts/incidence/${this.state.chartType}${window.location.search}`}
+                                        />
+                                    }
+                                    value="incidence"
+                                    label="Incidence"
+                                />
                                 <FormControlLabel
                                     control={
                                         <Radio
@@ -373,10 +370,12 @@ export default class Charts extends React.Component {
         );
     }
     // TODO: make weeks and reference parametrable by chart or user.
+    // Caveat: works only for cases because assumes their age groups.
     _getIncidenceData(weeks = 2, reference = 100000) {
         if (!this.props.cases) return;
         const data = {};
         const weeklyCases = getWeeklyData(this.props.cases, weeks);
+        const population = populationData.ageGroupsCases[this.props.province];
         for (const date of Object.keys(weeklyCases)) {
             if (!data[date]) {
                 data[date] = {};
@@ -388,7 +387,7 @@ export default class Charts extends React.Component {
                 if (ageGroup === 'Age unknown') {
                     incidence = 0;
                 } else {
-                    incidence = (reference * cases) / populationData[ageGroup];
+                    incidence = (reference * cases) / population[ageGroup];
                 }
                 data[date][ageGroup] = incidence;
             }

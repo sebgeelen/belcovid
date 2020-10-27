@@ -1,5 +1,4 @@
-    import Parser from 'rss-parser';
-import { rawPopulationData } from './populationData';
+import Parser from 'rss-parser';
 
 const parser = new Parser();
 const PROXY = 'https://cors-anywhere.herokuapp.com/';
@@ -145,31 +144,47 @@ export function fetchNewsData() {
 }
 // Keeping this for the record.
 // eslint-disable-next-line no-unused-vars
-function _normalizePopulationData() {
-    const points = AGE_GROUPS_CASES.reduce((points, group) => {
-        points[group] = 0;
-        return points;
-    }, {});
-    const ageMap = [];
-    for (var i = 0; i < 125; i++) {
-        if (i >= 0 && i <= 9) ageMap.push('0-9');
-        if (i >= 10 && i <= 19) ageMap.push('10-19');
-        if (i >= 20 && i <= 29) ageMap.push('20-29');
-        if (i >= 30 && i <= 39) ageMap.push('30-39');
-        if (i >= 40 && i <= 49) ageMap.push('40-49');
-        if (i >= 50 && i <= 59) ageMap.push('50-59');
-        if (i >= 60 && i <= 69) ageMap.push('60-69');
-        if (i >= 70 && i <= 79) ageMap.push('70-79');
-        if (i >= 80 && i <= 89) ageMap.push('80-89');
-        if (i >= 90) ageMap.push('90+');
+function _normalizePopulationData(rawPopulationData, ageGroups) {
+    const ageMap = {};
+    for (const group of ageGroups) {
+        const matchA = group.match(/^(\d+)-(\d+)$/);
+        const matchB = group.match(/^(\d+)\+$/);
+        let start = 0;
+        let end = 0;
+        if (matchA) {
+            start = +matchA[1];
+            end = +matchA[2];
+        } else if (matchB) {
+            start = +matchB[1];
+            end = 125; // There definitely isn't anyone older than that...
+        } else continue;
+        for (let i = start; i <= end; i++) {
+            ageMap[i] = group;
+        }
     }
-    for (const d of rawPopulationData) {
-        const age = +d.AgeGrpStart + +d.AgeGrpSpan - 1;
-        points[ageMap[age]] = (points[ageMap[age]] || 0) + (+d.PopTotal * 1000);
+    const normalizedData = {be: ageGroups.reduce((groups, group) => {
+        groups[group] = 0;
+        return groups;
+    }, {})};
+    normalizedData.be.total = 0;
+    for (const province of Object.keys(rawPopulationData)) {
+        normalizedData[province] = ageGroups.reduce((groups, group) => {
+            groups[group] = 0;
+            return groups;
+        }, {});
+        normalizedData[province].total = 0;
+        for (const age of Object.keys(rawPopulationData[province])) {
+            const pop = rawPopulationData[province][age];
+            const ageGroup = ageMap[age];
+            // update age group
+            normalizedData[province][ageGroup] += pop;
+            // update total
+            normalizedData[province].total += pop;
+            // update belgium age group
+            normalizedData.be[ageGroup] += pop;
+            // update belgium total
+            normalizedData.be.total += pop;
+        }
     }
-    points.total = Object.values(points).reduce((a, b) => a + b, 0);
-    return Object.keys(points).reduce((p, group) => {
-        p[group] = Math.round(points[group] * 100) / 100;
-        return p;
-    }, {});
+    return normalizedData;
 }
