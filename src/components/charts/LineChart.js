@@ -245,6 +245,7 @@ export default class LineChart extends React.Component {
             };
         } else {
             this.options.scales.yAxes[0].stacked = false;
+            this.options.tooltips.callbacks.footer = items => '';
         }
         if (this.props.bounds) {
             if (this.props.bounds.x?.min !== undefined) {
