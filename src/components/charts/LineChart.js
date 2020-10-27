@@ -274,6 +274,15 @@ export default class LineChart extends React.Component {
         if (this.props.tooltip === false) {
             this.options.tooltips.enabled = false;
         }
+        if (this.props.sort) {
+                this.options.tooltips.itemSort = (a, b, data) => {
+                    const dataset = data.datasets[a.datasetIndex];
+                    if (dataset.label.toLowerCase() === 'total') {
+                        return -1;
+                    }
+                    return b.yLabel - a.yLabel;
+                };
+        }
         // Ensure logarithmic type y axes have proper labels.
         for (let i = 0; i < this.options.scales.yAxes.length; i++) {
             const yAxis = this.options.scales.yAxes[i];

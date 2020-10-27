@@ -44,7 +44,6 @@ export default class ChartByAge extends React.Component {
             datasets={datasets}
             bounds={bounds}
             annotations={this.props.annotations}
-            tooltip={this.props.tooltip}
             asImage={this.props.asImage}
             stacked={this.props.stacked}
             ticksCallbacks={this.props.ticksCallbacks}

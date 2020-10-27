@@ -34,10 +34,10 @@ export default class AreaTimeChart extends React.Component {
                 stacked={stacked}
                 annotations={this.props.annotations}
                 bounds={this.props.bounds}
-                tooltip={this.props.tooltip}
                 asImage={this.props.asImage}
                 ticksCallbacks={this.props.ticksCallbacks}
                 labelStrings={this.props.labelStrings}
+                sort={true}
             />
         );
     }
