@@ -3,7 +3,7 @@ import ChartByAge from './ChartByAge';
 import AveragedData from './AveragedData';
 import Testing from './Testing';
 import RateOfChange from './RateOfChange';
-import { Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Tooltip } from '@material-ui/core';
+import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, provinceString } from '../../data';
@@ -49,7 +49,7 @@ export const dataInfo = {
             </React.Fragment>
         ),
         average: {
-            title: 'Incidence, by age group (14 days, per 100k inhabitants)',
+            title: 'Incidence, by age group',
             annotations: testingAnnotations,
             ageGroups: (() => {
                 const groups = [...AGE_GROUPS_CASES];
@@ -138,6 +138,8 @@ export default class Charts extends React.Component {
     state = {
         mainVariable: window.location.pathname.split('/')[2] || 'cases',
         chartType: window.location.pathname.split('/')[3] || 'average',
+        incidenceDays: +(window.location.pathname.split('/')[4] || 14),
+        incidenceDenominator: +(window.location.pathname.split('/')[4] || 100000),
     }
     classes = this.props.classes;
 
@@ -146,7 +148,7 @@ export default class Charts extends React.Component {
             <React.Fragment>
                 <Title>Charts for {provinceString(this.props.province)}</Title>
                 <FormControl component="fieldset" className={this.classes.formControl} style={{width: "100%"}}>
-                    <Grid container spacing={6} justify="center">
+                    <Grid container spacing={4} justify="center">
                         <Grid item xs>
                             <FormLabel component="legend">Main variable</FormLabel>
                             <RadioGroup
@@ -252,7 +254,7 @@ export default class Charts extends React.Component {
                 </FormControl>
                 <section id="chart">
                     <Switch>
-                        <Route path="/charts/:mainVariable/:chartType">
+                        <Route path="/charts/:mainVariable/:chartType/:incidenceDays/:incidenceDenominator">
                             {this.getChart.bind(this)}
                         </Route>
                         <Route path="/charts">
@@ -280,7 +282,7 @@ export default class Charts extends React.Component {
                 data = this.props.totalICU;
                 break;
             case 'incidence':
-                data = this._getIncidenceData();
+                data = this._getIncidenceData(this.state.incidenceDays, this.state.incidenceDenominator);
                 break;
             default:
                 data = this.props[mainVariable];
@@ -292,6 +294,17 @@ export default class Charts extends React.Component {
         switch (chartType) {
             case 'average': {
                 if (chartInfo.ageGroups) {
+                    let labelStrings = chartInfo.labelStrings;
+                    if (mainVariable === 'incidence') {
+                        const denominator = this.state.incidenceDenominator;
+                        labelStrings = {
+                            y: `cases / ${
+                                denominator === 100 ?
+                                    100 + 'inhabitants' :
+                                    (denominator / 1000) + 'k'
+                                }`,
+                        };
+                    }
                     chart = (
                         <ChartByAge
                             classes={this.classes}
@@ -302,7 +315,7 @@ export default class Charts extends React.Component {
                             ageGroups={chartInfo.ageGroups}
                             stacked={chartInfo.stacked}
                             ticksCallbacks={chartInfo.ticksCallbacks}
-                            labelStrings={chartInfo.labelStrings}
+                            labelStrings={labelStrings}
                         />
                     );
                 } else {
@@ -348,12 +361,21 @@ export default class Charts extends React.Component {
             }
             default: break;
         }
+        let title = chartInfo.title;
+        if (mainVariable === 'incidence') {
+            title += ` (${this.state.incidenceDays} days, `;
+            if (this.state.incidenceDenominator === 100) {
+                title += 'in %)';
+            } else {
+                title += `per ${this.state.incidenceDenominator / 1000}k inhabitants)`;
+            }
+        }
         return (
             <React.Fragment>
                 <div style={{ marginTop: 20 }} />
                 <Divider variant="middle" />
                 <div style={{ marginTop: 20 }} />
-                <Title id="icu">{chartInfo.title}</Title>
+                <Title id="icu">{title}</Title>
                 {
                     variableInfo.description &&
                     <p><small>{variableInfo.description}</small></p>
@@ -366,6 +388,67 @@ export default class Charts extends React.Component {
                 <div className={this.classes.chartSection}>
                     { chart }
                 </div>
+
+                {
+                    this.state.mainVariable === 'incidence' &&
+                    <Container style={{ marginTop: 15, maxWidth: 500 }}>
+                        <Slider
+                            defaultValue={14}
+                            getAriaValueText={value => `${value} days`}
+                            aria-labelledby="discrete-slider"
+                            valueLabelDisplay="auto"
+                            step={7}
+                            marks={[
+                                {
+                                    value: 7,
+                                    label: '7 days',
+                                },
+                                {
+                                    value: 14,
+                                    label: '14 days',
+                                },
+                            ]}
+                            min={7}
+                            max={14}
+                            onChange={(ev, value) => this.setState({ incidenceDays: value })}
+                        />
+                        <Slider
+                            defaultValue={100000}
+                            getAriaValueText={value => {
+                                if (value === 100) return '%';
+                                return `/${value / 1000}k`;
+                            }}
+                            valueLabelFormat={value => {
+                                if (value === 100) return '%';
+                                return `/${value / 1000}k`;
+                            }}
+                            aria-labelledby="discrete-slider"
+                            valueLabelDisplay="auto"
+                            step={null}
+                            marks={[
+                                {
+                                    value: 100,
+                                    label: '%',
+                                },
+                                {
+                                    value: 10000,
+                                    label: '/10k',
+                                },
+                                {
+                                    value: 50000,
+                                    label: '/50k',
+                                },
+                                {
+                                    value: 100000,
+                                    label: '/100k',
+                                },
+                            ]}
+                            min={100}
+                            max={100000}
+                            onChange={(ev, value) => this.setState({ incidenceDenominator: value })}
+                        />
+                    </Container>
+                }
             </React.Fragment>
         );
     }
