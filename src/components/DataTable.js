@@ -63,13 +63,6 @@ function peakPopover(variable, peak) {
         </InfoBox>
     );
 }
-const truncatedDataInfoBox = (
-    <InfoBox>
-        Excluding the last 4 days, counting from
-        today included, which are not yet
-        consolidated.
-    </InfoBox>
-);
 
 export default class DataTable extends React.Component {
     peakHospitalizations = null;
@@ -105,10 +98,10 @@ export default class DataTable extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {/* Daily average */}
+                        {/* Average */}
                         <TableRow>
                             <TableCell variant="head">
-                                Daily average (7 days)
+                                7-day rolling average
                             </TableCell>
                             <TableCell>
                                 {this.props.cases &&
@@ -117,7 +110,6 @@ export default class DataTable extends React.Component {
                                     lastConsolidatedDataDay(),
                                     -7,
                                 ))}
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                             <TableCell>
                                 {this.incidence &&
@@ -128,7 +120,9 @@ export default class DataTable extends React.Component {
                                 )) + '/100k inhabitants'}
                                 &nbsp;<InfoBox>
                                     This is the incidence for today over 14 days
-                                    and for 100k inhabitants.
+                                    and for 100k inhabitants. Taking the average
+                                    is not necessary for this value as it spans
+                                    over 14 days already.
                                 </InfoBox>
                             </TableCell>
                             <TableCell>
@@ -138,7 +132,6 @@ export default class DataTable extends React.Component {
                                     lastConsolidatedDataDay(),
                                     -7,
                                 ))}
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                             <TableCell>
                                 {this.props.totalICU &&
@@ -147,7 +140,6 @@ export default class DataTable extends React.Component {
                                     lastConsolidatedDataDay(),
                                     -7,
                                 ))}
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                             <TableCell>
                                 {this.props.mortality &&
@@ -156,7 +148,6 @@ export default class DataTable extends React.Component {
                                     lastConsolidatedDataDay(),
                                     -7,
                                 ))}
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                         </TableRow>
                         {/* Doubling */}
@@ -169,7 +160,6 @@ export default class DataTable extends React.Component {
                                     this.props.cases &&
                                     this.getDaysToDoubling(this.props.cases)
                                 }
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                             <TableCell>
                                 {this.incidence &&
@@ -181,21 +171,18 @@ export default class DataTable extends React.Component {
                                     this.props.totalHospitalizations &&
                                     this.getDaysToDoubling(this.props.totalHospitalizations)
                                 }
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.totalICU &&
                                     this.getDaysToDoubling(this.props.totalICU)
                                 }
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.mortality &&
                                     this.getDaysToDoubling(this.props.mortality)
                                 }
-                                &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                         </TableRow>
                         {/* Comment */}
@@ -316,7 +303,6 @@ export default class DataTable extends React.Component {
     getDoublingDate(data, limit = lastConsolidatedDataDay()) {
         const isoLimit = getIsoDate(limit);
         const limitValue = typeof data[isoLimit] === 'object' ? data[isoLimit].total : data[isoLimit];
-        if (!limitValue) console.log(data);
         let date = limit;
         let value = limitValue;
         while (value && value > limitValue / 2) {
