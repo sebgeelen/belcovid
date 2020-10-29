@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween, getIsoDate } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -126,6 +126,10 @@ export default class DataTable extends React.Component {
                                     today(),
                                     1,
                                 )) + '/100k inhabitants'}
+                                &nbsp;<InfoBox>
+                                    This is the incidence for today over 14 days
+                                    and for 100k inhabitants.
+                                </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {this.props.totalHospitalizations &&
@@ -152,6 +156,45 @@ export default class DataTable extends React.Component {
                                     lastConsolidatedDataDay(),
                                     -7,
                                 ))}
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                        </TableRow>
+                        {/* Doubling */}
+                        <TableRow>
+                            <TableCell variant="head">
+                                Doubling period
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.cases &&
+                                    this.getDaysToDoubling(this.props.cases)
+                                }
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                            <TableCell>
+                                {this.incidence &&
+                                    this.getDaysToDoubling(this.incidence, today())
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.totalHospitalizations &&
+                                    this.getDaysToDoubling(this.props.totalHospitalizations)
+                                }
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.totalICU &&
+                                    this.getDaysToDoubling(this.props.totalICU)
+                                }
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.mortality &&
+                                    this.getDaysToDoubling(this.props.mortality)
+                                }
                                 &nbsp;{truncatedDataInfoBox}
                             </TableCell>
                         </TableRow>
@@ -229,8 +272,8 @@ export default class DataTable extends React.Component {
                                 <TableCell variant="head">
                                     Day of saturation (at current rate)
                                 </TableCell>
-                                <TableCell/>
-                                <TableCell/>
+                                <TableCell>-</TableCell>
+                                <TableCell>-</TableCell>
                                 <TableCell>{
                                     this.props.totalHospitalizations &&
                                     this.getDayToValueString(
@@ -245,7 +288,7 @@ export default class DataTable extends React.Component {
                                         TOTAL_ICU_BEDS,
                                     )
                                 }&nbsp;{saturationPopover(true)}</TableCell>
-                                <TableCell/>
+                                <TableCell>-</TableCell>
                             </TableRow>
                         }
                     </TableBody>
@@ -269,6 +312,24 @@ export default class DataTable extends React.Component {
         const date = this.getDayToValue(data, value, limit);
         if (!date) return '';
         return getDaysBetween(date, limit) ? date.toDateString() : 'Exceeded';
+    }
+    getDoublingDate(data, limit = lastConsolidatedDataDay()) {
+        const isoLimit = getIsoDate(limit);
+        const limitValue = typeof data[isoLimit] === 'object' ? data[isoLimit].total : data[isoLimit];
+        if (!limitValue) console.log(data);
+        let date = limit;
+        let value = limitValue;
+        while (value && value > limitValue / 2) {
+            date = getDateFrom(date, -1);
+            const point = data[getIsoDate(date)];
+            value = typeof point === 'object' ? point.total : point;
+        }
+        return value && date;
+    }
+    getDaysToDoubling(data, limit = lastConsolidatedDataDay()) {
+        const date = this.getDoublingDate(data, limit);
+        if (!date) return '';
+        return getDaysBetween(date, limit) + ' days';
     }
 
     _getPeak(data) {
