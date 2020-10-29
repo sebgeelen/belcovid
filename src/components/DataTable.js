@@ -42,10 +42,11 @@ function saturationPopover(icu = false) {
     }
     return (
         <InfoBox>
-            The day that all available {icu ? 'ICU' : 'hospital'} beds would be
-            in use if the 7-day rolling average total number of COVID-19
-            patients in {icu ? 'ICU' : 'hospitals'} were to keep growing at the
-            same pace.<br/>
+            The day that all available {icu ? 'ICU' : 'hospital'} beds (
+            estimated to be {icu ? TOTAL_ICU_BEDS : AVAILABLE_BEDS}) would be in
+            use if the 7-day rolling average total number of COVID-19 patients
+            in {icu ? 'ICU' : 'hospitals'} were to keep growing at the same
+            pace.<br/>
             <br/>
             {source}
         </InfoBox>
