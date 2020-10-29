@@ -6,10 +6,9 @@ import RateOfChange from './RateOfChange';
 import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
-import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, provinceString } from '../../data';
-import { casesAnnotations as testingAnnotations, getWeeklyData, lastConsolidatedDataDay } from '../../helpers';
+import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data';
+import { casesAnnotations as testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
-import { populationData } from '../../populationData';
 
 export const dataInfo = {
     cases: {
@@ -282,7 +281,12 @@ export default class Charts extends React.Component {
                 data = this.props.totalICU;
                 break;
             case 'incidence':
-                data = this._getIncidenceData(this.state.incidenceDays, this.state.incidenceDenominator);
+                data = this.props.cases && getIncidenceData(
+                    this.props.cases,
+                    this.props.province,
+                    this.state.incidenceDays,
+                    this.state.incidenceDenominator
+                );
                 break;
             default:
                 data = this.props[mainVariable];
@@ -458,30 +462,5 @@ export default class Charts extends React.Component {
                 }
             </React.Fragment>
         );
-    }
-    // TODO: make weeks and reference parametrable by chart or user.
-    // Caveat: works only for cases because assumes their age groups.
-    _getIncidenceData(weeks = 2, reference = 100000) {
-        if (!this.props.cases) return;
-        const data = {};
-        const weeklyCases = getWeeklyData(this.props.cases, weeks);
-        const population = populationData.ageGroupsCases[this.props.province];
-        for (const date of Object.keys(weeklyCases)) {
-            if (!data[date]) {
-                data[date] = {};
-            }
-            const casesAtDate = weeklyCases[date];
-            for (const ageGroup of Object.keys(casesAtDate)) {
-                const cases = casesAtDate[ageGroup];
-                let incidence;
-                if (ageGroup === 'Age unknown') {
-                    incidence = 0;
-                } else {
-                    incidence = (reference * cases) / population[ageGroup];
-                }
-                data[date][ageGroup] = incidence;
-            }
-        }
-        return data;
     }
 }

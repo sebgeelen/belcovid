@@ -331,6 +331,7 @@ class App extends React.Component {
                                     allCasesData={this.state.cases}
                                     totalHospitalizations={this.state.totalHospitalizations?.be}
                                     totalICU={this.state.totalICU?.be}
+                                    mortality={this.state.mortality?.be}
                                     newsData={this.state.newsData}
                                     province={this.state.province}
                                 />

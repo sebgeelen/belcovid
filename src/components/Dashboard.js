@@ -53,6 +53,7 @@ export default class Dashboard extends React.Component {
                 cases={this.props.allCasesData?.be}
                 totalHospitalizations={this.props.totalHospitalizations}
                 totalICU={this.props.totalICU}
+                mortality={this.props.mortality}
               /> :
               <Skeleton variant="rect" height={200} />
             }

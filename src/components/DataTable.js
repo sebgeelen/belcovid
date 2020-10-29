@@ -1,11 +1,12 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import { Link } from '@material-ui/core';
+import { Link, TableHead } from '@material-ui/core';
 import { InfoBox } from './InfoBox';
+import { getIncidenceData } from '../data';
 
 function saturationPopover(icu = false) {
     let source;
@@ -52,103 +53,199 @@ function saturationPopover(icu = false) {
         </InfoBox>
     );
 }
-function peakPopover(peak) {
+function peakPopover(variable, peak) {
     return (
         <InfoBox>
-            The day that the number of people at the hospital would be the same
+            The day that the {variable} would be the same
             as on the highest day recorded
             ({peak.date.toDateString()}:&nbsp;{Math.round(peak.total)}), based on
             7-day rolling average to account for statistical noise.
         </InfoBox>
     );
 }
+const truncatedDataInfoBox = (
+    <InfoBox>
+        Excluding the last 4 days, counting from
+        today included, which are not yet
+        consolidated.
+    </InfoBox>
+);
 
 export default class DataTable extends React.Component {
     peakHospitalizations = null;
     peakICU = null;
     render() {
+        if (this.props.cases && !this.peakCases) {
+            this.peakCases = this._getPeak(this.props.cases);
+        }
+        if (this.props.cases && !this.peakIncidence) {
+            this.incidence = getIncidenceData(this.props.cases);
+            this.peakIncidence = this._getPeak(this.incidence);
+        }
         if (this.props.totalHospitalizations && !this.peakHospitalizations) {
             this.peakHospitalizations = this._getPeak(this.props.totalHospitalizations);
         }
         if (this.props.totalICU && !this.peakICU) {
             this.peakICU = this._getPeak(this.props.totalICU);
         }
+        if (this.props.mortality && !this.peakMortality) {
+            this.peakMortality = this._getPeak(this.props.mortality);
+        }
         return (
             <React.Fragment>
                 <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell/>
+                            <TableCell>Cases</TableCell>
+                            <TableCell>Incidence (14d)</TableCell>
+                            <TableCell>Total in Hospital</TableCell>
+                            <TableCell>Total in ICU</TableCell>
+                            <TableCell>Mortality</TableCell>
+                        </TableRow>
+                    </TableHead>
                     <TableBody>
-                        {
-                            this.props.cases &&
-                            <TableRow>
-                                <TableCell>
-                                    Cases (last 7 days, daily average)
-                                    <InfoBox>
-                                        Excluding the last 4 days, counting from
-                                        today included, which are not yet
-                                        consolidated.
-                                    </InfoBox>
-                                </TableCell>
-                                <TableCell>
-                                    {Math.round(getAverageOver(
-                                        this.props.cases,
-                                        lastConsolidatedDataDay(),
-                                        -7,
-                                    ))}
-                                </TableCell>
-                            </TableRow>
-                        }
+                        {/* Daily average */}
+                        <TableRow>
+                            <TableCell variant="head">
+                                Daily average (7 days)
+                            </TableCell>
+                            <TableCell>
+                                {this.props.cases &&
+                                Math.round(getAverageOver(
+                                    this.props.cases,
+                                    lastConsolidatedDataDay(),
+                                    -7,
+                                ))}
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                            <TableCell>
+                                {this.incidence &&
+                                Math.round(getAverageOver(
+                                    this.incidence,
+                                    today(),
+                                    1,
+                                )) + '/100k inhabitants'}
+                            </TableCell>
+                            <TableCell>
+                                {this.props.totalHospitalizations &&
+                                Math.round(getAverageOver(
+                                    this.props.totalHospitalizations,
+                                    lastConsolidatedDataDay(),
+                                    -7,
+                                ))}
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                            <TableCell>
+                                {this.props.totalICU &&
+                                Math.round(getAverageOver(
+                                    this.props.totalICU,
+                                    lastConsolidatedDataDay(),
+                                    -7,
+                                ))}
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                            <TableCell>
+                                {this.props.mortality &&
+                                Math.round(getAverageOver(
+                                    this.props.mortality,
+                                    lastConsolidatedDataDay(),
+                                    -7,
+                                ))}
+                                &nbsp;{truncatedDataInfoBox}
+                            </TableCell>
+                        </TableRow>
+                        {/* Comment */}
                         {
                             (this.props.totalHospitalizations || this.props.totalICU) &&
                             <TableRow>
-                                <TableCell colSpan={2} style={{ textAlign: 'center' }}>
+                                <TableCell colSpan={6} style={{ textAlign: 'center' }}>
                                     <small><u>Note</u>: please take the rest of this table with a healthy dose of skepticism. These are not meant as
                                     strict predictions but merely to help grasping the current rate of growth. They are naive estimates.</small>
                                 </TableCell>
                             </TableRow>
                         }
+                        {/* Peak */}
                         {
-                            this.props.totalHospitalizations &&
                             <TableRow>
-                                <TableCell>
-                                    Day of new total in hospital peak
-                                    (at current rate)&nbsp;{peakPopover(this.peakHospitalizations)}
+                                <TableCell variant="head">
+                                    Day of next peak (at current rate)
                                 </TableCell>
-                                <TableCell>{
-                                    this.getSaturationDay(
+                                <TableCell>{ this.props.cases &&
+                                    this.peakCases &&
+                                    this.getDayToValueString(
+                                        this.props.cases,
+                                        this.peakCases.total,
+                                    )
+                                }&nbsp;{peakPopover(
+                                    'daily number of cases',
+                                    this.peakCases)}
+                                </TableCell>
+                                <TableCell>{ this.incidence &&
+                                    this.peakIncidence &&
+                                    this.getDayToValueString(
+                                        this.incidence,
+                                        this.peakIncidence.total,
+                                    )
+                                }&nbsp;{peakPopover(
+                                    'incidence (14d, 100k)',
+                                    this.peakIncidence)}
+                                </TableCell>
+                                <TableCell>{ this.props.totalHospitalizations &&
+                                    this.peakHospitalizations &&
+                                    this.getDayToValueString(
                                         this.props.totalHospitalizations,
                                         this.peakHospitalizations.total,
-                                    )?.toDateString()
-                                }</TableCell>
-                            </TableRow>
-                        }
-                        {
-                            this.props.totalHospitalizations &&
-                            <TableRow>
-                                <TableCell>
-                                    Day of hospital saturation
-                                    (at current rate)&nbsp;{saturationPopover()}
+                                    )
+                                }&nbsp;{peakPopover(
+                                    'total number of people at the hospital',
+                                    this.peakHospitalizations)}
+                                </TableCell>
+                                <TableCell>{ this.props.totalICU &&
+                                    this.peakICU &&
+                                    this.getDayToValueString(
+                                        this.props.totalICU,
+                                        this.peakICU.total,
+                                    )
+                                }&nbsp;{peakPopover(
+                                    'total number of people in intensive care',
+                                    this.peakICU)
+                                }
                                 </TableCell>
                                 <TableCell>{
-                                    this.getSaturationDay(
+                                        this.getDayToValueString(
+                                            this.props.mortality,
+                                            this.peakMortality.total,
+                                        )
+                                    }&nbsp;{peakPopover(
+                                        'daily mortality',
+                                        this.peakMortality)}
+                                </TableCell>
+                            </TableRow>
+                        }
+                        {/* Saturation */}
+                        {
+                            <TableRow>
+                                <TableCell variant="head">
+                                    Day of saturation (at current rate)
+                                </TableCell>
+                                <TableCell/>
+                                <TableCell/>
+                                <TableCell>{
+                                    this.props.totalHospitalizations &&
+                                    this.getDayToValueString(
                                         this.props.totalHospitalizations,
                                         AVAILABLE_BEDS,
-                                    )?.toDateString()
-                                }</TableCell>
-                            </TableRow>
-                        }
-                        {
-                            this.props.totalICU &&
-                            <TableRow>
-                                <TableCell>
-                                    Day of ICU saturation
-                                    (at current rate)&nbsp;{saturationPopover(true)}
-                                </TableCell>
+                                    )
+                                }&nbsp;{saturationPopover()}</TableCell>
                                 <TableCell>{
-                                    this.getSaturationDay(
+                                    this.props.totalICU &&
+                                    this.getDayToValueString(
                                         this.props.totalICU,
                                         TOTAL_ICU_BEDS,
-                                    )?.toDateString()
-                                }</TableCell>
+                                    )
+                                }&nbsp;{saturationPopover(true)}</TableCell>
+                                <TableCell/>
                             </TableRow>
                         }
                     </TableBody>
@@ -156,17 +253,22 @@ export default class DataTable extends React.Component {
             </React.Fragment>
         );
     }
-    getSaturationDay(data, availableBeds) {
+    getDayToValue(data, value, limit = lastConsolidatedDataDay()) {
         const interval = 7;
-        const day1 = getAverageOver(data, getDateFrom(lastConsolidatedDataDay(), -(interval)), -6);
-        const day2 = getAverageOver(data, lastConsolidatedDataDay(), -6);
+        const day1 = getAverageOver(data, getDateFrom(limit, -(interval)), -6);
+        const day2 = getAverageOver(data, limit, -6);
         if (!day2 || day1 >= day2) return;
 
         const pcChange = (day2 - day1) / day1;
-        const daysToSaturation = interval * (Math.floor(Math.log(availableBeds / day2) / Math.log((1 + pcChange))));
-        const saturationDay = getDateFrom(lastConsolidatedDataDay(), daysToSaturation);
+        const daysToSaturation = interval * (Math.floor(Math.log(value / day2) / Math.log((1 + pcChange))));
+        const saturationDay = getDateFrom(limit, daysToSaturation);
 
         return saturationDay;
+    }
+    getDayToValueString(data, value, limit = lastConsolidatedDataDay()) {
+        const date = this.getDayToValue(data, value, limit);
+        if (!date) return '';
+        return getDaysBetween(date, limit) ? date.toDateString() : 'Exceeded';
     }
 
     _getPeak(data) {

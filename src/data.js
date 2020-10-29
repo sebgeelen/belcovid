@@ -1,4 +1,6 @@
 import Parser from 'rss-parser';
+import { getDateFrom, getIsoDate, normalizeDate } from './helpers';
+import { populationData } from './populationData';
 
 const parser = new Parser();
 const PROXY = 'https://cors-anywhere.herokuapp.com/';
@@ -141,6 +143,52 @@ export function fetchNewsData() {
         dataPromises.push({ ...source, promise: fetchRssData(source.rss)});
     }
     return dataPromises;
+}
+export function getWeeklyData(data, weeks = 1) {
+    const weeklyData = {};
+    let dataIndex = 0;
+    for (const date of Object.keys(data)) {
+        if (dataIndex >= 6) {
+            let comparativeDate = normalizeDate(new Date(date));
+            for (let i = 0; i < (weeks * 7); i++) {
+                const value = data[getIsoDate(comparativeDate)];
+                if (typeof value === 'object') {
+                    weeklyData[date] = Object.keys(value).reduce((groups, name) => {
+                        groups[name] = (weeklyData[date]?.[name] || 0) + value[name];
+                        return groups;
+                    }, {});
+                } else if (value !== undefined) {
+                    weeklyData[date] = (weeklyData[date] || 0) + (value || 0);
+                }
+                comparativeDate = normalizeDate(getDateFrom(new Date(comparativeDate), -1));
+            }
+        }
+        dataIndex++;
+    }
+    return weeklyData;
+}
+// Caveat: works only for cases because assumes their age groups.
+export function getIncidenceData(casesData, province = 'be', weeks = 2, reference = 100000) {
+    const data = {};
+    const weeklyCases = getWeeklyData(casesData, weeks);
+    const population = populationData.ageGroupsCases[province];
+    for (const date of Object.keys(weeklyCases)) {
+        if (!data[date]) {
+            data[date] = {};
+        }
+        const casesAtDate = weeklyCases[date];
+        for (const ageGroup of Object.keys(casesAtDate)) {
+            const cases = casesAtDate[ageGroup];
+            let incidence;
+            if (ageGroup === 'Age unknown') {
+                incidence = 0;
+            } else {
+                incidence = (reference * cases) / population[ageGroup];
+            }
+            data[date][ageGroup] = incidence;
+        }
+    }
+    return data;
 }
 // Keeping this for the record.
 // eslint-disable-next-line no-unused-vars

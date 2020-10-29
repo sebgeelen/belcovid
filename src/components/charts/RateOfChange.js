@@ -1,7 +1,7 @@
 import React from 'react';
+import { getWeeklyData } from '../../data';
 import {
     betterRound,
-    getWeeklyData,
     getPolynomialRegressionPoints,
 } from '../../helpers';
 import LineChart from './LineChart';

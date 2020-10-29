@@ -10,11 +10,10 @@ export class InfoBox extends React.Component {
                 {(popupState) => (
                     <React.Fragment>
                         <IconButton
-                            color="primary"
-                            style={{verticalAlign: 'super', padding: 0}}
+                            style={{verticalAlign: 'super', padding: 0, color: 'grey'}}
                             {...bindTrigger(popupState)}
                         >
-                            <InfoIcon style={{fontSize: 15 }} />
+                            <InfoIcon style={{fontSize: 13 }} />
                         </IconButton>
                         <Popover
                             {...bindPopover(popupState)}

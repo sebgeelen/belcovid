@@ -272,26 +272,3 @@ export function setIntoLocalStorage(name, value) {
         console.warn(e);
     }
 }
-export function getWeeklyData(data, weeks = 1) {
-    const weeklyData = {};
-    let dataIndex = 0;
-    for (const date of Object.keys(data)) {
-        if (dataIndex >= 6) {
-            let comparativeDate = normalizeDate(new Date(date));
-            for (let i = 0; i < (weeks * 7); i++) {
-                const value = data[getIsoDate(comparativeDate)];
-                if (typeof value === 'object') {
-                    weeklyData[date] = Object.keys(value).reduce((groups, name) => {
-                        groups[name] = (weeklyData[date]?.[name] || 0) + value[name];
-                        return groups;
-                    }, {});
-                } else if (value !== undefined) {
-                    weeklyData[date] = (weeklyData[date] || 0) + (value || 0);
-                }
-                comparativeDate = normalizeDate(getDateFrom(new Date(comparativeDate), -1));
-            }
-        }
-        dataIndex++;
-    }
-    return weeklyData;
-}
