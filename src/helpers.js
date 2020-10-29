@@ -285,8 +285,8 @@ export function getWeeklyData(data, weeks = 1) {
                         groups[name] = (weeklyData[date]?.[name] || 0) + value[name];
                         return groups;
                     }, {});
-                } else {
-                    weeklyData[date] = (weeklyData[date] || 0) + value;
+                } else if (value !== undefined) {
+                    weeklyData[date] = (weeklyData[date] || 0) + (value || 0);
                 }
                 comparativeDate = normalizeDate(getDateFrom(new Date(comparativeDate), -1));
             }
