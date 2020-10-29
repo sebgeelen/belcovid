@@ -10,6 +10,7 @@ import News from './News';
 import { provinceString } from '../data';
 import { dataInfo } from './charts/Charts';
 import { lastConsolidatedDataDay } from '../helpers';
+import { TableContainer } from '@material-ui/core';
 
 export default class Dashboard extends React.Component {
   classes = this.props.classes;
@@ -46,15 +47,17 @@ export default class Dashboard extends React.Component {
         </Grid>
         {/* Recent Data */}
         <Grid item xs={12}>
-          <Paper className={this.classes.paper} style={{ overflow: 'hidden' }}>
+          <Paper className={this.classes.paper}>
             <Title>Today in Belgium</Title>
             {this.props.allCasesData || this.props.totalHospitalizations || this.props.totalICU ?
-              <DataTable
-                cases={this.props.allCasesData?.be}
-                totalHospitalizations={this.props.totalHospitalizations}
-                totalICU={this.props.totalICU}
-                mortality={this.props.mortality}
-              /> :
+              <TableContainer component={Paper} style={{ border: 0, boxShadow: 'none'}}>
+                <DataTable
+                  cases={this.props.allCasesData?.be}
+                  totalHospitalizations={this.props.totalHospitalizations}
+                  totalICU={this.props.totalICU}
+                  mortality={this.props.mortality}
+                />
+              </TableContainer> :
               <Skeleton variant="rect" height={200} />
             }
           </Paper>
