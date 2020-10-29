@@ -362,7 +362,7 @@ export default class Charts extends React.Component {
             default: break;
         }
         let title = chartInfo.title;
-        if (mainVariable === 'incidence') {
+        if (mainVariable === 'incidence' && chartType === 'average') {
             title += ` (${this.state.incidenceDays} days, `;
             if (this.state.incidenceDenominator === 100) {
                 title += 'in %)';
@@ -412,41 +412,44 @@ export default class Charts extends React.Component {
                             max={14}
                             onChange={(ev, value) => this.setState({ incidenceDays: value })}
                         />
-                        <Slider
-                            defaultValue={100000}
-                            getAriaValueText={value => {
-                                if (value === 100) return '%';
-                                return `/${value / 1000}k`;
-                            }}
-                            valueLabelFormat={value => {
-                                if (value === 100) return '%';
-                                return `/${value / 1000}k`;
-                            }}
-                            aria-labelledby="discrete-slider"
-                            valueLabelDisplay="auto"
-                            step={null}
-                            marks={[
-                                {
-                                    value: 100,
-                                    label: '%',
-                                },
-                                {
-                                    value: 10000,
-                                    label: '/10k',
-                                },
-                                {
-                                    value: 50000,
-                                    label: '/50k',
-                                },
-                                {
-                                    value: 100000,
-                                    label: '/100k',
-                                },
-                            ]}
-                            min={100}
-                            max={100000}
-                            onChange={(ev, value) => this.setState({ incidenceDenominator: value })}
-                        />
+                        {
+                            this.state.chartType === 'average' &&
+                            <Slider
+                                defaultValue={100000}
+                                getAriaValueText={value => {
+                                    if (value === 100) return '%';
+                                    return `/${value / 1000}k`;
+                                }}
+                                valueLabelFormat={value => {
+                                    if (value === 100) return '%';
+                                    return `/${value / 1000}k`;
+                                }}
+                                aria-labelledby="discrete-slider"
+                                valueLabelDisplay="auto"
+                                step={null}
+                                marks={[
+                                    {
+                                        value: 100,
+                                        label: '%',
+                                    },
+                                    {
+                                        value: 10000,
+                                        label: '/10k',
+                                    },
+                                    {
+                                        value: 50000,
+                                        label: '/50k',
+                                    },
+                                    {
+                                        value: 100000,
+                                        label: '/100k',
+                                    },
+                                ]}
+                                min={100}
+                                max={100000}
+                                onChange={(ev, value) => this.setState({ incidenceDenominator: value })}
+                            />
+                        }
                     </Container>
                 }
             </React.Fragment>
