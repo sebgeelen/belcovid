@@ -68,11 +68,13 @@ export default class DataTable extends React.Component {
     peakHospitalizations = null;
     peakICU = null;
     render() {
+        if (this.props.cases) {
+            this.incidence = getIncidenceData(this.props.cases);
+        }
         if (this.props.cases && !this.peakCases) {
             this.peakCases = this._getPeak(this.props.cases);
         }
-        if (this.props.cases && !this.peakIncidence) {
-            this.incidence = getIncidenceData(this.props.cases);
+        if (this.incidence && !this.peakIncidence) {
             this.peakIncidence = this._getPeak(this.incidence);
         }
         if (this.props.totalHospitalizations && !this.peakHospitalizations) {
@@ -104,50 +106,66 @@ export default class DataTable extends React.Component {
                                 7-day rolling average
                             </TableCell>
                             <TableCell>
-                                {this.props.cases &&
-                                Math.round(getAverageOver(
-                                    this.props.cases,
-                                    lastConsolidatedDataDay(),
-                                    -7,
-                                ))}
+                                {
+                                    this.props.cases &&
+                                    Math.round(getAverageOver(
+                                        this.props.cases,
+                                        lastConsolidatedDataDay(),
+                                        -7,
+                                    ))
+                                }
                             </TableCell>
                             <TableCell>
-                                {this.incidence &&
-                                Math.round(getAverageOver(
-                                    this.incidence,
-                                    today(),
-                                    1,
-                                )) + '/100k inhabitants'}
-                                &nbsp;<InfoBox>
-                                    This is the incidence for today over 14 days
-                                    and for 100k inhabitants. Taking the average
-                                    is not necessary for this value as it spans
-                                    over 14 days already.
-                                </InfoBox>
+                                {
+                                    this.incidence &&
+                                    (
+                                        <React.Fragment>
+                                            {
+                                                Math.round(getAverageOver(
+                                                    this.incidence,
+                                                    today(),
+                                                    1,
+                                                ))
+                                            }/100k inhabitants
+                                            &nbsp;<InfoBox>
+                                                This is the incidence for today over 14 days
+                                                and for 100k inhabitants. Taking the average
+                                                is not necessary for this value as it spans
+                                                over 14 days already.
+                                            </InfoBox>
+                                        </React.Fragment>
+                                    )
+                                }
                             </TableCell>
                             <TableCell>
-                                {this.props.totalHospitalizations &&
-                                Math.round(getAverageOver(
-                                    this.props.totalHospitalizations,
-                                    lastConsolidatedDataDay(),
-                                    -7,
-                                ))}
+                                {
+                                    this.props.totalHospitalizations &&
+                                    Math.round(getAverageOver(
+                                        this.props.totalHospitalizations,
+                                        lastConsolidatedDataDay(),
+                                        -7,
+                                    ))
+                                }
                             </TableCell>
                             <TableCell>
-                                {this.props.totalICU &&
-                                Math.round(getAverageOver(
-                                    this.props.totalICU,
-                                    lastConsolidatedDataDay(),
-                                    -7,
-                                ))}
+                                {
+                                    this.props.totalICU &&
+                                    Math.round(getAverageOver(
+                                        this.props.totalICU,
+                                        lastConsolidatedDataDay(),
+                                        -7,
+                                    ))
+                                }
                             </TableCell>
                             <TableCell>
-                                {this.props.mortality &&
-                                Math.round(getAverageOver(
-                                    this.props.mortality,
-                                    lastConsolidatedDataDay(),
-                                    -7,
-                                ))}
+                                {
+                                    this.props.mortality &&
+                                    Math.round(getAverageOver(
+                                        this.props.mortality,
+                                        lastConsolidatedDataDay(),
+                                        -7,
+                                    ))
+                                }
                             </TableCell>
                         </TableRow>
                         {/* Doubling */}
@@ -162,7 +180,8 @@ export default class DataTable extends React.Component {
                                 }
                             </TableCell>
                             <TableCell>
-                                {this.incidence &&
+                                {
+                                    this.incidence &&
                                     this.getDaysToDoubling(this.incidence, today())
                                 }
                             </TableCell>
@@ -186,70 +205,121 @@ export default class DataTable extends React.Component {
                             </TableCell>
                         </TableRow>
                         {/* Comment */}
-                        {
-                            (this.props.totalHospitalizations || this.props.totalICU) &&
-                            <TableRow>
-                                <TableCell colSpan={6} style={{ textAlign: 'center' }}>
-                                    <small><u>Note</u>: please take the rest of this table with a healthy dose of skepticism. These are not meant as
-                                    strict predictions but merely to help grasping the current rate of growth. They are naive estimates.</small>
-                                </TableCell>
-                            </TableRow>
-                        }
+                        <TableRow>
+                            <TableCell colSpan={6} style={{ textAlign: 'center' }}>
+                                <small><u>Note</u>: please take the rest of this table with a healthy dose of skepticism. These are not meant as
+                                strict predictions but merely to help grasping the current rate of growth. They are naive estimates.</small>
+                            </TableCell>
+                        </TableRow>
                         {/* Peak */}
                         {
                             <TableRow>
                                 <TableCell variant="head">
                                     Day of next peak (at current rate)
                                 </TableCell>
-                                <TableCell>{ this.props.cases &&
-                                    this.peakCases &&
-                                    this.getDayToValueString(
-                                        this.props.cases,
-                                        this.peakCases.total,
-                                    )
-                                }&nbsp;{peakPopover(
-                                    'daily number of cases',
-                                    this.peakCases)}
-                                </TableCell>
-                                <TableCell>{ this.incidence &&
-                                    this.peakIncidence &&
-                                    this.getDayToValueString(
-                                        this.incidence,
-                                        this.peakIncidence.total,
-                                    )
-                                }&nbsp;{peakPopover(
-                                    'incidence (14d, 100k)',
-                                    this.peakIncidence)}
-                                </TableCell>
-                                <TableCell>{ this.props.totalHospitalizations &&
-                                    this.peakHospitalizations &&
-                                    this.getDayToValueString(
-                                        this.props.totalHospitalizations,
-                                        this.peakHospitalizations.total,
-                                    )
-                                }&nbsp;{peakPopover(
-                                    'total number of people at the hospital',
-                                    this.peakHospitalizations)}
-                                </TableCell>
-                                <TableCell>{ this.props.totalICU &&
-                                    this.peakICU &&
-                                    this.getDayToValueString(
-                                        this.props.totalICU,
-                                        this.peakICU.total,
-                                    )
-                                }&nbsp;{peakPopover(
-                                    'total number of people in intensive care',
-                                    this.peakICU)
-                                }
-                                </TableCell>
-                                <TableCell>{
-                                        this.getDayToValueString(
-                                            this.props.mortality,
-                                            this.peakMortality.total,
+                                <TableCell>
+                                    {
+                                        this.props.cases &&
+                                        this.peakCases &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.props.cases,
+                                                        this.peakCases.total,
+                                                    )
+                                                }&nbsp;{
+                                                    peakPopover(
+                                                        'daily number of cases',
+                                                        this.peakCases
+                                                    )
+                                                }
+                                            </React.Fragment>
                                         )
-                                    }&nbsp;{peakPopover(
-                                        'daily mortality',
-                                        this.peakMortality)}
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        this.incidence &&
+                                        this.peakIncidence &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.incidence,
+                                                        this.peakIncidence.total,
+                                                    )
+                                                }&nbsp;{
+                                                    peakPopover(
+                                                        'incidence (14d, 100k)',
+                                                        this.peakIncidence)
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        this.props.totalHospitalizations &&
+                                        this.peakHospitalizations &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.props.totalHospitalizations,
+                                                        this.peakHospitalizations.total,
+                                                    )
+                                                }&nbsp;{
+                                                    peakPopover(
+                                                        'total number of people at the hospital',
+                                                        this.peakHospitalizations
+                                                    )
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        this.props.totalICU &&
+                                        this.peakICU &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.props.totalICU,
+                                                        this.peakICU.total,
+                                                    )
+                                                }&nbsp;{
+                                                    peakPopover(
+                                                        'total number of people in intensive care',
+                                                        this.peakICU
+                                                    )
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        this.props.mortality &&
+                                        this.peakMortality &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.props.mortality,
+                                                        this.peakMortality.total,
+                                                    )
+                                                }&nbsp;{
+                                                    peakPopover(
+                                                        'daily mortality',
+                                                        this.peakMortality
+                                                    )
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    }
                                 </TableCell>
                             </TableRow>
                         }
@@ -261,20 +331,40 @@ export default class DataTable extends React.Component {
                                 </TableCell>
                                 <TableCell>-</TableCell>
                                 <TableCell>-</TableCell>
-                                <TableCell>{
-                                    this.props.totalHospitalizations &&
-                                    this.getDayToValueString(
-                                        this.props.totalHospitalizations,
-                                        AVAILABLE_BEDS,
-                                    )
-                                }&nbsp;{saturationPopover()}</TableCell>
-                                <TableCell>{
-                                    this.props.totalICU &&
-                                    this.getDayToValueString(
-                                        this.props.totalICU,
-                                        TOTAL_ICU_BEDS,
-                                    )
-                                }&nbsp;{saturationPopover(true)}</TableCell>
+                                <TableCell>
+                                    {
+                                        this.props.totalHospitalizations &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.props.totalHospitalizations,
+                                                        AVAILABLE_BEDS,
+                                                    )
+                                                }&nbsp;{
+                                                    saturationPopover()
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        this.props.totalICU &&
+                                        (
+                                            <React.Fragment>
+                                                {
+                                                    this.getDayToValueString(
+                                                        this.props.totalICU,
+                                                        TOTAL_ICU_BEDS,
+                                                    )
+                                                }&nbsp;{
+                                                    saturationPopover(true)
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    }
+                                </TableCell>
                                 <TableCell>-</TableCell>
                             </TableRow>
                         }
