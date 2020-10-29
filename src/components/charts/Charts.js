@@ -7,7 +7,7 @@ import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Lin
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, provinceString } from '../../data';
-import { casesAnnotations as testingAnnotations, getWeeklyData } from '../../helpers';
+import { casesAnnotations as testingAnnotations, getWeeklyData, lastConsolidatedDataDay } from '../../helpers';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import { populationData } from '../../populationData';
 
@@ -316,6 +316,7 @@ export default class Charts extends React.Component {
                             stacked={chartInfo.stacked}
                             ticksCallbacks={chartInfo.ticksCallbacks}
                             labelStrings={labelStrings}
+                            max={mainVariable !== 'incidence' && lastConsolidatedDataDay()}
                         />
                     );
                 } else {
@@ -327,6 +328,7 @@ export default class Charts extends React.Component {
                             annotations={chartInfo.annotations}
                             asImage={true}
                             labelStrings={chartInfo.labelStrings}
+                            max={lastConsolidatedDataDay()}
                         />
                     );
                 }
@@ -343,6 +345,7 @@ export default class Charts extends React.Component {
                         chartName={chartInfo.title}
                         annotations={chartInfo.annotations}
                         asImage={true}
+                        max={lastConsolidatedDataDay()}
                     />
                 );
                 break;
@@ -355,6 +358,7 @@ export default class Charts extends React.Component {
                         chartName={chartInfo.title}
                         annotations={chartInfo.annotations}
                         asImage={true}
+                        max={mainVariable !== 'incidence' && lastConsolidatedDataDay()}
                     />
                 );
                 break;

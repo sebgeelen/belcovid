@@ -14,6 +14,9 @@ export default class ChartByAge extends React.Component {
         let start;
         let end;
         for (const date of Object.keys(casesData)) {
+            // Ignore the data if it concerns days beyond the limite set in
+            // props.
+            if (this.props.max && new Date(date) > this.props.max) continue;
             if (!start || new Date(date) < start) start = new Date(date);
             if (!end || new Date(date) > end) end = new Date(date);
             for (const group of this.props.ageGroups) {

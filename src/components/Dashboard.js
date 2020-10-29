@@ -9,6 +9,7 @@ import { Skeleton } from '@material-ui/lab';
 import News from './News';
 import { provinceString } from '../data';
 import { dataInfo } from './charts/Charts';
+import { lastConsolidatedDataDay } from '../helpers';
 
 export default class Dashboard extends React.Component {
   classes = this.props.classes;
@@ -30,6 +31,7 @@ export default class Dashboard extends React.Component {
                   chartName={chartInfo.title}
                   asImage={true}
                   ageGroups={chartInfo.ageGroups}
+                  max={lastConsolidatedDataDay()}
                 /> :
               <Skeleton variant="rect" height={'100%'} />
             }

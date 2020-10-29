@@ -12,7 +12,14 @@ export default class RateOfChange extends React.Component {
         let data = this.props.data;
         const weeklyData = getWeeklyData(data);
         const weeklyPoints = [];
+        let start;
+        let end;
         for (const date of Object.keys(weeklyData)) {
+            // Ignore the data if it concerns days beyond the limite set in
+            // props.
+            if (this.props.max && new Date(date) > this.props.max) continue;
+            if (!start || new Date(date) < start) start = new Date(date);
+            if (!end || new Date(date) > start) end = new Date(date);
             const value = weeklyData[date];
             weeklyPoints.push({
                 x: new Date(date),
@@ -51,11 +58,10 @@ export default class RateOfChange extends React.Component {
                 radius: 0,
             },
         ];
-        const dates = Object.keys(data);
         const bounds = {
             x: {
-                min: new Date(dates[0]),
-                max: new Date(dates[dates.length - 1]),
+                min: start,
+                max: end,
             },
         };
         const annotations = [{

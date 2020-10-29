@@ -33,7 +33,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import { getDaysBetween, getFromLocalStorage, isMobile, lastConsolidatedDataDay, setIntoLocalStorage, today } from '../helpers.js';
+import { getDaysBetween, getFromLocalStorage, isMobile, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import ListItemLink from './ListItemLink.js';
@@ -60,7 +60,7 @@ function Footer() {
             <Link color="inherit" href="https://www.info-coronavirus.be/" target="_blank" rel="noopener noreferrer">Official national information on Covid-19</Link>
             {'.'}
             <br/>
-            <small>Data is truncated to exclude the last 4 days because that data is not yet consolidated.</small>
+            <small>Most data is truncated to exclude the last 4 days because that data is not yet consolidated.</small>
         </Typography>
     );
 }
@@ -451,12 +451,10 @@ class App extends React.Component {
             object[province] = {};
             return object;
         }, {});
-        const limitDay = lastConsolidatedDataDay();
         for (const item of values) {
             const province = (item.PROVINCE && provinceKey(item.PROVINCE)) || 'be';
             const date = item.DATE;
-            // Ignore days for which the data is not yet consolidated.
-            if (!date || new Date(date) > limitDay) continue;
+            if (!date) continue;
 
             const value = +item[dataKey];
             if (ageGroups) {
