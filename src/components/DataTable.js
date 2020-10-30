@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween, getIsoDate } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -391,13 +391,12 @@ export default class DataTable extends React.Component {
         return getDaysBetween(date, limit) ? date.toDateString() : 'Exceeded';
     }
     getDoublingDate(data, limit = lastConsolidatedDataDay()) {
-        const isoLimit = getIsoDate(limit);
-        const limitValue = typeof data[isoLimit] === 'object' ? data[isoLimit].total : data[isoLimit];
+        const limitValue = getAverageOver(data, limit, -7);
         let date = limit;
         let value = limitValue;
         while (value && value > limitValue / 2) {
             date = getDateFrom(date, -1);
-            const point = data[getIsoDate(date)];
+            const point = getAverageOver(data, date, -7);
             value = typeof point === 'object' ? point.total : point;
         }
         return value && date;
