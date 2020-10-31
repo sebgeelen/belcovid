@@ -116,7 +116,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.cases,
                                         lastConsolidatedDataDay(),
-                                        -6,
+                                        -7,
                                     ))
                                 }
                             </TableCell>
@@ -133,7 +133,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.totalHospitalizations,
                                         lastConsolidatedDataDay(),
-                                        -6,
+                                        -7,
                                     ))
                                 }
                             </TableCell>
@@ -143,7 +143,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.totalICU,
                                         lastConsolidatedDataDay(),
-                                        -6,
+                                        -7,
                                     ))
                                 }
                             </TableCell>
@@ -153,7 +153,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.mortality,
                                         lastConsolidatedDataDay(),
-                                        -6,
+                                        -7,
                                     ))
                                 }
                             </TableCell>
@@ -437,8 +437,8 @@ export default class DataTable extends React.Component {
     }
     getDayToValue(data, value, limit = lastConsolidatedDataDay()) {
         const interval = 7;
-        const day1 = getAverageOver(data, getDateFrom(limit, -(interval)), -6);
-        const day2 = getAverageOver(data, limit, -6);
+        const day1 = getAverageOver(data, getDateFrom(limit, -(interval)), -7);
+        const day2 = getAverageOver(data, limit, -7);
         if (!day2 || day1 >= day2) return;
 
         const pcChange = (day2 - day1) / day1;
@@ -453,12 +453,12 @@ export default class DataTable extends React.Component {
         return getDaysBetween(date, limit) ? date.toDateString() : 'Exceeded';
     }
     getDoublingDate(data, limit = lastConsolidatedDataDay()) {
-        const limitValue = getAverageOver(data, limit, -6);
+        const limitValue = getAverageOver(data, limit, -7);
         let date = limit;
         let value = limitValue;
         while (value && value > limitValue / 2) {
             date = getDateFrom(date, -1);
-            const point = getAverageOver(data, date, -6);
+            const point = getAverageOver(data, date, -7);
             value = typeof point === 'object' ? point.total : point;
         }
         return value && date;
