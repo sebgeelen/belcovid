@@ -210,6 +210,14 @@ export function today() {
     return new Date();
 }
 /**
+ * Return yesterday's date.
+ *
+ * @returns {Date}
+ */
+export function yesterday() {
+    return getDateFrom(today(), -1);
+}
+/**
  * Return the last day for which we can say that epidemiological data is
  * consolidated (ie. 4 days before today).
  *

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween, yesterday } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -116,26 +116,7 @@ export default class DataTable extends React.Component {
                                 }
                             </TableCell>
                             <TableCell>
-                                {
-                                    this.incidence &&
-                                    (
-                                        <React.Fragment>
-                                            {
-                                                Math.round(getAverageOver(
-                                                    this.incidence,
-                                                    today(),
-                                                    1,
-                                                ))
-                                            }/100k inhabitants
-                                            &nbsp;<InfoBox>
-                                                This is the incidence for today over 14 days
-                                                and for 100k inhabitants. Taking the average
-                                                is not necessary for this value as it spans
-                                                over 14 days already.
-                                            </InfoBox>
-                                        </React.Fragment>
-                                    )
-                                }
+                                -
                             </TableCell>
                             <TableCell>
                                 {
@@ -164,6 +145,61 @@ export default class DataTable extends React.Component {
                                         this.props.mortality,
                                         lastConsolidatedDataDay(),
                                         -7,
+                                    ))
+                                }
+                            </TableCell>
+                        </TableRow>
+                        {/* Raw */}
+                        <TableRow>
+                            <TableCell variant="head">
+                                Raw numbers from yesterday
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.incidence &&
+                                    (
+                                        <React.Fragment>
+                                            {
+                                                Math.round(getAverageOver(
+                                                    this.incidence,
+                                                    yesterday(),
+                                                    1,
+                                                ))
+                                            }/100k inhabitants
+                                        </React.Fragment>
+                                    )
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.totalHospitalizations &&
+                                    Math.round(getAverageOver(
+                                        this.props.totalHospitalizations,
+                                        yesterday(),
+                                        1,
+                                    ))
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.totalICU &&
+                                    Math.round(getAverageOver(
+                                        this.props.totalICU,
+                                        yesterday(),
+                                        1,
+                                    ))
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.mortality &&
+                                    Math.round(getAverageOver(
+                                        this.props.mortality,
+                                        yesterday(),
+                                        1,
                                     ))
                                 }
                             </TableCell>
