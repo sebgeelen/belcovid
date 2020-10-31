@@ -29,7 +29,7 @@ export const casesAnnotations = [{
     label: {
         backgroundColor: 'rgba(128, 128, 128, 0.3)',
         fontColor: 'black',
-        content: 'Testing downscaled',
+        content: 'Testing strategy change',
         enabled: true,
         fontSize: 9,
         fontStyle: 'normal',
