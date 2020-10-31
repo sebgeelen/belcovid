@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday, today, normalizeDate } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -7,7 +7,16 @@ import TableRow from '@material-ui/core/TableRow';
 import { Link, TableHead } from '@material-ui/core';
 import { InfoBox } from './InfoBox';
 import { getIncidenceData } from '../data';
+import { MathComponent } from 'mathjax-react';
 
+const dayofMath = (
+    <small>
+        Solving the compound interest formula for t:
+        <MathComponent tex={
+            String.raw`A = P(1 + \frac{r}{n})^{nt} \quad \Leftrightarrow \quad t = \frac{\ln(\frac{A}{P})}{n\ln(1+\frac{r}{n})}`
+        } />
+    </small>
+);
 function saturationPopover(icu = false) {
     let source;
     if (icu) {
@@ -49,6 +58,7 @@ function saturationPopover(icu = false) {
             in {icu ? 'ICU' : 'hospitals'} were to keep growing at the same
             pace.<br/>
             <br/>
+            {dayofMath}
             {source}
         </InfoBox>
     );
@@ -59,7 +69,9 @@ function peakPopover(variable, peak) {
             The day that the {variable} would be the same
             as on the highest day recorded
             ({peak.date.toDateString()}:&nbsp;{Math.round(peak.total)}), based on
-            7-day rolling average to account for statistical noise.
+            7-day rolling average to account for statistical noise.<br/>
+            <br/>
+            {dayofMath}
         </InfoBox>
     );
 }
@@ -442,15 +454,19 @@ export default class DataTable extends React.Component {
         if (!day2 || day1 >= day2) return;
 
         const pcChange = (day2 - day1) / day1;
-        const daysToSaturation = interval * (Math.floor(Math.log(value / day2) / Math.log((1 + pcChange))));
-        const saturationDay = getDateFrom(limit, daysToSaturation);
+        const n = 1 / interval;
+        const daysToSaturation = Math.log(value / day2) / (n * Math.log(1 + (pcChange / n)));
+        const saturationDay = getDateFrom(limit, Math.round(daysToSaturation));
 
         return saturationDay;
     }
     getDayToValueString(data, value, limit = lastConsolidatedDataDay()) {
         const date = this.getDayToValue(data, value, limit);
         if (!date) return '';
-        return getDaysBetween(date, limit) ? date.toDateString() : 'Exceeded';
+        const normalizedDate = normalizeDate(date);
+        if (normalizedDate > today()) return normalizedDate.toDateString();
+        if (getDaysBetween(normalizedDate, today()) === 0) return 'Today';
+        return 'Exceeded';
     }
     getDoublingDate(data, limit = lastConsolidatedDataDay()) {
         const limitValue = getAverageOver(data, limit, -7);

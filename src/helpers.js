@@ -207,7 +207,7 @@ export function getDaysBetween(day1, day2) {
  * @returns {Date}
  */
 export function today() {
-    return new Date();
+    return normalizeDate(new Date());
 }
 /**
  * Return yesterday's date.
