@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, today, getDaysBetween, yesterday } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -104,6 +104,11 @@ export default class DataTable extends React.Component {
                         <TableRow>
                             <TableCell variant="head">
                                 7-day rolling average
+                                &nbsp;<InfoBox>
+                                    Until {lastConsolidatedDataDay().toDateString()}.
+                                    The data after that date is not yet
+                                    consolidated.
+                                </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {
@@ -111,12 +116,16 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.cases,
                                         lastConsolidatedDataDay(),
-                                        -7,
+                                        -6,
                                     ))
                                 }
                             </TableCell>
                             <TableCell>
-                                -
+                                -&nbsp;<InfoBox>
+                                    A 7-day rolling average is unnecessary for
+                                    the incidence as it already covers the last
+                                    14 days.
+                                </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {
@@ -124,7 +133,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.totalHospitalizations,
                                         lastConsolidatedDataDay(),
-                                        -7,
+                                        -6,
                                     ))
                                 }
                             </TableCell>
@@ -134,7 +143,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.totalICU,
                                         lastConsolidatedDataDay(),
-                                        -7,
+                                        -6,
                                     ))
                                 }
                             </TableCell>
@@ -144,7 +153,7 @@ export default class DataTable extends React.Component {
                                     Math.round(getAverageOver(
                                         this.props.mortality,
                                         lastConsolidatedDataDay(),
-                                        -7,
+                                        -6,
                                     ))
                                 }
                             </TableCell>
@@ -152,10 +161,19 @@ export default class DataTable extends React.Component {
                         {/* Raw */}
                         <TableRow>
                             <TableCell variant="head">
-                                Raw numbers from yesterday
+                                Yesterday's raw numbers
+                                &nbsp;<InfoBox>
+                                    These values might still change as the data
+                                    consolidates.
+                                </InfoBox>
                             </TableCell>
                             <TableCell>
-                                -
+                                -&nbsp;<InfoBox>
+                                    We are not including this value as it proves
+                                    particularly unreliable (it takes several
+                                    days for test results to be aggregated into
+                                    Sciensano's database).
+                                </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {
@@ -208,6 +226,14 @@ export default class DataTable extends React.Component {
                         <TableRow>
                             <TableCell variant="head">
                                 Doubling period
+                                &nbsp;<InfoBox>
+                                    This shows how many days passed between the
+                                    7-day rolling average on {
+                                        lastConsolidatedDataDay().toDateString()
+                                    } (the last day for which we have
+                                    consolidated data) and the day at which the
+                                    7-day rolling average was half of that.
+                                </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {
@@ -218,7 +244,7 @@ export default class DataTable extends React.Component {
                             <TableCell>
                                 {
                                     this.incidence &&
-                                    this.getDaysToDoubling(this.incidence, today())
+                                    this.getDaysToDoubling(this.incidence)
                                 }
                             </TableCell>
                             <TableCell>
@@ -427,12 +453,12 @@ export default class DataTable extends React.Component {
         return getDaysBetween(date, limit) ? date.toDateString() : 'Exceeded';
     }
     getDoublingDate(data, limit = lastConsolidatedDataDay()) {
-        const limitValue = getAverageOver(data, limit, -7);
+        const limitValue = getAverageOver(data, limit, -6);
         let date = limit;
         let value = limitValue;
         while (value && value > limitValue / 2) {
             date = getDateFrom(date, -1);
-            const point = getAverageOver(data, date, -7);
+            const point = getAverageOver(data, date, -6);
             value = typeof point === 'object' ? point.total : point;
         }
         return value && date;
