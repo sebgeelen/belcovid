@@ -183,7 +183,7 @@ class App extends React.Component {
             } else {
                 const statsToSet = {};
                 let areStatsMissing = false;
-                for (const key of ['cases', 'totalHospitalizations', 'totalICU', 'mortality', 'tests']) {
+                for (const key of ['cases', 'totalHospitalizations', 'newHospitalizations', 'totalICU', 'mortality', 'tests']) {
                     const statsData = getFromLocalStorage('belcovid:' + key);
                     if (statsData) {
                         statsToSet[key] = JSON.parse(statsData);
@@ -328,11 +328,11 @@ class App extends React.Component {
                             <Route path="/">
                                 <Dashboard
                                     classes={this.classes}
-                                    allCasesData={this.state.cases}
-                                    totalHospitalizations={this.state.totalHospitalizations?.be}
-                                    newHospitalizations={this.state.newHospitalizations?.be}
-                                    totalICU={this.state.totalICU?.be}
-                                    mortality={this.state.mortality?.be}
+                                    cases={this.state.cases}
+                                    totalHospitalizations={this.state.totalHospitalizations}
+                                    newHospitalizations={this.state.newHospitalizations}
+                                    totalICU={this.state.totalICU}
+                                    mortality={this.state.mortality}
                                     newsData={this.state.newsData}
                                     province={this.state.province}
                                 />

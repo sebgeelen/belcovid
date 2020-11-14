@@ -24,10 +24,10 @@ export default class Dashboard extends React.Component {
         <Grid item xs={12} md={7} lg={7}>
           <Paper className={this.fixedHeightPaper} style={{height: '100%', width: '100%'}}>
             <Title>New cases, by age group (7-day rolling average) in {provinceString(this.props.province)}</Title>
-            {this.props.allCasesData ?
+            {this.props.cases ?
                 <ChartByAge
                   classes={this.classes}
-                  data={this.props.allCasesData[this.props.province]}
+                  data={this.props.cases[this.props.province]}
                   annotations={chartInfo.annotations}
                   chartName={chartInfo.title}
                   asImage={true}
@@ -48,15 +48,16 @@ export default class Dashboard extends React.Component {
         {/* Recent Data */}
         <Grid item xs={12}>
           <Paper className={this.classes.paper}>
-            <Title>Today in Belgium</Title>
-            {this.props.allCasesData || this.props.totalHospitalizations || this.props.totalICU ?
+            <Title>Today in {provinceString(this.props.province)}</Title>
+            {this.props.cases || this.props.totalHospitalizations || this.props.totalICU || this.props.newHospitalizations || this.props.mortality ?
               <TableContainer component={Paper} style={{ border: 0, boxShadow: 'none'}}>
                 <DataTable
-                  cases={this.props.allCasesData?.be}
+                  cases={this.props.cases}
                   totalHospitalizations={this.props.totalHospitalizations}
                   newHospitalizations={this.props.newHospitalizations}
                   totalICU={this.props.totalICU}
                   mortality={this.props.mortality}
+                  province={this.props.province}
                 />
               </TableContainer> :
               <Skeleton variant="rect" height={200} />

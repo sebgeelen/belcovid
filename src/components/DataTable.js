@@ -6,7 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import { Link, TableHead } from '@material-ui/core';
 import { InfoBox } from './InfoBox';
-import { getIncidenceData } from '../data';
+import { getIncidenceData, provinceString } from '../data';
 import { MathComponent } from 'mathjax-react';
 import { populationData } from '../populationData';
 
@@ -82,22 +82,22 @@ export default class DataTable extends React.Component {
     peakICU = null;
     render() {
         if (this.props.cases) {
-            this.incidence = getIncidenceData(this.props.cases);
+            this.incidence = getIncidenceData(this.props.cases[this.props.province], this.props.province);
         }
         if (this.props.cases && !this.peakCases) {
-            this.peakCases = this._getPeak(this.props.cases);
+            this.peakCases = this._getPeak(this.props.cases[this.props.province]);
         }
         if (this.incidence && !this.peakIncidence) {
             this.peakIncidence = this._getPeak(this.incidence);
         }
         if (this.props.totalHospitalizations && !this.peakHospitalizations) {
-            this.peakHospitalizations = this._getPeak(this.props.totalHospitalizations);
+            this.peakHospitalizations = this._getPeak(this.props.totalHospitalizations[this.props.province]);
         }
         if (this.props.totalICU && !this.peakICU) {
-            this.peakICU = this._getPeak(this.props.totalICU);
+            this.peakICU = this._getPeak(this.props.totalICU[this.props.province]);
         }
         if (this.props.mortality && !this.peakMortality) {
-            this.peakMortality = this._getPeak(this.props.mortality);
+            this.peakMortality = this._getPeak(this.props.mortality.be); // Mortality data exists only for Belgium.
         }
         return (
             <React.Fragment>
@@ -127,7 +127,7 @@ export default class DataTable extends React.Component {
                                 {
                                     this.props.cases &&
                                     Math.round(getAverageOver(
-                                        this.props.cases,
+                                        this.props.cases[this.props.province],
                                         lastConsolidatedDataDay(),
                                         -7,
                                     ))
@@ -144,7 +144,7 @@ export default class DataTable extends React.Component {
                                 {
                                     this.props.totalHospitalizations &&
                                     Math.round(getAverageOver(
-                                        this.props.totalHospitalizations,
+                                        this.props.totalHospitalizations[this.props.province],
                                         lastConsolidatedDataDay(),
                                         -7,
                                     ))
@@ -154,7 +154,7 @@ export default class DataTable extends React.Component {
                                 {
                                     this.props.totalICU &&
                                     Math.round(getAverageOver(
-                                        this.props.totalICU,
+                                        this.props.totalICU[this.props.province],
                                         lastConsolidatedDataDay(),
                                         -7,
                                     ))
@@ -162,12 +162,16 @@ export default class DataTable extends React.Component {
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.mortality &&
-                                    Math.round(getAverageOver(
-                                        this.props.mortality,
-                                        lastConsolidatedDataDay(),
-                                        -7,
-                                    ))
+                                    this.props.province === 'be' ?
+                                        (
+                                            this.props.mortality &&
+                                            Math.round(getAverageOver(
+                                                this.props.mortality[this.props.province],
+                                                lastConsolidatedDataDay(),
+                                                -7,
+                                            ))
+                                        ) :
+                                        '-'
                                 }
                             </TableCell>
                         </TableRow>
@@ -208,7 +212,7 @@ export default class DataTable extends React.Component {
                                 {
                                     this.props.totalHospitalizations &&
                                     Math.round(getAverageOver(
-                                        this.props.totalHospitalizations,
+                                        this.props.totalHospitalizations[this.props.province],
                                         yesterday(),
                                         1,
                                     ))
@@ -218,7 +222,7 @@ export default class DataTable extends React.Component {
                                 {
                                     this.props.totalICU &&
                                     Math.round(getAverageOver(
-                                        this.props.totalICU,
+                                        this.props.totalICU[this.props.province],
                                         yesterday(),
                                         1,
                                     ))
@@ -226,12 +230,16 @@ export default class DataTable extends React.Component {
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.mortality &&
-                                    Math.round(getAverageOver(
-                                        this.props.mortality,
-                                        yesterday(),
-                                        1,
-                                    ))
+                                    this.props.province === 'be' ?
+                                    (
+                                        this.props.mortality &&
+                                        Math.round(getAverageOver(
+                                            this.props.mortality[this.props.province],
+                                            yesterday(),
+                                            1,
+                                        ))
+                                    ) :
+                                    '-'
                                 }
                             </TableCell>
                         </TableRow>
@@ -251,7 +259,7 @@ export default class DataTable extends React.Component {
                             <TableCell>
                                 {
                                     this.props.cases &&
-                                    this.getDaysToDoubling(this.props.cases)
+                                    this.getDaysToDoubling(this.props.cases[this.props.province])
                                 }
                             </TableCell>
                             <TableCell>
@@ -263,19 +271,23 @@ export default class DataTable extends React.Component {
                             <TableCell>
                                 {
                                     this.props.totalHospitalizations &&
-                                    this.getDaysToDoubling(this.props.totalHospitalizations)
+                                    this.getDaysToDoubling(this.props.totalHospitalizations[this.props.province])
                                 }
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.totalICU &&
-                                    this.getDaysToDoubling(this.props.totalICU)
+                                    this.getDaysToDoubling(this.props.totalICU[this.props.province])
                                 }
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.mortality &&
-                                    this.getDaysToDoubling(this.props.mortality)
+                                    this.props.province === 'be' ?
+                                    (
+                                        this.props.mortality &&
+                                        this.getDaysToDoubling(this.props.mortality[this.props.province])
+                                    ) :
+                                    '-'
                                 }
                             </TableCell>
                         </TableRow>
@@ -286,7 +298,7 @@ export default class DataTable extends React.Component {
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.cases && this.getTotal(this.props.cases)
+                                    this.props.cases && this.getTotal(this.props.cases[this.props.province])
                                 }
                             </TableCell>
                             <TableCell>
@@ -294,7 +306,7 @@ export default class DataTable extends React.Component {
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.newHospitalizations && this.getTotal(this.props.newHospitalizations)
+                                    this.props.newHospitalizations && this.getTotal(this.props.newHospitalizations[this.props.province])
                                 }
                             </TableCell>
                             <TableCell>
@@ -302,8 +314,12 @@ export default class DataTable extends React.Component {
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.mortality &&
-                                    this.getTotal(this.props.mortality)
+                                    this.props.province === 'be' ?
+                                    (
+                                        this.props.mortality &&
+                                        this.getTotal(this.props.mortality[this.props.province])
+                                    ) :
+                                    '-'
                                 }
                             </TableCell>
                         </TableRow>
@@ -312,13 +328,13 @@ export default class DataTable extends React.Component {
                             <TableCell variant="head">
                                 Total as a fraction of population
                                 &nbsp;<InfoBox>
-                                    1 person out of n Belgians.
+                                    1 person out of n inhabitants of {provinceString(this.props.province)}.
                                 </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.cases &&
-                                    `1 / ${Math.round(populationData.totals.be / this.getTotal(this.props.cases))}`
+                                    `1 / ${Math.round(populationData.totals[this.props.province] / this.getTotal(this.props.cases[this.props.province]))}`
                                 }
                             </TableCell>
                             <TableCell>
@@ -327,7 +343,7 @@ export default class DataTable extends React.Component {
                             <TableCell>
                                 {
                                     this.props.newHospitalizations &&
-                                    `1 / ${Math.round(populationData.totals.be / this.getTotal(this.props.newHospitalizations))}`
+                                    `1 / ${Math.round(populationData.totals[this.props.province] / this.getTotal(this.props.newHospitalizations[this.props.province]))}`
                                 }
                             </TableCell>
                             <TableCell>
@@ -335,8 +351,12 @@ export default class DataTable extends React.Component {
                             </TableCell>
                             <TableCell>
                                 {
-                                    this.props.mortality &&
-                                    `1 / ${Math.round(populationData.totals.be / this.getTotal(this.props.mortality))}`
+                                    this.props.province === 'be' ?
+                                    (
+                                        this.props.mortality &&
+                                        `1 / ${Math.round(populationData.totals[this.props.province] / this.getTotal(this.props.mortality[this.props.province]))}`
+                                    ) :
+                                    '-'
                                 }
                             </TableCell>
                         </TableRow>
@@ -361,7 +381,7 @@ export default class DataTable extends React.Component {
                                             <React.Fragment>
                                                 {
                                                     this.getDayToValueString(
-                                                        this.props.cases,
+                                                        this.props.cases[this.props.province],
                                                         this.peakCases.total,
                                                     )
                                                 }&nbsp;{
@@ -402,7 +422,7 @@ export default class DataTable extends React.Component {
                                             <React.Fragment>
                                                 {
                                                     this.getDayToValueString(
-                                                        this.props.totalHospitalizations,
+                                                        this.props.totalHospitalizations[this.props.province],
                                                         this.peakHospitalizations.total,
                                                     )
                                                 }&nbsp;{
@@ -423,7 +443,7 @@ export default class DataTable extends React.Component {
                                             <React.Fragment>
                                                 {
                                                     this.getDayToValueString(
-                                                        this.props.totalICU,
+                                                        this.props.totalICU[this.props.province],
                                                         this.peakICU.total,
                                                     )
                                                 }&nbsp;{
@@ -438,23 +458,27 @@ export default class DataTable extends React.Component {
                                 </TableCell>
                                 <TableCell>
                                     {
-                                        this.props.mortality &&
-                                        this.peakMortality &&
+                                        this.props.province === 'be' ?
                                         (
-                                            <React.Fragment>
-                                                {
-                                                    this.getDayToValueString(
-                                                        this.props.mortality,
-                                                        this.peakMortality.total,
-                                                    )
-                                                }&nbsp;{
-                                                    peakPopover(
-                                                        'daily mortality',
-                                                        this.peakMortality
-                                                    )
-                                                }
-                                            </React.Fragment>
-                                        )
+                                            this.props.mortality &&
+                                            this.peakMortality &&
+                                            (
+                                                <React.Fragment>
+                                                    {
+                                                        this.getDayToValueString(
+                                                            this.props.mortality[this.props.province],
+                                                            this.peakMortality.total,
+                                                        )
+                                                    }&nbsp;{
+                                                        peakPopover(
+                                                            'daily mortality',
+                                                            this.peakMortality
+                                                        )
+                                                    }
+                                                </React.Fragment>
+                                            )
+                                        ) :
+                                        '-'
                                     }
                                 </TableCell>
                             </TableRow>
@@ -463,7 +487,7 @@ export default class DataTable extends React.Component {
                         {
                             <TableRow>
                                 <TableCell variant="head">
-                                    Day of saturation (at current rate)
+                                    Day of saturation (national, at current rate)
                                 </TableCell>
                                 <TableCell>-</TableCell>
                                 <TableCell>-</TableCell>
@@ -474,7 +498,7 @@ export default class DataTable extends React.Component {
                                             <React.Fragment>
                                                 {
                                                     this.getDayToValueString(
-                                                        this.props.totalHospitalizations,
+                                                        this.props.totalHospitalizations.be,
                                                         AVAILABLE_BEDS,
                                                     )
                                                 }&nbsp;{
@@ -491,7 +515,7 @@ export default class DataTable extends React.Component {
                                             <React.Fragment>
                                                 {
                                                     this.getDayToValueString(
-                                                        this.props.totalICU,
+                                                        this.props.totalICU.be,
                                                         TOTAL_ICU_BEDS,
                                                     )
                                                 }&nbsp;{
