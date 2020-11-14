@@ -8,6 +8,7 @@ import { Link, TableHead } from '@material-ui/core';
 import { InfoBox } from './InfoBox';
 import { getIncidenceData } from '../data';
 import { MathComponent } from 'mathjax-react';
+import { populationData } from '../populationData';
 
 const dayofMath = (
     <small>
@@ -278,6 +279,62 @@ export default class DataTable extends React.Component {
                                 }
                             </TableCell>
                         </TableRow>
+                        {/* Total */}
+                        <TableRow>
+                            <TableCell variant="head">
+                                Total
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.cases && this.getTotal(this.props.cases)
+                                }
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.mortality &&
+                                    this.getTotal(this.props.mortality)
+                                }
+                            </TableCell>
+                        </TableRow>
+                        {/* Total as fraction */}
+                        <TableRow>
+                            <TableCell variant="head">
+                                Total as a fraction of population
+                                &nbsp;<InfoBox>
+                                    1 person out of n Belgians.
+                                </InfoBox>
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.cases &&
+                                    `1 / ${Math.round(populationData.totals.be / this.getTotal(this.props.cases))}`
+                                }
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                -
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    this.props.mortality &&
+                                    `1 / ${Math.round(populationData.totals.be / this.getTotal(this.props.mortality))}`
+                                }
+                            </TableCell>
+                        </TableRow>
                         {/* Comment */}
                         <TableRow>
                             <TableCell colSpan={6} style={{ textAlign: 'center' }}>
@@ -446,6 +503,18 @@ export default class DataTable extends React.Component {
                 </Table>
             </React.Fragment>
         );
+    }
+    getTotal(data) {
+        return Object.keys(data).reduce((total, key) => {
+            let count = data[key];
+            if (typeof count === 'number') {
+                return total + count;
+            } else if (typeof count === 'object') {
+                return total + count.total;
+            } else {
+                return total;
+            }
+        }, 0);
     }
     getDayToValue(data, value, limit = lastConsolidatedDataDay()) {
         const interval = 7;
