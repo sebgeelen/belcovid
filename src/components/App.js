@@ -481,7 +481,7 @@ class App extends React.Component {
                 const totalValue = data[province][date].total || 0;
                 data[province][date].total = totalValue + value;
                 // Add to totals for Belgium at date.
-                if (province !== 'Belgium') {
+                if (province !== 'be') {
                     if (!data.be[date]) {
                         data.be[date] = {};
                     }
@@ -497,7 +497,7 @@ class App extends React.Component {
                 // Set province value at date.
                 data[province][date] = provinceValue + value;
                 // Add to total for Belgium at date.
-                if (province !== 'Belgium') {
+                if (province !== 'be') {
                     const belgiumValue = data.be[date] || 0;
                     data.be[date] = belgiumValue + value;
                 }
