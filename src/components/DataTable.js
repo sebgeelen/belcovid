@@ -293,7 +293,9 @@ export default class DataTable extends React.Component {
                                 -
                             </TableCell>
                             <TableCell>
-                                -
+                                {
+                                    this.props.newHospitalizations && this.getTotal(this.props.newHospitalizations)
+                                }
                             </TableCell>
                             <TableCell>
                                 -
@@ -323,7 +325,10 @@ export default class DataTable extends React.Component {
                                 -
                             </TableCell>
                             <TableCell>
-                                -
+                                {
+                                    this.props.newHospitalizations &&
+                                    `1 / ${Math.round(populationData.totals.be / this.getTotal(this.props.newHospitalizations))}`
+                                }
                             </TableCell>
                             <TableCell>
                                 -

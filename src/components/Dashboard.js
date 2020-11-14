@@ -54,6 +54,7 @@ export default class Dashboard extends React.Component {
                 <DataTable
                   cases={this.props.allCasesData?.be}
                   totalHospitalizations={this.props.totalHospitalizations}
+                  newHospitalizations={this.props.newHospitalizations}
                   totalICU={this.props.totalICU}
                   mortality={this.props.mortality}
                 />

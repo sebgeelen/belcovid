@@ -330,6 +330,7 @@ class App extends React.Component {
                                     classes={this.classes}
                                     allCasesData={this.state.cases}
                                     totalHospitalizations={this.state.totalHospitalizations?.be}
+                                    newHospitalizations={this.state.newHospitalizations?.be}
                                     totalICU={this.state.totalICU?.be}
                                     mortality={this.state.mortality?.be}
                                     newsData={this.state.newsData}
@@ -425,11 +426,16 @@ class App extends React.Component {
             case 'hospitalizations': {
                 return {
                     ...this._normalizeData('totalHospitalizations', values),
+                    ...this._normalizeData('newHospitalizations', values),
                     ...this._normalizeData('totalICU', values),
                 };
             }
             case 'totalHospitalizations': {
                 dataKey = 'TOTAL_IN';
+                break;
+            }
+            case 'newHospitalizations': {
+                dataKey = 'NEW_IN';
                 break;
             }
             case 'totalICU': {
