@@ -75,6 +75,18 @@ const _PROVINCE_KEYS = Object.keys(PROVINCES).reduce((obj, key) => {
     obj[PROVINCES[key]] = key;
     return obj;
 }, {});
+const _REFNIS = {
+    10000: 'ant',
+    20001: 'vbr',
+    20002: 'brw',
+    30000: 'wvl',
+    40000: 'ovl',
+    50000: 'hnt',
+    60000: 'lge',
+    70000: 'lim',
+    80000: 'lux',
+    90000: 'nam',
+};
 export const AGE_GROUPS_CASES = [
     '0-9',
     '10-19',
@@ -190,9 +202,12 @@ export function getIncidenceData(casesData, province = 'be', weeks = 2, referenc
     }
     return data;
 }
+
+//--------------------------------------------------------------------------
 // Keeping this for the record.
-// eslint-disable-next-line no-unused-vars
-function _normalizePopulationData(rawPopulationData, ageGroups) {
+//--------------------------------------------------------------------------
+
+function makeAgeMap(ageGroups) {
     const ageMap = {};
     for (const group of ageGroups) {
         const matchA = group.match(/^(\d+)-(\d+)$/);
@@ -210,6 +225,11 @@ function _normalizePopulationData(rawPopulationData, ageGroups) {
             ageMap[i] = group;
         }
     }
+    return ageMap;
+}
+// eslint-disable-next-line no-unused-vars
+function _normalizePopulationData(rawPopulationData, ageGroups) {
+    const ageMap = makeAgeMap(ageGroups);
     const normalizedData = {be: ageGroups.reduce((groups, group) => {
         groups[group] = 0;
         return groups;
@@ -235,4 +255,15 @@ function _normalizePopulationData(rawPopulationData, ageGroups) {
         }
     }
     return normalizedData;
+}
+function daysOfYear() {
+    const jan1 = normalizeDate('2020-01-01');
+    const dec31 = normalizeDate('2020-12-31');
+    const dates = [];
+    let date = jan1;
+    while (date <= dec31) {
+        dates.push(date);
+        date = getDateFrom(date, 1);
+    }
+    return dates;
 }
