@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday, today, normalizeDate, getChangeRatio, betterRound } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday, today, normalizeDate, getChangeRatio, betterRound, getIsoDate } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -101,12 +101,6 @@ export default class DataTable extends React.Component {
         }
         return (
             <React.Fragment>
-                <small><u>Note</u>: Change rates are calculated on the 7-day
-                    average on {
-                    lastConsolidatedDataDay().toDateString()
-                    } (the last day for which we have consolidated data), and
-                    that of the week before.
-                </small>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -126,7 +120,8 @@ export default class DataTable extends React.Component {
                                 &nbsp;<InfoBox>
                                     Until {lastConsolidatedDataDay().toDateString()}.
                                     The data after that date is not yet
-                                    consolidated.
+                                    consolidated.<br/>
+                                    Change is shown over a period of 7 days.
                                 </InfoBox>
                             </TableCell>
                             <TableCell>
@@ -204,7 +199,9 @@ export default class DataTable extends React.Component {
                                 Yesterday's raw numbers
                                 &nbsp;<InfoBox>
                                     These values might still change as the data
-                                    consolidates.
+                                    consolidates.<br/>
+                                    Change is shown as compared to the day
+                                    before.
                                 </InfoBox>
                             </TableCell>
                             <TableCell>
@@ -230,6 +227,10 @@ export default class DataTable extends React.Component {
                                         </React.Fragment>
                                     )
                                 }
+                                {
+                                    this.incidence &&
+                                    this.getChangeJsx(this.incidence, yesterday(), 1, false)
+                                }
                             </TableCell>
                             <TableCell>
                                 {
@@ -240,6 +241,15 @@ export default class DataTable extends React.Component {
                                         1,
                                     ))
                                 }
+                                {
+                                    this.props.totalHospitalizations &&
+                                    this.getChangeJsx(
+                                        this.props.totalHospitalizations[this.props.province],
+                                        yesterday(),
+                                        1,
+                                        false,
+                                    )
+                                }
                             </TableCell>
                             <TableCell>
                                 {
@@ -249,6 +259,15 @@ export default class DataTable extends React.Component {
                                         yesterday(),
                                         1,
                                     ))
+                                }
+                                {
+                                    this.props.totalICU &&
+                                    this.getChangeJsx(
+                                        this.props.totalICU[this.props.province],
+                                        yesterday(),
+                                        1,
+                                        false,
+                                    )
                                 }
                             </TableCell>
                             <TableCell>
@@ -263,6 +282,16 @@ export default class DataTable extends React.Component {
                                         ))
                                     ) :
                                     '-'
+                                }
+                                {
+                                    this.props.province === 'be' &&
+                                    this.props.mortality &&
+                                    this.getChangeJsx(
+                                        this.props.mortality[this.props.province],
+                                        yesterday(),
+                                        1,
+                                        false,
+                                    )
                                 }
                             </TableCell>
                         </TableRow>
@@ -625,13 +654,21 @@ export default class DataTable extends React.Component {
         if (getDaysBetween(normalizedDate, today()) === 0) return 'Today';
         return 'Exceeded';
     }
-    getChangeRatioOver(data, limit = lastConsolidatedDataDay(), period = 7) {
-        const newValue = getAverageOver(data, limit, -7);
-        const oldValue = getAverageOver(data, getDateFrom(limit, period * -1), -7);
+    getChangeRatioOver(data, limit = lastConsolidatedDataDay(), period = 7, overAverage = true) {
+        let newValue, oldValue;
+        if (overAverage) {
+            newValue = getAverageOver(data, limit, -7);
+            oldValue = getAverageOver(data, getDateFrom(limit, period * -1), -7);
+        } else {
+            const newValueObj = data[getIsoDate(limit)];
+            newValue = typeof newValueObj === 'number' ? newValueObj : newValueObj.total;
+            const oldValueObj = data[getIsoDate(getDateFrom(limit, period * -1))];
+            oldValue = typeof oldValueObj === 'number' ? oldValueObj : oldValueObj.total;
+        }
         return getChangeRatio(newValue, oldValue);
     }
-    getChangeJsx(data, limit = lastConsolidatedDataDay()) {
-        const change = this.getChangeRatioOver(data, limit);
+    getChangeJsx(data, limit = lastConsolidatedDataDay(), period = 7, overAverage = true) {
+        const change = this.getChangeRatioOver(data, limit, period, overAverage);
         const style = { color: (change > 0 ? 'red' : 'green') };
         return (
             <small style={style}>
