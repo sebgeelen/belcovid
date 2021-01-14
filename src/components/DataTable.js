@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday, today, normalizeDate } from '../helpers';
+import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday, today, normalizeDate, getChangeRatio, betterRound } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -132,6 +132,10 @@ export default class DataTable extends React.Component {
                                         -7,
                                     ))
                                 }
+                                {
+                                    this.props.cases &&
+                                    this.getChangeJsx(this.props.cases[this.props.province])
+                                }
                             </TableCell>
                             <TableCell>
                                 -&nbsp;<InfoBox>
@@ -149,6 +153,10 @@ export default class DataTable extends React.Component {
                                         -7,
                                     ))
                                 }
+                                {
+                                    this.props.totalHospitalizations &&
+                                    this.getChangeJsx(this.props.totalHospitalizations[this.props.province])
+                                }
                             </TableCell>
                             <TableCell>
                                 {
@@ -158,6 +166,10 @@ export default class DataTable extends React.Component {
                                         lastConsolidatedDataDay(),
                                         -7,
                                     ))
+                                }
+                                {
+                                    this.props.totalICU &&
+                                    this.getChangeJsx(this.props.totalICU[this.props.province])
                                 }
                             </TableCell>
                             <TableCell>
@@ -172,6 +184,11 @@ export default class DataTable extends React.Component {
                                             ))
                                         ) :
                                         '-'
+                                }
+                                {
+                                    this.props.province === 'be' &&
+                                    this.props.mortality &&
+                                    this.getChangeJsx(this.props.mortality[this.props.province])
                                 }
                             </TableCell>
                         </TableRow>
@@ -246,38 +263,67 @@ export default class DataTable extends React.Component {
                         {/* Doubling */}
                         <TableRow>
                             <TableCell variant="head">
-                                Doubling period
+                                Doubling/Halving period (in days)
                                 &nbsp;<InfoBox>
-                                    This shows how many days passed between the
-                                    7-day rolling average on {
+                                    This shows the number of days it would take
+                                    to double or halve the 7-day rolling average
+                                    on {
                                         lastConsolidatedDataDay().toDateString()
                                     } (the last day for which we have
-                                    consolidated data) and the day at which the
-                                    7-day rolling average was half of that.
+                                    consolidated data), based on the change with
+                                    that of the day before.
                                 </InfoBox>
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.cases &&
-                                    this.getDaysToDoubling(this.props.cases[this.props.province])
+                                    (() => {
+                                        const days = this.getDaysToDoubling(this.props.cases[this.props.province]);
+                                        return `${Math.abs(days)} (${(
+                                            days > 0
+                                                ? 'doubling'
+                                                : 'halving'
+                                        )})`;
+                                    })()
                                 }
                             </TableCell>
                             <TableCell>
                                 {
                                     this.incidence &&
-                                    this.getDaysToDoubling(this.incidence)
+                                    (() => {
+                                        const days = this.getDaysToDoubling(this.incidence);
+                                        return `${Math.abs(days)} (${(
+                                            days > 0
+                                                ? 'doubling'
+                                                : 'halving'
+                                        )})`;
+                                    })()
                                 }
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.totalHospitalizations &&
-                                    this.getDaysToDoubling(this.props.totalHospitalizations[this.props.province])
+                                    (() => {
+                                        const days = this.getDaysToDoubling(this.props.totalHospitalizations[this.props.province]);
+                                        return `${Math.abs(days)} (${(
+                                            days > 0
+                                                ? 'doubling'
+                                                : 'halving'
+                                        )})`;
+                                    })()
                                 }
                             </TableCell>
                             <TableCell>
                                 {
                                     this.props.totalICU &&
-                                    this.getDaysToDoubling(this.props.totalICU[this.props.province])
+                                    (() => {
+                                        const days = this.getDaysToDoubling(this.props.totalICU[this.props.province]);
+                                        return `${Math.abs(days)} (${(
+                                            days > 0
+                                                ? 'doubling'
+                                                : 'halving'
+                                        )})`;
+                                    })()
                                 }
                             </TableCell>
                             <TableCell>
@@ -285,7 +331,14 @@ export default class DataTable extends React.Component {
                                     this.props.province === 'be' ?
                                     (
                                         this.props.mortality &&
-                                        this.getDaysToDoubling(this.props.mortality[this.props.province])
+                                        (() => {
+                                            const days = this.getDaysToDoubling(this.props.mortality[this.props.province]);
+                                            return `${Math.abs(days)} (${(
+                                                days > 0
+                                                    ? 'doubling'
+                                                    : 'halving'
+                                            )})`;
+                                        })()
                                     ) :
                                     '-'
                                 }
@@ -560,27 +613,30 @@ export default class DataTable extends React.Component {
     }
     getDayToValueString(data, value, limit = lastConsolidatedDataDay()) {
         const date = this.getDayToValue(data, value, limit);
-        if (!date) return '';
+        if (!date) return 'N.A.';
         const normalizedDate = normalizeDate(date);
         if (normalizedDate > today()) return normalizedDate.toDateString();
         if (getDaysBetween(normalizedDate, today()) === 0) return 'Today';
         return 'Exceeded';
     }
-    getDoublingDate(data, limit = lastConsolidatedDataDay()) {
+    getChangeRatioWithYesterday(data, limit = lastConsolidatedDataDay()) {
         const limitValue = getAverageOver(data, limit, -7);
-        let date = limit;
-        let value = limitValue;
-        while (value && value > limitValue / 2) {
-            date = getDateFrom(date, -1);
-            const point = getAverageOver(data, date, -7);
-            value = typeof point === 'object' ? point.total : point;
-        }
-        return value && date;
+        const valueDayBefore = getAverageOver(data, getDateFrom(limit, -1), -7);
+        return getChangeRatio(limitValue, valueDayBefore);
+    }
+    getChangeJsx(data, limit = lastConsolidatedDataDay()) {
+        const change = this.getChangeRatioWithYesterday(data, limit);
+        const style = { color: (change > 0 ? 'red' : 'green') };
+        return (
+            <small style={style}>
+                <sup><strong>
+                    {`${change > 0 ? ' +' : ' '}${change}%`}
+                </strong></sup>
+            </small>
+        )
     }
     getDaysToDoubling(data, limit = lastConsolidatedDataDay()) {
-        const date = this.getDoublingDate(data, limit);
-        if (!date) return '';
-        return getDaysBetween(date, limit) + ' days';
+        return betterRound(100 / this.getChangeRatioWithYesterday(data, limit));
     }
 
     _getPeak(data) {

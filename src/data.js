@@ -75,6 +75,7 @@ const _PROVINCE_KEYS = Object.keys(PROVINCES).reduce((obj, key) => {
     obj[PROVINCES[key]] = key;
     return obj;
 }, {});
+// eslint-disable-next-line no-unused-vars
 const _REFNIS = {
     10000: 'ant',
     20001: 'vbr',
@@ -256,6 +257,7 @@ function _normalizePopulationData(rawPopulationData, ageGroups) {
     }
     return normalizedData;
 }
+// eslint-disable-next-line no-unused-vars
 function daysOfYear() {
     const jan1 = normalizeDate('2020-01-01');
     const dec31 = normalizeDate('2020-12-31');

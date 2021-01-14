@@ -280,3 +280,24 @@ export function setIntoLocalStorage(name, value) {
         console.warn(e);
     }
 }
+/**
+ * Return the change ratio between two numerical values, in percentage.
+ *
+ * @param {number} newValue
+ * @param {number} oldValue
+ * @returns {number}
+ */
+export function getChangeRatio(newValue, oldValue) {
+    if (oldValue === newValue) {
+        return 0;
+    } else if (!oldValue) {
+        // If we come from 0 and get to a different value, the rate of
+        // change is undefined.
+        return;
+    } else if (newValue > oldValue) {
+        return betterRound(100 * ((newValue / oldValue) - 1));
+    } else {
+        // If the value went down, the result should be negative.
+        return betterRound(-100 * ((oldValue / newValue) - 1));
+    }
+}

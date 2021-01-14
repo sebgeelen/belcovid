@@ -1,7 +1,7 @@
 import React from 'react';
 import { getWeeklyData } from '../../data';
 import {
-    betterRound,
+    getChangeRatio,
     getPolynomialRegressionPoints,
 } from '../../helpers';
 import LineChart from './LineChart';
@@ -29,7 +29,7 @@ export default class RateOfChange extends React.Component {
         const rateOfChangePoints = weeklyPoints.map((point, index) => {
             let y;
             if (index >= 6 && weeklyPoints[index - 6]) {
-                y = this._getChangeRatio(point.y, weeklyPoints[index - 6].y);
+                y = getChangeRatio(point.y, weeklyPoints[index - 6].y);
             }
             if (y !== undefined) {
                 return {
@@ -83,26 +83,5 @@ export default class RateOfChange extends React.Component {
             asImage={this.props.asImage}
             labelStrings={{y: '% / week'}}
         />;
-    }
-    /**
-     * Return the change ratio between two numerical values, in percentage.
-     *
-     * @param {number} newValue
-     * @param {number} oldValue
-     * @returns {number}
-     */
-    _getChangeRatio(newValue, oldValue) {
-        if (oldValue === newValue) {
-            return 0;
-        } else if (!oldValue) {
-            // If we come from 0 and get to a different value, the rate of
-            // change is undefined.
-            return;
-        } else if (newValue > oldValue) {
-            return betterRound(100 * ((newValue / oldValue) - 1));
-        } else {
-            // If the value went down, the result should be negative.
-            return betterRound(-100 * ((oldValue / newValue) - 1));
-        }
     }
 }
