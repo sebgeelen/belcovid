@@ -101,6 +101,12 @@ export default class DataTable extends React.Component {
         }
         return (
             <React.Fragment>
+                <small><u>Note</u>: Change rates are calculated on the 7-day
+                    average on {
+                    lastConsolidatedDataDay().toDateString()
+                    } (the last day for which we have consolidated data), and
+                    that of the week before.
+                </small>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -271,7 +277,7 @@ export default class DataTable extends React.Component {
                                         lastConsolidatedDataDay().toDateString()
                                     } (the last day for which we have
                                     consolidated data), based on the change with
-                                    that of the day before.
+                                    that of the week before.
                                 </InfoBox>
                             </TableCell>
                             <TableCell>
@@ -619,13 +625,13 @@ export default class DataTable extends React.Component {
         if (getDaysBetween(normalizedDate, today()) === 0) return 'Today';
         return 'Exceeded';
     }
-    getChangeRatioWithYesterday(data, limit = lastConsolidatedDataDay()) {
-        const limitValue = getAverageOver(data, limit, -7);
-        const valueDayBefore = getAverageOver(data, getDateFrom(limit, -1), -7);
-        return getChangeRatio(limitValue, valueDayBefore);
+    getChangeRatioOver(data, limit = lastConsolidatedDataDay(), period = 7) {
+        const newValue = getAverageOver(data, limit, -7);
+        const oldValue = getAverageOver(data, getDateFrom(limit, period * -1), -7);
+        return getChangeRatio(newValue, oldValue);
     }
     getChangeJsx(data, limit = lastConsolidatedDataDay()) {
-        const change = this.getChangeRatioWithYesterday(data, limit);
+        const change = this.getChangeRatioOver(data, limit);
         const style = { color: (change > 0 ? 'red' : 'green') };
         return (
             <small style={style}>
@@ -636,7 +642,7 @@ export default class DataTable extends React.Component {
         )
     }
     getDaysToDoubling(data, limit = lastConsolidatedDataDay()) {
-        return betterRound(100 / this.getChangeRatioWithYesterday(data, limit));
+        return betterRound(100 / this.getChangeRatioOver(data, limit));
     }
 
     _getPeak(data) {
