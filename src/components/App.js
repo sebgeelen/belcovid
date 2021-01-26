@@ -318,6 +318,7 @@ class App extends React.Component {
                                 <Charts
                                     classes={this.classes}
                                     cases={this.state.cases?.[this.state.province]}
+                                    newHospitalizations={this.state.newHospitalizations?.[this.state.province]}
                                     totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
                                     totalICU={this.state.totalICU?.[this.state.province]}
                                     mortality={this.state.mortality?.[this.state.province]}

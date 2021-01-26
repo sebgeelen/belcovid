@@ -81,6 +81,12 @@ export const dataInfo = {
                 y: 'total hospital patients',
             },
         },
+        tocases: {
+            title: 'Overall total hospitalizations in function of overall total cases',
+            labelStrings: {
+                y: 'total hospitalizations / total cases (in %)',
+            },
+        },
         change: {
             title: 'Week by week change of hospitalized patients',
             description: (
@@ -118,6 +124,12 @@ export const dataInfo = {
             stacked: true,
             labelStrings: {
                 y: 'new deaths',
+            },
+        },
+        tocases: {
+            title: 'Overall total mortality in function of overall total cases',
+            labelStrings: {
+                y: 'total deaths / total cases (in %)',
             },
         },
         change: {
@@ -241,6 +253,17 @@ export default class Charts extends React.Component {
                                     control={
                                         <Radio
                                             component={RouterLink}
+                                            to={`/charts/${this.state.mainVariable}/tocases${window.location.search}`}
+                                        />
+                                    }
+                                    value="tocases"
+                                    label="In function of total cases"
+                                    disabled={['cases', 'incidence', 'icu'].includes(this.state.mainVariable)}
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
                                             to={`/charts/${this.state.mainVariable}/change${window.location.search}`}
                                         />
                                     }
@@ -274,9 +297,14 @@ export default class Charts extends React.Component {
         if (!chartInfo) return;
         let data;
         switch (mainVariable) {
-            case 'hospitalizations':
-                data = this.props.totalHospitalizations;
+            case 'hospitalizations': {
+                if (chartType === 'tocases') {
+                    data = this.props.newHospitalizations;
+                } else {
+                    data = this.props.totalHospitalizations;
+                }
                 break;
+            }
             case 'icu':
                 data = this.props.totalICU;
                 break;
@@ -354,6 +382,29 @@ export default class Charts extends React.Component {
                 );
                 break;
             }
+            case 'tocases': {
+                const comparedData = {};
+                let currentTotalCases = 0;
+                let currentTotalOther = 0;
+                for (const date of Object.keys(data)) {
+                    const casesToday = this.props.cases[date];
+                    currentTotalCases += casesToday ? casesToday.total : 0;
+                    currentTotalOther += typeof data[date] === 'object' ? data[date].total : data[date];
+                    comparedData[date] = 100 * currentTotalOther / currentTotalCases;
+                }
+                chart = (
+                    <AveragedData
+                        classes={this.classes}
+                        data={comparedData}
+                        chartName={chartInfo.title}
+                        annotations={chartInfo.annotations}
+                        asImage={true}
+                        labelStrings={chartInfo.labelStrings}
+                        max={lastConsolidatedDataDay()}
+                    />
+                );
+                break;
+            }
             case 'change': {
                 chart = (
                     <RateOfChange
@@ -385,7 +436,7 @@ export default class Charts extends React.Component {
                 <div style={{ marginTop: 20 }} />
                 <Title id="icu">{title}</Title>
                 {
-                    variableInfo.description &&
+                    variableInfo.description && chartType !== 'tocases' &&
                     <p><small>{variableInfo.description}</small></p>
                 }
                 {
