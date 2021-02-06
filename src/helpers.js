@@ -18,7 +18,7 @@ export const AVAILABLE_BEDS = TOTAL_BEDS - TAKEN_BEDS_PER_DAY;
 export const TOTAL_ICU_BEDS = 2650;
 // source: https://www.vrt.be/vrtnws/en/2020/03/22/health-minister-says-that-an-additional-759-intensive-care-beds/
 
-export const casesAnnotations = [{
+export const testingAnnotations = [{
     type: 'line',
     mode: 'vertical',
     scaleID: 'x-axis-0',

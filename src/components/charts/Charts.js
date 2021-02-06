@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ChartByAge from './ChartByAge';
 import AveragedData from './AveragedData';
-import Testing from './Testing';
 import RateOfChange from './RateOfChange';
 import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data';
-import { casesAnnotations as testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
+import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 
 export const dataInfo = {
@@ -20,10 +19,6 @@ export const dataInfo = {
             labelStrings: {
                 y: 'new cases',
             },
-        },
-        testing: {
-            title: 'Test positivity ratio',
-            annotations: testingAnnotations,
         },
         change: {
             title: 'Week by week change of new cases',
@@ -81,12 +76,6 @@ export const dataInfo = {
                 y: 'total hospital patients',
             },
         },
-        tocases: {
-            title: 'Overall total hospitalizations in function of overall total cases',
-            labelStrings: {
-                y: 'total hospitalizations / total cases (in %)',
-            },
-        },
         change: {
             title: 'Week by week change of hospitalized patients',
             description: (
@@ -126,12 +115,6 @@ export const dataInfo = {
                 y: 'new deaths',
             },
         },
-        tocases: {
-            title: 'Overall total mortality in function of overall total cases',
-            labelStrings: {
-                y: 'total deaths / total cases (in %)',
-            },
-        },
         change: {
             title: 'Week by week change of mortality',
             description: (
@@ -143,290 +126,208 @@ export const dataInfo = {
             ),
         },
     },
+    tests: {
+        average: {
+            title: 'Tests administered (7-day rolling average)',
+            labelStrings: {
+                y: 'new tests',
+            },
+        },
+        change: {
+            title: 'Week by week change of testing',
+            description: (
+                <React.Fragment>
+                    How fast is the testing rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of tests between the
+                        last 7 days and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+        },
+    },
 };
 
-export default class Charts extends React.Component {
-    state = {
-        mainVariable: window.location.pathname.split('/')[2] || 'cases',
-        chartType: window.location.pathname.split('/')[3] || 'average',
-        incidenceDays: +(window.location.pathname.split('/')[4] || 14),
-        incidenceDenominator: +(window.location.pathname.split('/')[4] || 100000),
-    }
-    classes = this.props.classes;
+export default function Charts({
+    cases,
+    classes,
+    mortality,
+    newHospitalizations,
+    province,
+    tests,
+    totalHospitalizations,
+    totalICU,
+}) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const [variable1, setVariable1] = useState(urlParams.get('var1') || 'cases');
+    const [variable2, setVariable2] = useState(urlParams.get('var2') || null);
+    const [chartType, setChartType] = useState(urlParams.get('chartType') || 'average');
+    const [incidenceDays, setIncidenceDays] = useState(+urlParams.get('incDays') || 14);
+    const [incidenceDenominator, setIncidenceDenominator] = useState(+urlParams.get('incDen') || 100000);
 
-    render() {
-        return (
-            <React.Fragment>
-                <Title>Charts for {provinceString(this.props.province)}</Title>
-                <FormControl component="fieldset" className={this.classes.formControl} style={{width: "100%"}}>
-                    <Grid container spacing={4} justify="center">
-                        <Grid item xs>
-                            <FormLabel component="legend">Main variable</FormLabel>
-                            <RadioGroup
-                                value={this.state.mainVariable}
-                                onChange={ (ev) => this.setState({ mainVariable: ev.target.value }) }
-                            >
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/cases/${this.state.chartType}${window.location.search}`}
-                                        />
-                                    }
-                                    value="cases"
-                                    label="Cases" />
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/incidence/${this.state.chartType}${window.location.search}`}
-                                        />
-                                    }
-                                    value="incidence"
-                                    label="Incidence"
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/hospitalizations/${this.state.chartType}${window.location.search}`}
-                                        />
-                                    }
-                                    value="hospitalizations"
-                                    label="Hospitalizations"
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/icu/${this.state.chartType}${window.location.search}`}
-                                        />
-                                    }
-                                    value="icu"
-                                    label="Intensive Care Units"
-                                />
-                                <Tooltip title="Mortality data cannot be filtered per province.">
-                                    <FormControlLabel
-                                        control={
-                                            <Radio
-                                                component={RouterLink}
-                                                to={`/charts/mortality/${this.state.chartType}${window.location.search}`}
-                                            />
-                                        }
-                                        value="mortality"
-                                        label="Mortality"
-                                        disabled={this.props.province !== 'be'}
-                                    />
-                                </Tooltip>
-                            </RadioGroup>
-                        </Grid>
-                        <Grid item xs>
-                            <FormLabel component="legend">Chart type</FormLabel>
-                            <RadioGroup
-                                value={this.state.chartType}
-                                onChange={ (ev) => this.setState({ chartType: ev.target.value }) }
-                            >
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/${this.state.mainVariable}/average${window.location.search}`}
-                                        />
-                                    }
-                                    value="average"
-                                    label="Rolling average"
-                                />
-                                <Tooltip title="Testing positivity should only be viewed in relationship with case numbers.">
-                                    <FormControlLabel
-                                        control={
-                                            <Radio
-                                                component={RouterLink}
-                                                to={`/charts/${this.state.mainVariable}/testing${window.location.search}`}
-                                            />
-                                        }
-                                        value="testing"
-                                        label="Testing ratio"
-                                        disabled={this.state.mainVariable !== 'cases'}
-                                    />
-                                </Tooltip>
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/${this.state.mainVariable}/tocases${window.location.search}`}
-                                        />
-                                    }
-                                    value="tocases"
-                                    label="In function of total cases"
-                                    disabled={['cases', 'incidence', 'icu'].includes(this.state.mainVariable)}
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts/${this.state.mainVariable}/change${window.location.search}`}
-                                        />
-                                    }
-                                    value="change"
-                                    label="Rate of change"
-                                />
-                            </RadioGroup>
-                        </Grid>
-                    </Grid>
-                </FormControl>
-                <section id="chart">
-                    <Switch>
-                        <Route path="/charts/:mainVariable/:chartType/:incidenceDays/:incidenceDenominator">
-                            {this.getChart.bind(this)}
-                        </Route>
-                        <Route path="/charts">
-                            {this.getChart.bind(this)}
-                        </Route>
-                    </Switch>
-                </section>
-            </React.Fragment>
-        );
+    useEffect(() => {
+        urlParams.set('var1', variable1);
+        variable2 ? urlParams.set('var2', variable2) : urlParams.delete('var2');
+        chartType ? urlParams.set('chartType', chartType) : urlParams.delete('chartType');
+        if ('?' + urlParams.toString() !== window.location.search) {
+            const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+    });
+
+    const getData = variableName => {
+        switch (variableName) {
+            case 'cases': {
+                return cases;
+            }
+            case 'hospitalizations': {
+                return variable2 ? newHospitalizations : totalHospitalizations;
+            }
+            case 'icu':
+                return totalICU;
+            case 'incidence':
+                return getIncidenceData(
+                    cases,
+                    province,
+                    incidenceDays,
+                    incidenceDenominator,
+                );
+            case 'mortality':
+                return mortality;
+            case 'tests':
+                return tests;
+            default:
+                return null;
+        }
     }
-    getChart({history, location, match}) {
-        const params = match.params;
-        const mainVariable = params.mainVariable || this.state.mainVariable;
-        const chartType = params.chartType || this.state.chartType;
-        const variableInfo = dataInfo[mainVariable];
+    const getChart = () => {
+        const variableInfo = dataInfo[variable1];
         if (!variableInfo) return;
         const chartInfo = variableInfo[chartType];
         if (!chartInfo) return;
-        let data;
-        switch (mainVariable) {
-            case 'hospitalizations': {
-                if (chartType === 'tocases') {
-                    data = this.props.newHospitalizations;
-                } else {
-                    data = this.props.totalHospitalizations;
-                }
-                break;
-            }
-            case 'icu':
-                data = this.props.totalICU;
-                break;
-            case 'incidence':
-                data = this.props.cases && getIncidenceData(
-                    this.props.cases,
-                    this.props.province,
-                    this.state.incidenceDays,
-                    this.state.incidenceDenominator
-                );
-                break;
-            default:
-                data = this.props[mainVariable];
-        }
+        const data = getData(variable1);
         if (!data) {
             return <Skeleton variant="rect" height={200} />;
         }
         let chart;
-        switch (chartType) {
-            case 'average': {
-                if (chartInfo.ageGroups) {
-                    let labelStrings = chartInfo.labelStrings;
-                    if (mainVariable === 'incidence') {
-                        const denominator = this.state.incidenceDenominator;
-                        labelStrings = {
-                            y: `cases / ${
-                                denominator === 100 ?
-                                    100 + 'inhabitants' :
-                                    (denominator / 1000) + 'k'
-                                }`,
-                        };
-                    }
-                    chart = (
-                        <ChartByAge
-                            classes={this.classes}
-                            data={data}
-                            annotations={chartInfo.annotations}
-                            chartName={chartInfo.title}
-                            asImage={true}
-                            ageGroups={chartInfo.ageGroups}
-                            stacked={chartInfo.stacked}
-                            ticksCallbacks={chartInfo.ticksCallbacks}
-                            labelStrings={labelStrings}
-                            max={mainVariable !== 'incidence' && lastConsolidatedDataDay()}
-                        />
-                    );
-                } else {
+        let title = chartInfo.title;
+        if (variable2) {
+            const data2 = getData(variable2);
+            const comparedData = {};
+            let currentTotal1 = 0;
+            let currentTotal2 = 0;
+            for (const date of Object.keys(data)) {
+                currentTotal1 += typeof data[date] === 'object'
+                    ? data[date].total
+                    : data[date];
+                const today2 = data2[date];
+                currentTotal2 += today2
+                    ? (
+                        typeof today2 === 'object'
+                            ? today2.total
+                            : today2
+                        )
+                    : 0;
+                comparedData[date] = 100 * currentTotal1 / currentTotal2;
+            }
+            title = `Cumulative ${variable1} / cumulative ${variable2}`;
+            const labelStrings = {
+                y: `total ${variable1} / total ${variable2} (in %)`,
+            };
+            switch (chartType) {
+                case 'average':
+                    title += ' (7-day rolling average)'
                     chart = (
                         <AveragedData
-                            classes={this.classes}
-                            data={data}
-                            chartName={chartInfo.title}
+                            classes={classes}
+                            data={comparedData}
+                            chartName={title}
                             annotations={chartInfo.annotations}
                             asImage={true}
-                            labelStrings={chartInfo.labelStrings}
+                            labelStrings={labelStrings}
                             max={lastConsolidatedDataDay()}
                         />
                     );
+                    break;
+                case 'change':
+                    title += ' (rate of change)'
+                    chart = (
+                        <RateOfChange
+                            classes={classes}
+                            data={comparedData}
+                            chartName={title}
+                            annotations={chartInfo.annotations}
+                            asImage={true}
+                            labelStrings={labelStrings}
+                            max={lastConsolidatedDataDay()}
+                        />
+                    );
+                    break;
+                default: break;
+            }
+        } else {
+            switch (chartType) {
+                case 'average': {
+                    if (chartInfo.ageGroups) {
+                        let labelStrings = chartInfo.labelStrings;
+                        if (variable1 === 'incidence') {
+                            labelStrings = {
+                                y: `cases / ${
+                                    incidenceDenominator === 100 ?
+                                        100 + 'inhabitants' :
+                                        (incidenceDenominator / 1000) + 'k'
+                                    }`,
+                            };
+                        }
+                        chart = (
+                            <ChartByAge
+                                classes={classes}
+                                data={data}
+                                annotations={chartInfo.annotations}
+                                chartName={chartInfo.title}
+                                asImage={true}
+                                ageGroups={chartInfo.ageGroups}
+                                stacked={chartInfo.stacked}
+                                ticksCallbacks={chartInfo.ticksCallbacks}
+                                labelStrings={labelStrings}
+                                max={variable1 !== 'incidence' && lastConsolidatedDataDay()}
+                            />
+                        );
+                    } else {
+                        chart = (
+                            <AveragedData
+                                classes={classes}
+                                data={data}
+                                chartName={chartInfo.title}
+                                annotations={chartInfo.annotations}
+                                asImage={true}
+                                labelStrings={chartInfo.labelStrings}
+                                max={lastConsolidatedDataDay()}
+                            />
+                        );
+                    }
+                    break;
                 }
-                break;
-            }
-            case 'testing': {
-                const formattedDataName = mainVariable.charAt(0).toUpperCase() + mainVariable.slice(1);
-                chart = (
-                    <Testing
-                        classes={this.classes}
-                        testData={this.props.tests}
-                        comparativeData={data}
-                        comparativeDataName={formattedDataName}
-                        chartName={chartInfo.title}
-                        annotations={chartInfo.annotations}
-                        asImage={true}
-                        max={lastConsolidatedDataDay()}
-                    />
-                );
-                break;
-            }
-            case 'tocases': {
-                const comparedData = {};
-                let currentTotalCases = 0;
-                let currentTotalOther = 0;
-                for (const date of Object.keys(data)) {
-                    const casesToday = this.props.cases[date];
-                    currentTotalCases += casesToday ? casesToday.total : 0;
-                    currentTotalOther += typeof data[date] === 'object' ? data[date].total : data[date];
-                    comparedData[date] = 100 * currentTotalOther / currentTotalCases;
+                case 'change': {
+                    chart = (
+                        <RateOfChange
+                            classes={classes}
+                            data={data}
+                            chartName={chartInfo.title}
+                            annotations={chartInfo.annotations}
+                            asImage={true}
+                            max={variable1 !== 'incidence' && lastConsolidatedDataDay()}
+                        />
+                    );
+                    break;
                 }
-                chart = (
-                    <AveragedData
-                        classes={this.classes}
-                        data={comparedData}
-                        chartName={chartInfo.title}
-                        annotations={chartInfo.annotations}
-                        asImage={true}
-                        labelStrings={chartInfo.labelStrings}
-                        max={lastConsolidatedDataDay()}
-                    />
-                );
-                break;
+                default: break;
             }
-            case 'change': {
-                chart = (
-                    <RateOfChange
-                        classes={this.classes}
-                        data={data}
-                        chartName={chartInfo.title}
-                        annotations={chartInfo.annotations}
-                        asImage={true}
-                        max={mainVariable !== 'incidence' && lastConsolidatedDataDay()}
-                    />
-                );
-                break;
-            }
-            default: break;
         }
-        let title = chartInfo.title;
-        if (mainVariable === 'incidence' && chartType === 'average') {
-            title += ` (${this.state.incidenceDays} days, `;
-            if (this.state.incidenceDenominator === 100) {
+        if (!variable2 && variable1 === 'incidence' && chartType === 'average') {
+            title += ` (${incidenceDays} days, `;
+            if (incidenceDenominator === 100) {
                 title += 'in %)';
             } else {
-                title += `per ${this.state.incidenceDenominator / 1000}k inhabitants)`;
+                title += `per ${incidenceDenominator / 1000}k inhabitants)`;
             }
         }
         return (
@@ -436,20 +337,20 @@ export default class Charts extends React.Component {
                 <div style={{ marginTop: 20 }} />
                 <Title id="icu">{title}</Title>
                 {
-                    variableInfo.description && chartType !== 'tocases' &&
+                    !variable2 && variableInfo.description &&
                     <p><small>{variableInfo.description}</small></p>
                 }
                 {
-                    chartInfo.description &&
+                    !variable2 && chartInfo.description &&
                     <p><small>{chartInfo.description}</small></p>
                 }
 
-                <div className={this.classes.chartSection}>
+                <div className={classes.chartSection}>
                     { chart }
                 </div>
 
                 {
-                    this.state.mainVariable === 'incidence' &&
+                    variable1 === 'incidence' &&
                     <Container style={{ marginTop: 15, maxWidth: 500 }}>
                         <Slider
                             defaultValue={14}
@@ -469,10 +370,10 @@ export default class Charts extends React.Component {
                             ]}
                             min={7}
                             max={14}
-                            onChange={(ev, value) => this.setState({ incidenceDays: value })}
+                            onChange={(ev, value) => setIncidenceDays(value)}
                         />
                         {
-                            this.state.chartType === 'average' &&
+                            chartType === 'average' &&
                             <Slider
                                 defaultValue={100000}
                                 getAriaValueText={value => {
@@ -506,12 +407,200 @@ export default class Charts extends React.Component {
                                 ]}
                                 min={100}
                                 max={100000}
-                                onChange={(ev, value) => this.setState({ incidenceDenominator: value })}
+                                onChange={(ev, value) => setIncidenceDenominator(value)}
                             />
                         }
                     </Container>
                 }
             </React.Fragment>
         );
-    }
+    };
+
+    return (
+        <React.Fragment>
+            <Title>Charts for {provinceString(province)}</Title>
+            <FormControl component="fieldset" className={classes.formControl} style={{width: "100%"}}>
+                <Grid container spacing={4} justify="center">
+                    <Grid item xs>
+                        <FormLabel component="legend">Variable</FormLabel>
+                        <RadioGroup
+                            value={variable1}
+                            onChange={ev => setVariable1(ev.target.value)}
+                        >
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="cases"
+                                label="Cases" />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="incidence"
+                                label="Incidence"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="hospitalizations"
+                                label="Hospitalizations"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="icu"
+                                label="Intensive Care Units"
+                            />
+                            <Tooltip title="Mortality data cannot be filtered per province.">
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    value="mortality"
+                                    label="Mortality"
+                                    disabled={province !== 'be'}
+                                />
+                            </Tooltip>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="tests"
+                                label="Tests"
+                            />
+                        </RadioGroup>
+                    </Grid>
+                    <Grid item xs>
+                        <FormLabel component="legend">Compare with</FormLabel>
+                        <RadioGroup
+                            value={variable2}
+                            onChange={(ev) => setVariable2(ev.target.value || null)}
+                        >
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value={null}
+                                label="None" />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                disabled={['cases', 'incidence', 'icu', 'tests'].includes(variable1)}
+                                value="cases"
+                                label="Cases" />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                disabled={['cases', 'incidence', 'hospitalizations', 'icu', 'tests'].includes(variable1)}
+                                value="hospitalizations"
+                                label="Hospitalizations"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                disabled={['cases', 'incidence', 'icu', 'tests'].includes(variable1)}
+                                value="icu"
+                                label="Intensive Care Units"
+                            />
+                            <Tooltip title="Mortality data cannot be filtered per province.">
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    disabled={province !== 'be' || ['cases', 'incidence', 'mortality', 'icu', 'tests'].includes(variable1)}
+                                    value="mortality"
+                                    label="Mortality"
+                                />
+                            </Tooltip>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                disabled={['tests', 'icu'].includes(variable1)}
+                                value="tests"
+                                label="Tests"
+                            />
+                        </RadioGroup>
+                    </Grid>
+                    <Grid item xs>
+                        <FormLabel component="legend">Chart type</FormLabel>
+                        <RadioGroup
+                            value={chartType}
+                            onChange={ (ev) => setChartType(ev.target.value) }
+                        >
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="average"
+                                label="Rolling average"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        component={RouterLink}
+                                        to={`/charts?${urlParams.toString()}`}
+                                    />
+                                }
+                                value="change"
+                                label="Rate of change"
+                            />
+                        </RadioGroup>
+                    </Grid>
+                </Grid>
+            </FormControl>
+            <section id="chart">
+                <Switch>
+                    <Route path="/charts">
+                        {getChart}
+                    </Route>
+                </Switch>
+            </section>
+        </React.Fragment>
+    );
 }
