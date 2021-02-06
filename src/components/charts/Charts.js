@@ -489,16 +489,19 @@ export default function Charts({
                                     disabled={province !== 'be'}
                                 />
                             </Tooltip>
-                            <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
-                                    />
-                                }
-                                value="tests"
-                                label="Tests"
-                            />
+                            <Tooltip title="Testing data cannot be filtered per province.">
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    value="tests"
+                                    label="Tests"
+                                    disabled={province !== 'be'}
+                                />
+                            </Tooltip>
                         </RadioGroup>
                     </Grid>
                     {
@@ -563,17 +566,19 @@ export default function Charts({
                                         label="Mortality"
                                     />
                                 </Tooltip>
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
-                                        />
-                                    }
-                                    disabled={['tests', 'incidence', 'icu'].includes(variable1)}
-                                    value="tests"
-                                    label="Tests"
-                                />
+                                <Tooltip title="Testing data cannot be filtered per province.">
+                                    <FormControlLabel
+                                        control={
+                                            <Radio
+                                                component={RouterLink}
+                                                to={`/charts?${urlParams.toString()}`}
+                                            />
+                                        }
+                                        disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}
+                                        value="tests"
+                                        label="Tests"
+                                    />
+                                </Tooltip>
                             </RadioGroup>
                         </Grid>
                     }
