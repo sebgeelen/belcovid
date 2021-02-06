@@ -14,31 +14,37 @@ const colors = [
     "#247ba0",
     "#f2a359"
 ];
-export default class AreaTimeChart extends React.Component {
-    render() {
-        const stacked = typeof this.props.stacked === 'boolean' ? this.props.stacked : true;
-        const datasets = this.props.datasets.map((dataset, index) => {
-            return {
-                ...dataset,
-                borderColor: colors[index],
-                radius: 0,
-                backgroundColor: colors[index],
-                fill: stacked,
-            };
-        });
-        return (
-            <LineChart
-                classes={this.props.classes}
-                chartName={this.props.chartName}
-                datasets={[...datasets]}
-                stacked={stacked}
-                annotations={this.props.annotations}
-                bounds={this.props.bounds}
-                asImage={this.props.asImage}
-                ticksCallbacks={this.props.ticksCallbacks}
-                labelStrings={this.props.labelStrings}
-                sort={true}
-            />
-        );
-    }
+export default function AreaTimeChart({
+    annotations,
+    asImage,
+    bounds,
+    chartName,
+    classes,
+    datasets,
+    labelStrings,
+    stacked,
+    ticksCallbacks,
+}) {
+    return (
+        <LineChart
+            classes={classes}
+            chartName={chartName}
+            datasets={datasets.map((dataset, index) => {
+                return {
+                    ...dataset,
+                    borderColor: colors[index],
+                    radius: 0,
+                    backgroundColor: colors[index],
+                    fill: stacked,
+                };
+            })}
+            stacked={typeof stacked === 'boolean' ? stacked : true}
+            annotations={annotations}
+            bounds={bounds}
+            asImage={asImage}
+            ticksCallbacks={ticksCallbacks}
+            labelStrings={labelStrings}
+            sort={true}
+        />
+    );
 }

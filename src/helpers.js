@@ -301,3 +301,22 @@ export function getChangeRatio(newValue, oldValue) {
         return betterRound(-100 * ((oldValue / newValue) - 1));
     }
 }
+/**
+ * Return an object with the given `keys`, all set to the given `initalValue`.
+ *
+ * @param {string[]} keys
+ * @param {any} [initialValue] default: undefined
+ */
+export function objectFrom(keys, initialValue) {
+    return keys.reduce((object, key) => {
+        const value = Array.isArray(initialValue)
+            ? [...initialValue] :
+            (
+                typeof initialeValue === 'object'
+                    ? {...initialValue}
+                    : initialValue
+            );
+        object[key] = value;
+        return object;
+    }, {});
+}

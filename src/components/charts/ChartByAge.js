@@ -1,38 +1,50 @@
 import React from 'react';
-import { getAveragePoints } from '../../helpers';
+import { getAveragePoints, objectFrom } from '../../helpers';
 import 'chartjs-plugin-zoom';
 import AreaTimeChart from './AreaTimeChart';
 
-export default class ChartByAge extends React.Component {
-    render() {
-        let casesData = this.props.data;
-        const points = this.props.ageGroups.reduce((points, group) => {
-            points[group] = [];
-            return points;
-        }, {});
+export default function ChartByAge({
+    ageGroups,
+    annotations,
+    asImage,
+    chartName,
+    classes,
+    data,
+    labelStrings,
+    stacked,
+    ticksCallbacks,
+    max,
+}) {
+    const points = objectFrom(ageGroups, []);
 
-        let start;
-        let end;
-        for (const date of Object.keys(casesData)) {
-            // Ignore the data if it concerns days beyond the limite set in
-            // props.
-            if (this.props.max && new Date(date) > this.props.max) continue;
-            if (!start || new Date(date) < start) start = new Date(date);
-            if (!end || new Date(date) > end) end = new Date(date);
-            for (const group of this.props.ageGroups) {
-                points[group].push({
-                    x: new Date(date),
-                    y: casesData[date][group],
-                });
-            }
+    let start;
+    let end;
+    for (const date of Object.keys(data)) {
+        const dateObject = new Date(date);
+        // Ignore the data if it concerns days beyond the limite set in
+        // props.
+        if (max && dateObject > max) {
+            continue;
         }
-        const datasets = this.props.ageGroups.map(group => {
+        start = (dateObject >= start && start) || dateObject;
+        end = (dateObject <= end && end) || dateObject;
+        for (const group of ageGroups) {
+            points[group].push({
+                x: dateObject,
+                y: data[date][group],
+            });
+        }
+    }
+    return <AreaTimeChart
+        classes={classes}
+        chartName={chartName}
+        datasets={ageGroups.map(group => {
             return {
                 label: `${group}`,
                 data: getAveragePoints(points[group], 7),
             };
-        });
-        const bounds = {
+        })}
+        bounds={{
             x: {
                 min: start,
                 max: end,
@@ -40,17 +52,11 @@ export default class ChartByAge extends React.Component {
             y: {
                 min: 0,
             },
-        };
-        return <AreaTimeChart
-            classes={this.props.classes}
-            chartName={this.props.chartName}
-            datasets={datasets}
-            bounds={bounds}
-            annotations={this.props.annotations}
-            asImage={this.props.asImage}
-            stacked={this.props.stacked}
-            ticksCallbacks={this.props.ticksCallbacks}
-            labelStrings={this.props.labelStrings}
-        />;
-    }
+        }}
+        annotations={annotations}
+        asImage={asImage}
+        stacked={stacked}
+        ticksCallbacks={ticksCallbacks}
+        labelStrings={labelStrings}
+    />;
 }

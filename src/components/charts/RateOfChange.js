@@ -9,42 +9,54 @@ import {
 import LineChart from './LineChart';
 
 const regressionStart = getDateFrom(lastConsolidatedDataDay(), -28);
-export default class RateOfChange extends React.Component {
-    render() {
-        let data = this.props.data;
-        const weeklyData = getWeeklyData(data);
-        const weeklyPoints = [];
-        let start;
-        let end;
-        for (const date of Object.keys(weeklyData)) {
-            // Ignore the data if it concerns days beyond the limite set in
-            // props.
-            if (this.props.max && new Date(date) > this.props.max) continue;
-            if (!start || new Date(date) < start) start = new Date(date);
-            if (!end || new Date(date) > start) end = new Date(date);
-            const value = weeklyData[date];
-            weeklyPoints.push({
-                x: new Date(date),
-                y: typeof value === 'object' ? value.total : value,
-            });
+export default function RateOfChange({
+    annotations,
+    asImage,
+    chartName,
+    classes,
+    data,
+    max,
+}) {
+    const weeklyData = getWeeklyData(data);
+    const weeklyPoints = [];
+    let start;
+    let end;
+    for (const date of Object.keys(weeklyData)) {
+        const dateObject = new Date(date);
+        // Ignore the data if it concerns days beyond the limit set in
+        // props.
+        if (max && dateObject > max) {
+            continue;
         }
-        const rateOfChangePoints = weeklyPoints.map((point, index) => {
-            let y;
-            if (index >= 6 && weeklyPoints[index - 6]) {
-                y = getChangeRatio(point.y, weeklyPoints[index - 6].y);
-            }
-            if (y !== undefined) {
-                return {
-                    x: point.x,
-                    y,
-                };
-            } else {
-                return undefined;
-            }
-        }).filter(d => d && typeof d.y === 'number');
-        const datasets = [
+        start = (dateObject >= start && start) || dateObject;
+        end = (dateObject <= end && end) || dateObject;
+        const value = weeklyData[date];
+        weeklyPoints.push({
+            x: dateObject,
+            y: typeof value === 'object' ? value.total : value,
+        });
+    }
+    const rateOfChangePoints = weeklyPoints.map((point, index) => {
+        let y;
+        if (index >= 6 && weeklyPoints[index - 6]) {
+            y = getChangeRatio(point.y, weeklyPoints[index - 6].y);
+        }
+        if (y !== undefined) {
+            return {
+                x: point.x,
+                y,
+            };
+        } else {
+            return undefined;
+        }
+    }).filter(d => d && typeof d.y === 'number');
+
+    return <LineChart
+        classes={classes}
+        chartName={chartName}
+        datasets={[
             {
-                label: this.props.chartName,
+                label: chartName,
                 data: rateOfChangePoints,
                 borderColor: '#4ab5eb',
                 backgroundColor: '#4ab5eb',
@@ -59,14 +71,14 @@ export default class RateOfChange extends React.Component {
                 fill: false,
                 radius: 0,
             },
-        ];
-        const bounds = {
+        ]}
+        bounds={{
             x: {
                 min: start,
                 max: end,
             },
-        };
-        const annotations = [{
+        }}
+        annotations={[...(annotations || []), ...[{
             type: 'line',
             mode: 'horizontal',
             scaleID: 'y-axis-0',
@@ -74,16 +86,8 @@ export default class RateOfChange extends React.Component {
             borderColor: 'black',
             borderDash: [2, 2],
             borderWidth: 2,
-        }];
-
-        return <LineChart
-            classes={this.props.classes}
-            chartName={this.props.chartName}
-            datasets={datasets}
-            bounds={bounds}
-            annotations={[...(this.props.annotations || []), ...annotations]}
-            asImage={this.props.asImage}
-            labelStrings={{y: '% / week'}}
-        />;
-    }
+        }]]}
+        asImage={asImage}
+        labelStrings={{y: '% / week'}}
+    />;
 }

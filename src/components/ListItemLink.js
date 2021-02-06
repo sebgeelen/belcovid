@@ -1,11 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 
-export default function ListItemLink(props) {
-    const { icon, primary, to, exact } = props;
-
+export default function ListItemLink({ icon, primary, to, exact }) {
     const renderLink = React.useMemo(
         () => {
             return React.forwardRef(
@@ -27,9 +24,3 @@ export default function ListItemLink(props) {
         </li>
     );
 }
-
-ListItemLink.propTypes = {
-    icon: PropTypes.element,
-    primary: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-  };

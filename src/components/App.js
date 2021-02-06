@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import Dashboard from './Dashboard.js';
 import Charts from './charts/Charts.js';
@@ -32,7 +32,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import { getDaysBetween, getFromLocalStorage, isMobile, setIntoLocalStorage, today } from '../helpers.js';
+import { getDaysBetween, getFromLocalStorage, isMobile, objectFrom, setIntoLocalStorage, today } from '../helpers.js';
 import '../App.css';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import ListItemLink from './ListItemLink.js';
@@ -133,218 +133,28 @@ const styles = (theme) => ({
     },
 });
 
-class App extends React.Component {
-    provinceFromPath = window.location.search.substring(1);
-    state = {
-        open: false,
-        province: (Object.keys(PROVINCES).includes(this.provinceFromPath) && this.provinceFromPath)
-            || 'be',
-    };
-    classes = this.props.classes;
+function App({ classes }) {
+    const provinceFromPath = window.location.search.substring(1);
+    const [open, setOpen] = useState(false);
+    const [province, setProvince] = useState(
+        Object.keys(PROVINCES).includes(provinceFromPath)
+            ? provinceFromPath
+            : 'be'
+    );
+    const [cases, setCases] = useState();
+    const [totalHospitalizations, setTotalHospitalizations] = useState();
+    const [newHospitalizations, setNewHospitalizations] = useState();
+    const [totalICU, setTotalICU] = useState();
+    const [mortality, setMortality] = useState();
+    const [tests, setTests] = useState();
+    const [newsData, setNewsData] = useState();
 
-    async componentDidMount() {
-        const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
-        const lastSaveNews = getFromLocalStorage('belcovid:update:news');
-
-        // Update stats data.
-        if (lastSaveStats) {
-            const lastSaveDate = new Date(lastSaveStats);
-            const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
-            const areStatsExpired = getDaysBetween(lastSaveDate, today()) !== 0 || lastSaveHours >= 12;
-            if (areStatsExpired) {
-                // Data are too old: update.
-                // eslint-disable-next-line no-console
-                console.log('epidemiological data expired. Updating...');
-                this._updateData('stats');
-            } else {
-                const statsToSet = {};
-                let areStatsMissing = false;
-                for (const key of ['cases', 'totalHospitalizations', 'newHospitalizations', 'totalICU', 'mortality', 'tests']) {
-                    const statsData = getFromLocalStorage('belcovid:' + key);
-                    if (statsData) {
-                        statsToSet[key] = JSON.parse(statsData);
-                    } else {
-                        // Some stats are missing: update.
-                        areStatsMissing = true;
-                        break;
-                    }
-                }
-                if (areStatsMissing) {
-                    // eslint-disable-next-line no-console
-                    console.log('Some epidemiological data was not saved properly. Updating...');
-                    this._updateData('stats');
-                } else {
-                    this.setState(statsToSet);
-                }
-            }
-        } else {
-            // eslint-disable-next-line no-console
-            console.log('Fetching epidemiological data for the first time...');
-            this._updateData('stats');
-        }
-
-        // Update news data.
-        if (lastSaveNews) {
-            const newsData = getFromLocalStorage('belcovid:news');
-            const lastSaveDate = new Date(lastSaveNews);
-            const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / (1000 * 60 * 60);
-            if (newsData && lastSaveHours < 1) {
-                this.setState({ newsData: JSON.parse(newsData) });
-            } else {
-                this._updateData('news');
-            }
-        } else {
-            this._updateData('news');
-        }
-    }
-    render() {
-        return (
-            <div className={this.classes.root}>
-                <CssBaseline />
-                <AppBar
-                    position="absolute"
-                    className={
-                        clsx(
-                            this.classes.appBar,
-                            this.state.open && this.classes.appBarShift
-                        )
-                    }
-                >
-                    <Toolbar className={this.classes.toolbar}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={this._handleDrawerOpen.bind(this)}
-                            className={
-                                clsx(
-                                    this.classes.menuButton,
-                                    this.state.open && this.classes.menuButtonHidden
-                                )
-                            }
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            className={this.classes.title}
-                        >
-                            BelCovid
-                        </Typography>
-                        <FormControl className={this.classes.formControl}>
-                            <Select
-                                id="province-select"
-                                value={this.state.province}
-                                onChange={ev => this.setState({ province: ev.target.value })}
-                            >
-                                { Object.keys(PROVINCES).map(key => {
-                                    return (
-                                        <MenuItem
-                                            value={key}
-                                            key={key}
-                                            component={RouterLink}
-                                            to={{
-                                                search: key,
-                                                state: {
-                                                    ...this.state,
-                                                    ...{
-                                                        province: Object.keys(PROVINCES).includes(key) ? key : 'be',
-                                                    }},
-                                            }}
-                                        >
-                                            {provinceString(key)}
-                                        </MenuItem>
-                                    );
-                                }) }
-                            </Select>
-                        </FormControl>
-                    </Toolbar>
-                </AppBar>
-                <Drawer
-                    variant="permanent"
-                    classes={{
-                        paper: clsx(
-                            this.classes.drawerPaper,
-                            !this.state.open && this.classes.drawerPaperClose
-                        ),
-                    }}
-                    open={this.state.open}
-                >
-                    <div className={this.classes.toolbarIcon}>
-                        <IconButton
-                            onClick={this._handleDrawerClose.bind(this)}
-                        >
-                            <ChevronLeftIcon />
-                        </IconButton>
-                    </div>
-                    <Divider />
-                    <List>
-                        <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} exact />
-                        <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
-                    </List>
-                </Drawer>
-                <main className={this.classes.content}>
-                    <div className={this.classes.appBarSpacer} />
-                    <Container maxWidth="lg" className={this.classes.container}>
-                        <Switch>
-                            <Route path="/charts">
-                                <Charts
-                                    classes={this.classes}
-                                    cases={this.state.cases?.[this.state.province]}
-                                    newHospitalizations={this.state.newHospitalizations?.[this.state.province]}
-                                    totalHospitalizations={this.state.totalHospitalizations?.[this.state.province]}
-                                    totalICU={this.state.totalICU?.[this.state.province]}
-                                    mortality={this.state.mortality?.[this.state.province]}
-                                    tests={this.state.tests?.[this.state.province]}
-                                    province={this.state.province}
-                                />
-                            </Route>
-                            <Route path="/">
-                                <Dashboard
-                                    classes={this.classes}
-                                    cases={this.state.cases}
-                                    totalHospitalizations={this.state.totalHospitalizations}
-                                    newHospitalizations={this.state.newHospitalizations}
-                                    totalICU={this.state.totalICU}
-                                    mortality={this.state.mortality}
-                                    newsData={this.state.newsData}
-                                    province={this.state.province}
-                                />
-                            </Route>
-                        </Switch>
-                        <Box pt={4}>
-                            <Footer />
-                        </Box>
-                    </Container>
-                </main>
-                {
-                    isMobile() && navigator.share &&
-                    <Fab
-                        size="small"
-                        color="primary"
-                        aria-label="share"
-                        style={{
-                            position: 'absolute',
-                            bottom: 30,
-                            right: 30,
-                        }}
-                        onClick={this._share.bind(this)}
-                    >
-                        <ShareIcon/>
-                    </Fab>
-                }
-            </div>
-        );
-    }
-    _share() {
+    const _share = () => {
         if (navigator.share) {
             navigator
               .share({
                 title: `BelCovid`,
-                text: `Take a look at this data about Covid in ${provinceString(this.state.province)}.`,
+                text: `Take a look at this data about Covid in ${provinceString(province)}.`,
                 url: document.location.href,
               })
               .catch(error => {
@@ -352,24 +162,105 @@ class App extends React.Component {
               });
           }
     }
-    _updateData(name) {
-        if (name === 'stats') {
+
+    useEffect(() => {
+        const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
+        const lastSaveNews = getFromLocalStorage('belcovid:update:news');
+
+        const normalizeData = (dataKey, values, ageGroups) => {
+            const data = objectFrom(Object.keys(PROVINCES), {});
+            for (const item of values) {
+                const province = (item.PROVINCE && provinceKey(item.PROVINCE)) || 'be';
+                const date = item.DATE;
+                if (!date) continue;
+
+                const value = +item[dataKey];
+                if (ageGroups) {
+                    const ageGroup = item.AGEGROUP || 'Age unknown';
+                    if (!data[province][date]) {
+                        // Initialize the age group values.
+                        data[province][date] = objectFrom(ageGroups, 0);
+                    }
+                    if (!data.be[date]) {
+                        // Initialize the age group values for Belgium.
+                        data.be[date] = objectFrom(ageGroups, 0);
+                    }
+                    const normalizedValue = data[province][date][ageGroup] || 0;
+                    // Set province value at date for age group.
+                    data[province][date][ageGroup] = normalizedValue + value;
+                    // Add to total for province at date.
+                    const totalValue = data[province][date].total || 0;
+                    data[province][date].total = totalValue + value;
+                    // Add to totals for Belgium at date.
+                    if (province !== 'be') {
+                        if (!data.be[date]) {
+                            data.be[date] = {};
+                        }
+                        // Add to total for Belgium at date for age group.
+                        const belgiumValue = data.be[date][ageGroup] || 0;
+                        data.be[date][ageGroup] = belgiumValue + value;
+                        // Add to total for Belgium at date.
+                        const belgiumTotal = data.be[date].total || 0;
+                        data.be[date].total = belgiumTotal + value;
+                    }
+                } else {
+                    const provinceValue = data[province][date] || 0;
+                    // Set province value at date.
+                    data[province][date] = provinceValue + value;
+                    // Add to total for Belgium at date.
+                    if (province !== 'be') {
+                        const belgiumValue = data.be[date] || 0;
+                        data.be[date] = belgiumValue + value;
+                    }
+                }
+            }
+            return data;
+        };
+        const updateStats = () => {
             const dataPromises = fetchStatsData();
             for (const dataPromise of dataPromises) {
-                dataPromise.then(datum => {
-                    const key = datum[0];
-                    const values = datum[1];
-                    const normalizedData = this._normalizeData(key, values);
-                    for (const newKey of Object.keys(normalizedData)) {
-                        setIntoLocalStorage('belcovid:' + newKey, JSON.stringify(normalizedData[newKey]));
-                        this.setState({ [newKey]: normalizedData[newKey] });
+                dataPromise.then(([key, values]) => {
+                    let data;
+                    switch (key) {
+                        case 'cases': {
+                            data = normalizeData('CASES', values, AGE_GROUPS_CASES);
+                            setCases(data);
+                            break;
+                        }
+                        case 'hospitalizations': {
+                            data = normalizeData('TOTAL_IN', values);
+                            setTotalHospitalizations(data);
+                            setIntoLocalStorage('belcovid:totalHospitalizations', JSON.stringify(data));
+
+                            data = normalizeData('NEW_IN', values);
+                            setNewHospitalizations(data);
+                            setIntoLocalStorage('belcovid:newHospitalizations', JSON.stringify(data));
+
+                            data = normalizeData('TOTAL_IN_ICU', values);
+                            setTotalICU(data);
+                            setIntoLocalStorage('belcovid:totalICU', JSON.stringify(data));
+                            return;
+                        }
+                        case 'mortality': {
+                            data = normalizeData('DEATHS', values, AGE_GROUPS_MORTALITY);
+                            setMortality(data);
+                            break;
+                        }
+                        case 'tests': {
+                            data = normalizeData('TESTS_ALL', values, AGE_GROUPS_MORTALITY);
+                            setTests(data);
+                            break;
+                        }
+                        default: return;
                     }
+                    setIntoLocalStorage('belcovid:' + key, JSON.stringify(data));
                 });
             }
             Promise.all(dataPromises).then(() => {
                 setIntoLocalStorage('belcovid:update:stats', today().toISOString());
             });
-        } else if (name === 'news') {
+        }
+        const updateNews = () => {
             const data = [];
             const dataPromises = fetchNewsData();
             for (const dataPromise of dataPromises) {
@@ -382,7 +273,7 @@ class App extends React.Component {
                     }
                     data.push(formattedItem);
                 }
-                this.setState({ newsData: data });
+                setNewsData(data);
                 setIntoLocalStorage('belcovid:news', JSON.stringify(data));
                 });
             }
@@ -390,110 +281,194 @@ class App extends React.Component {
                 setIntoLocalStorage('belcovid:update:news', today().toISOString());
             });
         }
-    }
-    _normalizeData(key, values) {
-        let dataKey;
-        let ageGroups;
-        switch (key) {
-            case 'cases': {
-                dataKey = 'CASES';
-                ageGroups = AGE_GROUPS_CASES;
-                break;
-            }
-            case 'hospitalizations': {
-                return {
-                    ...this._normalizeData('totalHospitalizations', values),
-                    ...this._normalizeData('newHospitalizations', values),
-                    ...this._normalizeData('totalICU', values),
-                };
-            }
-            case 'totalHospitalizations': {
-                dataKey = 'TOTAL_IN';
-                break;
-            }
-            case 'newHospitalizations': {
-                dataKey = 'NEW_IN';
-                break;
-            }
-            case 'totalICU': {
-                dataKey = 'TOTAL_IN_ICU';
-                break;
-            }
-            case 'mortality': {
-                dataKey = 'DEATHS';
-                ageGroups = AGE_GROUPS_MORTALITY;
-                break;
-            }
-            case 'tests': {
-                dataKey = 'TESTS_ALL';
-                break;
-            }
-            default:
-                return {};
-        }
-        const data = Object.keys(PROVINCES).reduce((object, province) => {
-            object[province] = {};
-            return object;
-        }, {});
-        for (const item of values) {
-            const province = (item.PROVINCE && provinceKey(item.PROVINCE)) || 'be';
-            const date = item.DATE;
-            if (!date) continue;
 
-            const value = +item[dataKey];
-            if (ageGroups) {
-                const ageGroup = item.AGEGROUP || 'Age unknown';
-                if (!data[province][date]) {
-                    // Initialize the age group values.
-                    data[province][date] = ageGroups.reduce((groupsObject, groupName) => {
-                        groupsObject[groupName] = 0;
-                        return groupsObject;
-                    }, {});
-                }
-                if (!data.be[date]) {
-                    // Initialize the age group values for Belgium.
-                    data.be[date] = ageGroups.reduce((groupsObject, groupName) => {
-                        groupsObject[groupName] = 0;
-                        return groupsObject;
-                    }, {});
-                }
-                const normalizedValue = data[province][date][ageGroup] || 0;
-                // Set province value at date for age group.
-                data[province][date][ageGroup] = normalizedValue + value;
-                // Add to total for province at date.
-                const totalValue = data[province][date].total || 0;
-                data[province][date].total = totalValue + value;
-                // Add to totals for Belgium at date.
-                if (province !== 'be') {
-                    if (!data.be[date]) {
-                        data.be[date] = {};
-                    }
-                    // Add to total for Belgium at date for age group.
-                    const belgiumValue = data.be[date][ageGroup] || 0;
-                    data.be[date][ageGroup] = belgiumValue + value;
-                    // Add to total for Belgium at date.
-                    const belgiumTotal = data.be[date].total || 0;
-                    data.be[date].total = belgiumTotal + value;
-                }
+        // Update stats data.
+        if (lastSaveStats) {
+            const lastSaveDate = new Date(lastSaveStats);
+            const lastSaveHours = (lastSaveDate.getTime() - today().getTime()) / (1000 * 60 * 60);
+            const areStatsExpired = getDaysBetween(lastSaveDate, today()) !== 0 || lastSaveHours >= 12;
+            if (areStatsExpired) {
+                // Data are too old: update.
+                // eslint-disable-next-line no-console
+                console.log('epidemiological data expired. Updating...');
+                updateStats();
             } else {
-                const provinceValue = data[province][date] || 0;
-                // Set province value at date.
-                data[province][date] = provinceValue + value;
-                // Add to total for Belgium at date.
-                if (province !== 'be') {
-                    const belgiumValue = data.be[date] || 0;
-                    data.be[date] = belgiumValue + value;
+                let areStatsMissing = false;
+                for (const [key, setter] of [
+                    ['cases', setCases],
+                    ['totalHospitalizations', setTotalHospitalizations],
+                    ['newHospitalizations', setNewHospitalizations],
+                    ['totalICU', setTotalICU],
+                    ['mortality', setMortality],
+                    ['tests', setTests],
+                ]) {
+                    const statsData = getFromLocalStorage('belcovid:' + key);
+                    if (statsData) {
+                        setter(JSON.parse(statsData));
+                    } else {
+                        // Some stats are missing: update.
+                        areStatsMissing = true;
+                        break;
+                    }
+                }
+                if (areStatsMissing) {
+                    // eslint-disable-next-line no-console
+                    console.log('Some epidemiological data was not saved properly. Updating...');
+                    updateStats();
                 }
             }
+        } else {
+            // eslint-disable-next-line no-console
+            console.log('Fetching epidemiological data for the first time...');
+            updateStats();
         }
-        return { [key]: data };
-    }
-    _handleDrawerOpen() {
-        this.setState({ open: true });
-    }
-    _handleDrawerClose() {
-        this.setState({ open: false });
-    }
+
+        // Update news data.
+        if (lastSaveNews) {
+            const storedNewsData = getFromLocalStorage('belcovid:news');
+            const lastSaveDate = new Date(lastSaveNews);
+            const lastSaveHours = (today().getTime() - lastSaveDate.getTime()) / (1000 * 60 * 60);
+            if (storedNewsData && lastSaveHours < 1) {
+                setNewsData(JSON.parse(storedNewsData));
+            } else {
+                updateNews();
+            }
+        } else {
+            updateNews();
+        }
+    }, []);
+
+    return (
+        <div className={classes.root}>
+            <CssBaseline />
+            <AppBar
+                position="absolute"
+                className={
+                    clsx(
+                        classes.appBar,
+                        open && classes.appBarShift
+                    )
+                }
+            >
+                <Toolbar className={classes.toolbar}>
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={() => setOpen(true)}
+                        className={
+                            clsx(
+                                classes.menuButton,
+                                open && classes.menuButtonHidden
+                            )
+                        }
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography
+                        component="h1"
+                        variant="h6"
+                        color="inherit"
+                        noWrap
+                        className={classes.title}
+                    >
+                        BelCovid
+                    </Typography>
+                    <FormControl className={classes.formControl}>
+                        <Select
+                            id="province-select"
+                            value={province}
+                            onChange={ev => setProvince(ev.target.value)}
+                        >
+                            { Object.keys(PROVINCES).map(key => {
+                                return (
+                                    <MenuItem
+                                        value={key}
+                                        key={key}
+                                        component={RouterLink}
+                                        to={{ search: key }}
+                                    >
+                                        {provinceString(key)}
+                                    </MenuItem>
+                                );
+                            }) }
+                        </Select>
+                    </FormControl>
+                </Toolbar>
+            </AppBar>
+            <Drawer
+                variant="permanent"
+                classes={{
+                    paper: clsx(
+                        classes.drawerPaper,
+                        !open && classes.drawerPaperClose
+                    ),
+                }}
+                open={open}
+            >
+                <div className={classes.toolbarIcon}>
+                    <IconButton onClick={() => setOpen(false)}>
+                        <ChevronLeftIcon />
+                    </IconButton>
+                </div>
+                <Divider />
+                <List>
+                    <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} exact />
+                    <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
+                </List>
+            </Drawer>
+            <main className={classes.content}>
+                <div className={classes.appBarSpacer} />
+                <Container maxWidth="lg" className={classes.container}>
+                    <Switch>
+                        <Route path="/charts">
+                            <Charts
+                                classes={classes}
+                                cases={cases?.[province]}
+                                newHospitalizations={newHospitalizations?.[province]}
+                                totalHospitalizations={totalHospitalizations?.[province]}
+                                totalICU={totalICU?.[province]}
+                                mortality={mortality?.[province]}
+                                tests={tests?.[province]}
+                                province={province}
+                            />
+                        </Route>
+                        <Route path="/">
+                            <Dashboard
+                                classes={classes}
+                                cases={cases}
+                                totalHospitalizations={totalHospitalizations}
+                                newHospitalizations={newHospitalizations}
+                                totalICU={totalICU}
+                                mortality={mortality}
+                                newsData={newsData}
+                                province={province}
+                            />
+                        </Route>
+                    </Switch>
+                    <Box pt={4}>
+                        <Footer />
+                    </Box>
+                </Container>
+            </main>
+            {
+                isMobile() && navigator.share &&
+                <Fab
+                    size="small"
+                    color="primary"
+                    aria-label="share"
+                    style={{
+                        position: 'absolute',
+                        bottom: 30,
+                        right: 30,
+                    }}
+                    onClick={_share}
+                >
+                    <ShareIcon/>
+                </Fab>
+            }
+        </div>
+    );
 }
 
 export default withStyles(styles)(App);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import { betterRound, getDateFrom, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
@@ -34,445 +34,421 @@ const DialogTransition = React.forwardRef(function DialogTransition(props, ref) 
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
-export default class LineChart extends React.Component {
-    state = {
-        chartImageURI: null,
-        fullscreen: false,
-        asImage: this.props.asImage || false,
-    };
-    classes = this.props.classes
-    options = this._defaultOptions();
-    chartReference = React.createRef();
-    _lastDatasets = null;
-    _recomputeImage = false;
-    render() {
-        let contents;
-        if (!this._lastDatasets || this.props.datasets !== this._lastDatasets) {
-            this._recomputeImage = true;
-        }
-        this._lastDatasets = this.props.datasets;
-        this._adaptOptions();
-        if (!this._recomputeImage && this.state.asImage && this.state.chartImageURI) {
-            contents = <CardMedia
-                component="img"
-                alt={this.props.chartName}
-                image={this.state.chartImageURI}
-                title={this.props.chartName}
-                onClick={this.state.fullscreen ?
-                    () => true :
-                    this.toggleFullscreen.bind(this)}
-            />;
-        } else {
-            contents = (
-                <Line
-                    ref={this.chartReference}
-                    data={{
-                        datasets: this.props.datasets,
-                    }}
-                    options={this.options}
-                />
-            );
-        }
-        if (this.state.fullscreen) {
-            return (
-                <Dialog fullScreen open TransitionComponent={DialogTransition}>
-                    <AppBar>
-                        <Toolbar>
-                            <IconButton
-                                edge="start"
-                                color="inherit"
-                                onClick={this.toggleFullscreen.bind(this)}
-                                aria-label="close"
-                            >
-                                <CloseIcon />
-                            </IconButton>
-                            <Typography component="h1" variant="h6" color="inherit" noWrap className={this.classes?.title}>
-                                {this.props.chartName}
-                            </Typography>
-                        </Toolbar>
-                    </AppBar>
-                    <main className={this.classes?.content}>
-                        <div className={this.classes?.appBarSpacer} />
-                        <div style={{height: '90vh', padding: 5, minWidth: 200, minHeight: 200}}>
-                            {contents}
-                        </div>
-                    </main>
-                </Dialog>
-            );
-        } else {
-            return <div style={{minWidth: 200, minHeight: 200, height: '100%'}}>{contents}</div>;
-        }
+const defaultBaseOptions = () => {
+    return {
+        legend: {
+            display: true,
+        },
+        tooltips: {
+            enabled: true,
+            mode: 'index',
+            intersect: false,
+            position: 'custom',
+            xPadding: 10,
+            yPadding: 10,
+            titleAlign: 'center',
+            titleMarginBottom: 10,
+            bodySpacing: 5,
+            footerAlign: 'center',
+            footerMarginTop: 10,
+            callbacks: {
+                label: (item, data) => {
+                    const dataset = data.datasets[item.datasetIndex];
+                    return `${dataset.label}: ${betterRound(item.yLabel)}`;
+                },
+            },
+        },
+        scales: {
+            xAxes: [{
+                type: 'time',
+                time: {
+                    unit: 'day',
+                    tooltipFormat: 'MMM D YYYY'
+                },
+                ticks: {
+                    autoSkip: true,
+                    autoSkipPadding: 10,
+                    source: 'auto',
+                    min: getDateFrom(lastConsolidatedDataDay(), -28),
+                    max: lastConsolidatedDataDay(),
+                },
+            }],
+            yAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    autoSkipPadding: 10,
+                    source: 'auto',
+                },
+            }],
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        // Plugins
+        zoom: {
+            enabled: true,
+            mode: 'x',
+            rangeMin: {
+                x: null,
+            },
+            rangeMax: {
+                x: today(),
+            },
+        },
+        pan: {
+            enabled: true,
+            mode: 'x',
+            rangeMin: {
+                x: null,
+            },
+            rangeMax: {
+                x: null,
+            },
+        },
+        annotation: {
+            annotations: [
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-04-10'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Peak 1',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-03-13'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Start "lockdown"',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-05-11'),
+                    borderColor: 'grey',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Shops open',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-05-18'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Schools open',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-06-08'),
+                    borderColor: 'grey',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Horeca opens',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-07-01'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'School vacation',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-07-25'),
+                    borderColor: 'grey',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Mandatory masks indoors',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-09-01'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Schools open',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-09-24'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Mesures relaxed',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-11-02'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Start "lockdown"',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2020-12-28'),
+                    borderColor: 'red',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'First vaccine',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+            ]
+        },
     }
-    toggleFullscreen() {
-        const fullscreen = !this.state.fullscreen;
-        this.setState({
-            asImage: fullscreen ? false : this.props.asImage,
-            fullscreen: fullscreen,
-        });
-    }
-    _defaultOptions() {
-        return {
-            legend: {
-                display: true,
-            },
-            tooltips: {
-                enabled: true,
-                mode: 'index',
-                intersect: false,
-                position: 'custom',
-                xPadding: 10,
-                yPadding: 10,
-                titleAlign: 'center',
-                titleMarginBottom: 10,
-                bodySpacing: 5,
-                footerAlign: 'center',
-                footerMarginTop: 10,
-                callbacks: {
-                    label: (item, data) => {
-                        const dataset = data.datasets[item.datasetIndex];
-                        return `${dataset.label}: ${betterRound(item.yLabel)}`;
-                    },
-                },
-            },
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        unit: 'day',
-                        tooltipFormat: 'MMM D YYYY'
-                    },
-                    ticks: {
-                        autoSkip: true,
-                        autoSkipPadding: 10,
-                        source: 'auto',
-                        min: getDateFrom(lastConsolidatedDataDay(), -28),
-                        max: lastConsolidatedDataDay(),
-                    },
-                }],
-                yAxes: [{
-                    ticks: {
-                        autoSkip: true,
-                        autoSkipPadding: 10,
-                        source: 'auto',
-                    },
-                }],
-            },
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                onComplete: () => {
-                    if (this.state.asImage) {
-                        // Only recompute the image if that was specifically
-                        // requested or we haven't computed it yet.
-                        if (this._recomputeImage || !this.state.chartImageURI) {
-                            const chartImageURI = this.chartReference.current.chartInstance.toBase64Image();
-                            this._recomputeImage = false;
-                            this.setState({ chartImageURI });
-                        } else {
-                            this._recomputeImage = false;
-                            this.setState({ asImage: this.state.asImage });
-                        }
-                    }
-                },
-            },
-            // Plugins
-            zoom: {
-                enabled: true,
-                mode: 'x',
-                rangeMin: {
-                    x: null,
-                },
-                rangeMax: {
-                    x: today(),
-                },
-            },
-            pan: {
-                enabled: true,
-                mode: 'x',
-                rangeMin: {
-                    x: null,
-                },
-                rangeMax: {
-                    x: null,
-                },
-            },
-            annotation: {
-                annotations: [
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-04-10'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Peak 1',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-03-13'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Start "lockdown"',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-05-11'),
-                        borderColor: 'grey',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Shops open',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-05-18'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Schools open',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-06-08'),
-                        borderColor: 'grey',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Horeca opens',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-07-01'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'School vacation',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-07-25'),
-                        borderColor: 'grey',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Mandatory masks indoors',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-09-01'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Schools open',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-09-24'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Mesures relaxed',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-11-02'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'Start "lockdown"',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                    {
-                        type: 'line',
-                        mode: 'vertical',
-                        scaleID: 'x-axis-0',
-                        value: new Date('2020-12-28'),
-                        borderColor: 'red',
-                        borderDash: [10, 10],
-                        borderWidth: 1,
-                        label: {
-                            content: 'First vaccine',
-                            enabled: true,
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            position: 'top',
-                        },
-                    },
-                ]
+};
+
+// In order to render as an image, the chart rendering needs to complete first.
+// When then props change, in order to render as an image, we need to rerender
+// as a chart and then again as an image. For that purpose, we need this
+// variable to be global. It is set to false when rendering as a chart, and to
+// true when react-chartjs-2 triggers an event to notify that the rendering of
+// the chart is complete.
+let readyToRenderAsImage = false;
+export default function LineChart({
+    annotations,
+    bounds,
+    chartName,
+    classes,
+    datasets,
+    asImage,
+    labelStrings,
+    logarithmic,
+    stacked,
+    ticksCallbacks,
+    sort,
+    tooltip,
+    yAxes,
+}) {
+    const [chartImageURI, setChartImageURI] = useState(null);
+    const [fullscreen, setFullscreen] = useState(false);
+    const [showAsImage, setShowAsImage] = useState(asImage || false);
+    const chartReference = React.createRef();
+
+    const options = useMemo(() => {
+        const options = defaultBaseOptions();
+        options.animation = {
+            onComplete: () => {
+                if (showAsImage) {
+                    readyToRenderAsImage = true;
+                    setChartImageURI(chartReference.current.chartInstance.toBase64Image());
+                }
             },
         };
-    }
-    _adaptOptions() {
-        if (this.props.stacked) {
-            this.options.scales.yAxes[0].stacked = true;
-            this.options.tooltips.callbacks.footer = items => {
+        if (stacked) {
+            options.scales.yAxes[0].stacked = true;
+            options.tooltips.callbacks.footer = items => {
                 const total = items.reduce((sum, item) => {
                     return sum + item.yLabel;
                 }, 0);
                 return `Total: ${betterRound(total)}`;
             };
         } else {
-            this.options.scales.yAxes[0].stacked = false;
-            this.options.tooltips.callbacks.footer = items => '';
+            options.scales.yAxes[0].stacked = false;
+            options.tooltips.callbacks.footer = items => '';
         }
-        if (this.props.bounds) {
-            if (this.props.bounds.x?.min !== undefined) {
-                this.options.zoom.rangeMin.x = this.props.bounds.x.min;
+        if (bounds) {
+            bounds.x?.min !== undefined && (options.zoom.rangeMin.x = bounds.x.min);
+            if (bounds.x?.max !== undefined) {
+                options.scales.xAxes[0].ticks.max = bounds.x.max;
+                options.zoom.rangeMax.x = bounds.x.max;
             }
-            if (this.props.bounds.x?.max !== undefined) {
-                this.options.scales.xAxes[0].ticks.max = this.props.bounds.x.max;
-                this.options.zoom.rangeMax.x = this.props.bounds.x.max;
+            bounds.y?.min !== undefined && (options.scales.yAxes[0].ticks.min = bounds.y.min);
+            bounds.y?.max !== undefined && (options.scales.yAxes[0].ticks.max = bounds.y.max);
+        }
+        logarithmic && (options.scales.yAxes[0].type = 'logarithmic');
+        yAxes && (options.scales.yAxes = yAxes);
+        annotations &&
+            (options.annotation.annotations = [...options.annotation.annotations, ...annotations]);
+        tooltip === false && (options.tooltips.enabled = false);
+        sort && (options.tooltips.itemSort = (a, b, data) => {
+            const dataset = data.datasets[a.datasetIndex];
+            if (dataset.label.toLowerCase() === 'total') {
+                return -1;
             }
-            if (this.props.bounds.y?.min !== undefined) {
-                this.options.scales.yAxes[0].ticks.min = this.props.bounds.y.min;
-            }
-            if (this.props.bounds.y?.max !== undefined) {
-                this.options.scales.yAxes[0].ticks.max = this.props.bounds.y.max;
-            }
-        }
-        if (this.props.logarithmic) {
-            this.options.scales.yAxes[0].type = 'logarithmic';
-        }
-        if (this.props.yAxes) {
-            this.options.scales.yAxes = this.props.yAxes;
-        }
-        if (this.props.annotations) {
-            this.options.annotation.annotations = [...this.options.annotation.annotations, ...this.props.annotations];
-        }
-        if (this.props.tooltip === false) {
-            this.options.tooltips.enabled = false;
-        }
-        if (this.props.sort) {
-                this.options.tooltips.itemSort = (a, b, data) => {
-                    const dataset = data.datasets[a.datasetIndex];
-                    if (dataset.label.toLowerCase() === 'total') {
-                        return -1;
-                    }
-                    return b.yLabel - a.yLabel;
-                };
-        }
+            return b.yLabel - a.yLabel;
+        });
         // Ensure logarithmic type y axes have proper labels.
-        for (let i = 0; i < this.options.scales.yAxes.length; i++) {
-            const yAxis = this.options.scales.yAxes[i];
+        for (let i = 0; i < options.scales.yAxes.length; i++) {
+            const yAxis = options.scales.yAxes[i];
             if (yAxis.type === 'logarithmic') {
-                if (!this.options.scales.yAxes[i].ticks) {
-                    this.options.scales.yAxes[i].ticks = {};
+                if (!options.scales.yAxes[i].ticks) {
+                    options.scales.yAxes[i].ticks = {};
                 }
                 // Pass tick values as a string into Number contructor to format
                 // them.
-                this.options.scales.yAxes[i].ticks.callback = value => '' + Number(value.toString());
+                options.scales.yAxes[i].ticks.callback = value => '' + Number(value.toString());
             }
         }
-        if (this.state.fullscreen) {
-            this.options.legend.display = true;
-        } else {
-            this.options.legend.display = !isMobile(false);
+        options.legend.display = fullscreen ? true : !isMobile(false);
+        if (ticksCallbacks) {
+            ticksCallbacks.x && (options.scales.xAxes[0].ticks.callback = ticksCallbacks.x);
+            ticksCallbacks.y && (options.scales.yAxes[0].ticks.callback = ticksCallbacks.y);
         }
-        if (this.props.ticksCallbacks) {
-            if (this.props.ticksCallbacks.x) {
-                this.options.scales.xAxes[0].ticks.callback = this.props.ticksCallbacks.x;
-            }
-            if (this.props.ticksCallbacks.y) {
-                this.options.scales.yAxes[0].ticks.callback = this.props.ticksCallbacks.y;
-            }
-        }
-        if (this.props.labelStrings) {
-            if (this.props.labelStrings.x) {
-                const current = this.options.scales.xAxes[0].scaleLabel || {};
-                this.options.scales.xAxes[0].scaleLabel = {
+        if (labelStrings) {
+            if (labelStrings.x) {
+                const current = options.scales.xAxes[0].scaleLabel || {};
+                options.scales.xAxes[0].scaleLabel = {
                     ...current,
-                    labelString: this.props.labelStrings.x,
+                    labelString: labelStrings.x,
                     display: true,
                     fontSize: 10,
                     lineHeight: .5,
                 };
             }
-            if (this.props.labelStrings.y) {
-                const current = this.options.scales.yAxes[0].scaleLabel || {};
-                this.options.scales.yAxes[0].scaleLabel = {
+            if (labelStrings.y) {
+                const current = options.scales.yAxes[0].scaleLabel || {};
+                options.scales.yAxes[0].scaleLabel = {
                     ...current,
-                    labelString: this.props.labelStrings.y,
+                    labelString: labelStrings.y,
                     display: true,
                     fontSize: 10,
                     lineHeight: .5,
                 };
             }
         }
+        return options;
+    }, [annotations, bounds, chartReference, fullscreen, labelStrings, logarithmic, showAsImage, sort, stacked, ticksCallbacks, tooltip, yAxes]);
+
+    const toggleFullscreen = () => {
+        setShowAsImage(!fullscreen ? false : asImage);
+        setFullscreen(!fullscreen);
+    };
+    let contents;
+    if (readyToRenderAsImage && showAsImage && chartImageURI) {
+        contents = <CardMedia
+            component="img"
+            alt={chartName}
+            image={chartImageURI}
+            title={chartName}
+            onClick={toggleFullscreen}
+        />;
+        readyToRenderAsImage = false;
+    } else {
+        contents = (
+            <Line
+                ref={chartReference}
+                data={{ datasets }}
+                options={options}
+            />
+        );
+    }
+    if (fullscreen) {
+        return (
+            <Dialog fullScreen open TransitionComponent={DialogTransition}>
+                <AppBar>
+                    <Toolbar>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            onClick={toggleFullscreen}
+                            aria-label="close"
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes?.title}>
+                            {chartName}
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+                <main className={classes?.content}>
+                    <div className={classes?.appBarSpacer} />
+                    <div style={{height: '90vh', padding: 5, minWidth: 200, minHeight: 200}}>
+                        {contents}
+                    </div>
+                </main>
+            </Dialog>
+        );
+    } else {
+        return <div style={{minWidth: 200, minHeight: 200, height: '100%'}}>{contents}</div>;
     }
 }

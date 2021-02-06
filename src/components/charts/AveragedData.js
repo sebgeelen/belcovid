@@ -16,14 +16,17 @@ export default function AveragedData({
     let start;
     let end;
     for (const date of Object.keys(data)) {
+        const dateObject = new Date(date);
         // Ignore the data if it concerns days beyond the limit set in
         // props.
-        if (max && new Date(date) > max) continue;
-        if (!start || new Date(date) < start) start = new Date(date);
-        if (!end || new Date(date) > start) end = new Date(date);
+        if (max && dateObject > max) {
+            continue;
+        }
+        start = (dateObject >= start && start) || dateObject;
+        end = (dateObject <= end && end) || dateObject;
         const items = data[date];
         points.push({
-            x: new Date(date),
+            x: dateObject,
             y: typeof items === 'object' ? items.total : items,
         });
     }
@@ -58,22 +61,21 @@ export default function AveragedData({
         fill: false,
         radius: 0,
     });
-    const bounds = {
-        x: {
-            min: start,
-            max: end,
-        },
-        y: {
-            min: 0,
-            // Round up to the nearest ten.
-            max: Math.ceil((yValues[yValues.length - 1] + 10) / 10) * 10,
-        },
-    };
     return <LineChart
         classes={classes}
         chartName={chartName}
         datasets={datasets}
-        bounds={bounds}
+        bounds={{
+            x: {
+                min: start,
+                max: end,
+            },
+            y: {
+                min: 0,
+                // Round up to the nearest ten.
+                max: Math.ceil((yValues[yValues.length - 1] + 10) / 10) * 10,
+            },
+        }}
         logarithmic={true}
         asImage={asImage}
         labelStrings={labelStrings}
