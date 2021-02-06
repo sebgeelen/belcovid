@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import { betterRound, getDateFrom, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
@@ -314,6 +314,18 @@ export default function LineChart({
     const [showAsImage, setShowAsImage] = useState(asImage || false);
     const chartReference = React.createRef();
 
+    useEffect(() => {
+        if (fullscreen) {
+            document.addEventListener('keydown', ev => {
+                if (ev.key === 'Escape') {
+                    readyToRenderAsImage = false;
+                    setShowAsImage(asImage);
+                    setFullscreen(false);
+                }
+            });
+        }
+    }, [asImage, fullscreen]);
+
     const options = useMemo(() => {
         const options = defaultBaseOptions();
         options.animation = {
@@ -400,7 +412,7 @@ export default function LineChart({
     }, [annotations, bounds, chartReference, fullscreen, labelStrings, logarithmic, showAsImage, sort, stacked, ticksCallbacks, tooltip, yAxes]);
 
     const toggleFullscreen = () => {
-        setShowAsImage(!fullscreen ? false : asImage);
+        setShowAsImage(fullscreen ? asImage : false);
         setFullscreen(!fullscreen);
     };
     let contents;
