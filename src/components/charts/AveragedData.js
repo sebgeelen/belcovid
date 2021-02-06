@@ -1,8 +1,8 @@
 import React from 'react';
-import { getAveragePoints, getPolynomialRegressionPoints } from '../../helpers';
+import { getAveragePoints, getDateFrom, getPolynomialRegressionPoints, lastConsolidatedDataDay } from '../../helpers';
 import LineChart from './LineChart';
 
-const regressionStart = new Date('2020-08-15');
+const regressionStart = getDateFrom(lastConsolidatedDataDay(), -28);
 export default class AveragedData extends React.Component {
     render() {
         let data = this.props.data;

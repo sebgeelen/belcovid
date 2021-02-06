@@ -2,11 +2,13 @@ import React from 'react';
 import { getWeeklyData } from '../../data';
 import {
     getChangeRatio,
+    getDateFrom,
     getPolynomialRegressionPoints,
+    lastConsolidatedDataDay,
 } from '../../helpers';
 import LineChart from './LineChart';
 
-const regressionStart = new Date('2020-08-15');
+const regressionStart = getDateFrom(lastConsolidatedDataDay(), -28);
 export default class RateOfChange extends React.Component {
     render() {
         let data = this.props.data;
