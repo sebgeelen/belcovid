@@ -145,6 +145,7 @@ export const dataInfo = {
         },
     },
 };
+const compareOrder = ['cases', 'hospitalizations', 'icu', 'mortality', 'tests'];
 
 export default function Charts({
     cases,
@@ -164,6 +165,9 @@ export default function Charts({
     const [incidenceDenominator, setIncidenceDenominator] = useState(+urlParams.get('incDen') || 100000);
 
     useEffect(() => {
+        if (['incidence', 'icu', variable2].includes(variable1)) {
+            setVariable2(null);
+        }
         urlParams.set('var1', variable1);
         variable2 ? urlParams.set('var2', variable2) : urlParams.delete('var2');
         chartType ? urlParams.set('chartType', chartType) : urlParams.delete('chartType');
@@ -171,7 +175,7 @@ export default function Charts({
             const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
             window.history.pushState({ path: newUrl }, '', newUrl);
         }
-    });
+    }, [variable1, variable2, chartType, urlParams]);
 
     const getData = variableName => {
         switch (variableName) {
@@ -214,6 +218,7 @@ export default function Charts({
             const comparedData = {};
             let currentTotal1 = 0;
             let currentTotal2 = 0;
+            const mustReverse = compareOrder.indexOf(variable1) > compareOrder.indexOf(variable2);
             for (const date of Object.keys(data)) {
                 currentTotal1 += typeof data[date] === 'object'
                     ? data[date].total
@@ -226,15 +231,20 @@ export default function Charts({
                             : today2
                         )
                     : 0;
-                comparedData[date] = 100 * currentTotal1 / currentTotal2;
+                comparedData[date] = 100 * (mustReverse
+                    ? currentTotal1 / currentTotal2
+                    : currentTotal2 / currentTotal1);
             }
-            title = `Cumulative ${variable1} / cumulative ${variable2}`;
+            title = `Cumulative ${mustReverse ? variable1 : variable2} / cumulative ${mustReverse
+                ? variable2
+                : variable1}`;
             const labelStrings = {
-                y: `total ${variable1} / total ${variable2} (in %)`,
+                y: `total ${mustReverse ? variable1 : variable2} / total ${mustReverse
+                    ? variable2
+                    : variable1} (in %)`,
             };
             switch (chartType) {
                 case 'average':
-                    title += ' (7-day rolling average)'
                     chart = (
                         <AveragedData
                             classes={classes}
@@ -243,12 +253,12 @@ export default function Charts({
                             annotations={chartInfo.annotations}
                             asImage={true}
                             labelStrings={labelStrings}
+                            noAverage={true}
                             max={lastConsolidatedDataDay()}
                         />
                     );
                     break;
                 case 'change':
-                    title += ' (rate of change)'
                     chart = (
                         <RateOfChange
                             classes={classes}
@@ -491,54 +501,14 @@ export default function Charts({
                             />
                         </RadioGroup>
                     </Grid>
-                    <Grid item xs>
-                        <FormLabel component="legend">Compare with</FormLabel>
-                        <RadioGroup
-                            value={variable2}
-                            onChange={(ev) => setVariable2(ev.target.value || null)}
-                        >
-                            <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
-                                    />
-                                }
-                                value={null}
-                                label="None" />
-                            <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
-                                    />
-                                }
-                                disabled={['cases', 'incidence', 'icu', 'tests'].includes(variable1)}
-                                value="cases"
-                                label="Cases" />
-                            <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
-                                    />
-                                }
-                                disabled={['cases', 'incidence', 'hospitalizations', 'icu', 'tests'].includes(variable1)}
-                                value="hospitalizations"
-                                label="Hospitalizations"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
-                                    />
-                                }
-                                disabled={['cases', 'incidence', 'icu', 'tests'].includes(variable1)}
-                                value="icu"
-                                label="Intensive Care Units"
-                            />
-                            <Tooltip title="Mortality data cannot be filtered per province.">
+                    {
+                        !['incidence', 'icu'].includes(variable1) &&
+                        <Grid item xs>
+                            <FormLabel component="legend">Compare with</FormLabel>
+                            <RadioGroup
+                                value={variable2}
+                                onChange={(ev) => setVariable2(ev.target.value || null)}
+                            >
                                 <FormControlLabel
                                     control={
                                         <Radio
@@ -546,24 +516,67 @@ export default function Charts({
                                             to={`/charts?${urlParams.toString()}`}
                                         />
                                     }
-                                    disabled={province !== 'be' || ['cases', 'incidence', 'mortality', 'icu', 'tests'].includes(variable1)}
-                                    value="mortality"
-                                    label="Mortality"
-                                />
-                            </Tooltip>
-                            <FormControlLabel
-                                control={
+                                    value={null}
+                                    label="None" />
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    disabled={['cases', 'incidence', 'icu'].includes(variable1)}
+                                    value="cases"
+                                    label="Cases" />
+                                <FormControlLabel
+                                    control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    disabled={['incidence', 'hospitalizations', 'icu'].includes(variable1)}
+                                    value="hospitalizations"
+                                    label="Hospitalizations"
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    disabled={['incidence', 'icu'].includes(variable1)}
+                                    value="icu"
+                                    label="Intensive Care Units"
+                                />
+                                <Tooltip title="Mortality data cannot be filtered per province.">
+                                    <FormControlLabel
+                                        control={
+                                            <Radio
+                                                component={RouterLink}
+                                                to={`/charts?${urlParams.toString()}`}
+                                            />
+                                        }
+                                        disabled={province !== 'be' || ['incidence', 'mortality', 'icu'].includes(variable1)}
+                                        value="mortality"
+                                        label="Mortality"
                                     />
-                                }
-                                disabled={['tests', 'icu'].includes(variable1)}
-                                value="tests"
-                                label="Tests"
-                            />
-                        </RadioGroup>
-                    </Grid>
+                                </Tooltip>
+                                <FormControlLabel
+                                    control={
+                                        <Radio
+                                            component={RouterLink}
+                                            to={`/charts?${urlParams.toString()}`}
+                                        />
+                                    }
+                                    disabled={['tests', 'incidence', 'icu'].includes(variable1)}
+                                    value="tests"
+                                    label="Tests"
+                                />
+                            </RadioGroup>
+                        </Grid>
+                    }
                     <Grid item xs>
                         <FormLabel component="legend">Chart type</FormLabel>
                         <RadioGroup
@@ -578,7 +591,7 @@ export default function Charts({
                                     />
                                 }
                                 value="average"
-                                label="Rolling average"
+                                label={variable2 ? 'Ratio' : 'Rolling average'}
                             />
                             <FormControlLabel
                                 control={
