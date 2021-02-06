@@ -1,6 +1,6 @@
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
-import { betterRound, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
+import { betterRound, getDateFrom, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
 import { AppBar, CardMedia, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -145,7 +145,7 @@ export default class LineChart extends React.Component {
                         autoSkip: true,
                         autoSkipPadding: 10,
                         source: 'auto',
-                        min: new Date('2021-01-01'),
+                        min: getDateFrom(lastConsolidatedDataDay(), -28),
                         max: lastConsolidatedDataDay(),
                     },
                 }],
