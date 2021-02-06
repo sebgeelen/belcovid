@@ -6,9 +6,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import { Link, TableHead } from '@material-ui/core';
 import { InfoBox } from './InfoBox';
-import { getIncidenceData, provinceString } from '../data';
+import { getIncidenceData, provinceString } from '../data/data';
 import { MathComponent } from 'mathjax-react';
-import { populationData } from '../populationData';
+import { populationData } from '../data/populationData';
 
 const dayofMath = (
     <small>

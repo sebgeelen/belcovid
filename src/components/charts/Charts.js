@@ -5,7 +5,7 @@ import RateOfChange from './RateOfChange';
 import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
-import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data';
+import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data/data';
 import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 
@@ -159,14 +159,14 @@ export default function Charts({
 }) {
     const urlParams = new URLSearchParams(window.location.search);
     const [variable1, setVariable1] = useState(urlParams.get('var1') || 'cases');
-    const [variable2, setVariable2] = useState(urlParams.get('var2') || null);
+    const [variable2, setVariable2] = useState(urlParams.get('var2') || '');
     const [chartType, setChartType] = useState(urlParams.get('chartType') || 'average');
     const [incidenceDays, setIncidenceDays] = useState(+urlParams.get('incDays') || 14);
     const [incidenceDenominator, setIncidenceDenominator] = useState(+urlParams.get('incDen') || 100000);
 
     useEffect(() => {
         if (['incidence', 'icu', variable2].includes(variable1)) {
-            setVariable2(null);
+            setVariable2('');
         }
         urlParams.set('var1', variable1);
         variable2 ? urlParams.set('var2', variable2) : urlParams.delete('var2');
@@ -507,7 +507,7 @@ export default function Charts({
                             <FormLabel component="legend">Compare with</FormLabel>
                             <RadioGroup
                                 value={variable2}
-                                onChange={(ev) => setVariable2(ev.target.value || null)}
+                                onChange={(ev) => setVariable2(ev.target.value)}
                             >
                                 <FormControlLabel
                                     control={
@@ -516,7 +516,7 @@ export default function Charts({
                                             to={`/charts?${urlParams.toString()}`}
                                         />
                                     }
-                                    value={null}
+                                    value={''}
                                     label="None" />
                                 <FormControlLabel
                                     control={

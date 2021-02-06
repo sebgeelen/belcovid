@@ -10,7 +10,7 @@ import {
     AGE_GROUPS_MORTALITY,
     provinceString,
     provinceKey
-} from '../data';
+} from '../data/data';
 import {
     AppBar,
     Box,
@@ -45,6 +45,8 @@ function Footer() {
     const lastStatsUpdateDate = lastStatsUpdate && new Date(lastStatsUpdate);
     return (
         <Typography variant="body2" color="textSecondary" align="center">
+            <Link color="inherit" href="https://github.com/Zinston/belcovid" target="_blank" rel="noopener noreferrer">Contribute on GitHub.</Link>
+            <br/>
             {'All data from '}
             <Link color="inherit" href="https://www.sciensano.be/" target="_blank" rel="noopener noreferrer">Sciensano</Link>
             {

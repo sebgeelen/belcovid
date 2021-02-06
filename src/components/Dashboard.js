@@ -7,7 +7,7 @@ import Title from './Title';
 import ChartByAge from './charts/ChartByAge';
 import { Skeleton } from '@material-ui/lab';
 import News from './News';
-import { provinceString } from '../data';
+import { provinceString } from '../data/data';
 import { dataInfo } from './charts/Charts';
 import { lastConsolidatedDataDay } from '../helpers';
 import { TableContainer } from '@material-ui/core';

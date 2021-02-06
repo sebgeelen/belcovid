@@ -1,5 +1,5 @@
 import React from 'react';
-import { getWeeklyData } from '../../data';
+import { getWeeklyData } from '../../data/data';
 import {
     getChangeRatio,
     getDateFrom,

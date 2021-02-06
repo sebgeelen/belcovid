@@ -1,5 +1,5 @@
 import Parser from 'rss-parser';
-import { getDateFrom, getIsoDate, normalizeDate } from './helpers';
+import { getDateFrom, getIsoDate, normalizeDate } from '../helpers';
 import { populationData } from './populationData';
 
 const parser = new Parser();
