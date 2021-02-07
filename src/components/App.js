@@ -134,7 +134,7 @@ const styles = (theme) => ({
 });
 
 function App({ classes }) {
-    const provinceFromPath = window.location.search.substring(1);
+    const provinceFromPath = window.location.hash.substring(1);
     const [open, setOpen] = useState(false);
     const [province, setProvince] = useState(
         Object.keys(PROVINCES).includes(provinceFromPath)
@@ -386,7 +386,7 @@ function App({ classes }) {
                                         value={key}
                                         key={key}
                                         component={RouterLink}
-                                        to={{ search: key }}
+                                        to={{ hash: key }}
                                     >
                                         {provinceString(key)}
                                     </MenuItem>
@@ -413,8 +413,8 @@ function App({ classes }) {
                 </div>
                 <Divider />
                 <List>
-                    <ListItemLink to={`/${window.location.search}`} primary="Dashboard" icon={<DashboardIcon />} exact />
-                    <ListItemLink to={`/charts${window.location.search}`} primary="Charts" icon={<BarChartIcon />} />
+                    <ListItemLink to={`/${window.location.hash}`} primary="Dashboard" icon={<DashboardIcon />} exact />
+                    <ListItemLink to={`/charts${window.location.hash}`} primary="Charts" icon={<BarChartIcon />} />
                 </List>
             </Drawer>
             <main className={classes.content}>

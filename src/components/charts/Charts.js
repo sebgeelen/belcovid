@@ -172,7 +172,7 @@ export default function Charts({
         variable2 ? urlParams.set('var2', variable2) : urlParams.delete('var2');
         chartType ? urlParams.set('chartType', chartType) : urlParams.delete('chartType');
         if ('?' + urlParams.toString() !== window.location.search) {
-            const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+            const newUrl = `${window.location.pathname}${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`;
             window.history.pushState({ path: newUrl }, '', newUrl);
         }
     }, [variable1, variable2, chartType, urlParams]);
@@ -441,7 +441,7 @@ export default function Charts({
                                 control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                     />
                                 }
                                 value="cases"
@@ -450,7 +450,7 @@ export default function Charts({
                                 control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                     />
                                 }
                                 value="incidence"
@@ -460,7 +460,7 @@ export default function Charts({
                                 control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                     />
                                 }
                                 value="hospitalizations"
@@ -470,7 +470,7 @@ export default function Charts({
                                 control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                     />
                                 }
                                 value="icu"
@@ -481,7 +481,7 @@ export default function Charts({
                                     control={
                                         <Radio
                                             component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                         />
                                     }
                                     value="mortality"
@@ -494,7 +494,7 @@ export default function Charts({
                                     control={
                                         <Radio
                                             component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                         />
                                     }
                                     value="tests"
@@ -516,7 +516,7 @@ export default function Charts({
                                     control={
                                         <Radio
                                             component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                         />
                                     }
                                     value={''}
@@ -525,7 +525,7 @@ export default function Charts({
                                     control={
                                         <Radio
                                             component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                         />
                                     }
                                     disabled={['cases', 'incidence', 'icu'].includes(variable1)}
@@ -535,7 +535,7 @@ export default function Charts({
                                     control={
                                     <Radio
                                         component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                         />
                                     }
                                     disabled={['incidence', 'hospitalizations', 'icu'].includes(variable1)}
@@ -546,7 +546,7 @@ export default function Charts({
                                     control={
                                         <Radio
                                             component={RouterLink}
-                                            to={`/charts?${urlParams.toString()}`}
+                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                         />
                                     }
                                     disabled={['incidence', 'icu'].includes(variable1)}
@@ -558,7 +558,7 @@ export default function Charts({
                                         control={
                                             <Radio
                                                 component={RouterLink}
-                                                to={`/charts?${urlParams.toString()}`}
+                                                to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                             />
                                         }
                                         disabled={province !== 'be' || ['incidence', 'mortality', 'icu'].includes(variable1)}
@@ -571,7 +571,7 @@ export default function Charts({
                                         control={
                                             <Radio
                                                 component={RouterLink}
-                                                to={`/charts?${urlParams.toString()}`}
+                                                to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                             />
                                         }
                                         disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}
@@ -592,7 +592,7 @@ export default function Charts({
                                 control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                     />
                                 }
                                 value="average"
@@ -602,7 +602,7 @@ export default function Charts({
                                 control={
                                     <Radio
                                         component={RouterLink}
-                                        to={`/charts?${urlParams.toString()}`}
+                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
                                     />
                                 }
                                 value="change"
