@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -11,17 +11,19 @@ import { provinceString } from '../data/data';
 import { dataInfo } from './charts/Charts';
 import { lastConsolidatedDataDay } from '../helpers';
 import { TableContainer } from '@material-ui/core';
+import { DataContext } from './App';
 
-export default function Dashboard({
-	cases,
-	classes,
-	mortality,
-	newHospitalizations,
-	newsData,
-	province,
-	totalHospitalizations,
-	totalICU,
-}) {
+export default function Dashboard() {
+	const {
+		classes,
+		cases,
+		totalHospitalizations,
+		newHospitalizations,
+		totalICU,
+		mortality,
+		newsData,
+		province,
+	} = useContext(DataContext);
 	const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 	const chartInfo = dataInfo.cases.average;
 	return (
@@ -32,13 +34,12 @@ export default function Dashboard({
 				<Title>New cases, by age group (7-day rolling average) in {provinceString(province)}</Title>
 				{cases ?
 					<ChartByAge
-					classes={classes}
-					data={cases[province]}
-					annotations={chartInfo.annotations}
-					chartName={chartInfo.title}
-					asImage={true}
-					ageGroups={chartInfo.ageGroups}
-					max={lastConsolidatedDataDay()}
+						data={cases[province]}
+						annotations={chartInfo.annotations}
+						chartName={chartInfo.title}
+						asImage={true}
+						ageGroups={chartInfo.ageGroups}
+						max={lastConsolidatedDataDay()}
 					/> :
 				<Skeleton variant="rect" height={'100%'} />
 				}
@@ -57,14 +58,7 @@ export default function Dashboard({
 				<Title>Today in {provinceString(province)}</Title>
 				{cases || totalHospitalizations || totalICU || newHospitalizations || mortality ?
 				<TableContainer component={Paper} style={{ border: 0, boxShadow: 'none'}}>
-					<DataTable
-					cases={cases}
-					totalHospitalizations={totalHospitalizations}
-					newHospitalizations={newHospitalizations}
-					totalICU={totalICU}
-					mortality={mortality}
-					province={province}
-					/>
+					<DataTable/>
 				</TableContainer> :
 				<Skeleton variant="rect" height={200} />
 				}

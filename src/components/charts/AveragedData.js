@@ -6,7 +6,6 @@ const regressionStart = getDateFrom(lastConsolidatedDataDay(), -28);
 export default function AveragedData({
     asImage,
     chartName,
-    classes,
     data,
     labelStrings,
     noAverage,
@@ -62,7 +61,6 @@ export default function AveragedData({
         radius: 0,
     });
     return <LineChart
-        classes={classes}
         chartName={chartName}
         datasets={datasets}
         bounds={{

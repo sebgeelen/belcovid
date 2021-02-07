@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { AVAILABLE_BEDS, getDateFrom, getAverageOver, TOTAL_ICU_BEDS, lastConsolidatedDataDay, getAveragePoints, getDaysBetween, yesterday, today, normalizeDate, getChangeRatio, betterRound, getIsoDate } from '../helpers';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,6 +9,7 @@ import InfoBox from './InfoBox';
 import { getIncidenceData, provinceString } from '../data/data';
 import { MathComponent } from 'mathjax-react';
 import { populationData } from '../data/populationData';
+import { DataContext } from './App';
 
 const dayofMath = (
     <small>
@@ -152,14 +153,16 @@ const getPeak = data => {
     };
 }
 
-export default function DataTable({
-    cases,
-    mortality,
-    province,
-    newHospitalizations,
-    totalHospitalizations,
-    totalICU,
-}) {
+export default function DataTable() {
+    const {
+        cases,
+        totalHospitalizations,
+        newHospitalizations,
+        totalICU,
+        mortality,
+        province,
+    } = useContext(DataContext);
+
     const incidence = cases && getIncidenceData(cases[province], province);
     const peakCases = cases && getPeak(cases[province]);
     const peakIncidence = incidence && getPeak(incidence);

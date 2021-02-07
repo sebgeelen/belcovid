@@ -8,7 +8,6 @@ export default function ChartByAge({
     annotations,
     asImage,
     chartName,
-    classes,
     data,
     labelStrings,
     stacked,
@@ -36,7 +35,6 @@ export default function ChartByAge({
         }
     }
     return <AreaTimeChart
-        classes={classes}
         chartName={chartName}
         datasets={ageGroups.map(group => {
             return {

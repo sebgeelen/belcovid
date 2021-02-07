@@ -132,6 +132,7 @@ const styles = (theme) => ({
         marginTop: 20,
     },
 });
+export const DataContext = React.createContext();
 
 function App({ classes }) {
     const provinceFromPath = window.location.hash.substring(1);
@@ -420,32 +421,26 @@ function App({ classes }) {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Container maxWidth="lg" className={classes.container}>
-                    <Switch>
-                        <Route path="/charts">
-                            <Charts
-                                classes={classes}
-                                cases={cases?.[province]}
-                                newHospitalizations={newHospitalizations?.[province]}
-                                totalHospitalizations={totalHospitalizations?.[province]}
-                                totalICU={totalICU?.[province]}
-                                mortality={mortality?.[province]}
-                                tests={tests?.[province]}
-                                province={province}
-                            />
-                        </Route>
-                        <Route path="/">
-                            <Dashboard
-                                classes={classes}
-                                cases={cases}
-                                totalHospitalizations={totalHospitalizations}
-                                newHospitalizations={newHospitalizations}
-                                totalICU={totalICU}
-                                mortality={mortality}
-                                newsData={newsData}
-                                province={province}
-                            />
-                        </Route>
-                    </Switch>
+                    <DataContext.Provider value={{
+                        cases,
+                        classes,
+                        mortality,
+                        newHospitalizations,
+                        newsData,
+                        province,
+                        tests,
+                        totalHospitalizations,
+                        totalICU,
+                    }}>
+                        <Switch>
+                            <Route path="/charts">
+                                <Charts/>
+                            </Route>
+                            <Route path="/">
+                                <Dashboard/>
+                            </Route>
+                        </Switch>
+                    </DataContext.Provider>
                     <Box pt={4}>
                         <Footer />
                     </Box>

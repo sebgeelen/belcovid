@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ChartByAge from './ChartByAge';
 import AveragedData from './AveragedData';
 import RateOfChange from './RateOfChange';
@@ -8,6 +8,7 @@ import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data/data';
 import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
 import { Link as RouterLink, Route, Switch } from 'react-router-dom';
+import { DataContext } from '../App';
 
 export const dataInfo = {
     cases: {
@@ -147,16 +148,17 @@ export const dataInfo = {
 };
 const compareOrder = ['tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
 
-export default function Charts({
-    cases,
-    classes,
-    mortality,
-    newHospitalizations,
-    province,
-    tests,
-    totalHospitalizations,
-    totalICU,
-}) {
+export default function Charts() {
+    const context = useContext(DataContext);
+    const classes = context.classes;
+    const province = context.province;
+    const cases = context.cases?.[province];
+    const newHospitalizations = context.newHospitalizations?.[province]
+    const totalHospitalizations = context.totalHospitalizations?.[province];
+    const totalICU = context.totalICU?.[province];
+    const mortality = context.mortality?.[province];
+    const tests = context.tests?.[province];
+
     const urlParams = new URLSearchParams(window.location.search);
     const [variable1, setVariable1] = useState(urlParams.get('var1') || 'cases');
     const [variable2, setVariable2] = useState(urlParams.get('var2') || '');
@@ -247,7 +249,6 @@ export default function Charts({
                 case 'average':
                     chart = (
                         <AveragedData
-                            classes={classes}
                             data={comparedData}
                             chartName={title}
                             annotations={chartInfo.annotations}
@@ -261,7 +262,6 @@ export default function Charts({
                 case 'change':
                     chart = (
                         <RateOfChange
-                            classes={classes}
                             data={comparedData}
                             chartName={title}
                             annotations={chartInfo.annotations}
@@ -289,7 +289,6 @@ export default function Charts({
                         }
                         chart = (
                             <ChartByAge
-                                classes={classes}
                                 data={data}
                                 annotations={chartInfo.annotations}
                                 chartName={chartInfo.title}
@@ -304,7 +303,6 @@ export default function Charts({
                     } else {
                         chart = (
                             <AveragedData
-                                classes={classes}
                                 data={data}
                                 chartName={chartInfo.title}
                                 annotations={chartInfo.annotations}
@@ -319,7 +317,6 @@ export default function Charts({
                 case 'change': {
                     chart = (
                         <RateOfChange
-                            classes={classes}
                             data={data}
                             chartName={chartInfo.title}
                             annotations={chartInfo.annotations}

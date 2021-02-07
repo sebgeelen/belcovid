@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import { betterRound, getDateFrom, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
 import { AppBar, CardMedia, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import { DataContext } from '../App';
 
 Chart.Tooltip.positioners.custom = (elements, position) => {
     if (!elements.length) {
@@ -298,7 +299,6 @@ export default function LineChart({
     annotations,
     bounds,
     chartName,
-    classes,
     datasets,
     asImage,
     labelStrings,
@@ -309,6 +309,7 @@ export default function LineChart({
     tooltip,
     yAxes,
 }) {
+    const { classes } = useContext(DataContext);
     const [chartImageURI, setChartImageURI] = useState(null);
     const [fullscreen, setFullscreen] = useState(false);
     const [showAsImage, setShowAsImage] = useState(asImage || false);

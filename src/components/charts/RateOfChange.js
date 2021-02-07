@@ -13,7 +13,6 @@ export default function RateOfChange({
     annotations,
     asImage,
     chartName,
-    classes,
     data,
     max,
 }) {
@@ -52,7 +51,6 @@ export default function RateOfChange({
     }).filter(d => d && typeof d.y === 'number');
 
     return <LineChart
-        classes={classes}
         chartName={chartName}
         datasets={[
             {

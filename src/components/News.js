@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Avatar, Link, List, ListItem, ListItemAvatar, ListItemText, SvgIcon } from '@material-ui/core';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Flags from 'country-flag-icons/react/3x2';
 import { getFromLocalStorage, setIntoLocalStorage } from '../helpers';
+import { DataContext } from './App';
 
-export default function News({
-    classes,
-    data,
-}) {
+export default function News() {
+    const { classes, newsData } = useContext(DataContext);
     const [languages, setLanguages] = useState((
             getFromLocalStorage('belcovid:news:languages') &&
             JSON.parse(getFromLocalStorage('belcovid:news:languages'))
@@ -16,7 +15,7 @@ export default function News({
     const lastUpdate = getFromLocalStorage('belcovid:update:news');
     const lastUpdateDate = lastUpdate && new Date(lastUpdate);
 
-    const listItems = data?.filter(item => languages.includes(item.language.toLowerCase()))
+    const listItems = newsData?.filter(item => languages.includes(item.language.toLowerCase()))
         .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
         .map((item, index) => {
             const date = new Date(item.pubDate).toDateString();
@@ -60,7 +59,7 @@ export default function News({
                     </ToggleButton>
                 </ToggleButtonGroup>
             </div>
-            { data ?
+            { newsData ?
                 <List>{listItems}</List> :
                 <Skeleton variant="rect" height={200} /> }
         </React.Fragment>

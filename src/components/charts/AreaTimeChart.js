@@ -19,7 +19,6 @@ export default function AreaTimeChart({
     asImage,
     bounds,
     chartName,
-    classes,
     datasets,
     labelStrings,
     stacked,
@@ -27,7 +26,6 @@ export default function AreaTimeChart({
 }) {
     return (
         <LineChart
-            classes={classes}
             chartName={chartName}
             datasets={datasets.map((dataset, index) => {
                 return {
