@@ -149,6 +149,10 @@ function App({ classes }) {
     const [mortality, setMortality] = useState();
     const [tests, setTests] = useState();
     const [newsData, setNewsData] = useState();
+    const setData = (setter, data, localStorageKey) => {
+        setter(data);
+        setIntoLocalStorage(localStorageKey, JSON.stringify(data));
+    };
 
     const _share = () => {
         if (navigator.share) {
@@ -162,7 +166,7 @@ function App({ classes }) {
                 console.error('Something went wrong.', error);
               });
           }
-    }
+    };
 
     useEffect(() => {
         const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
@@ -221,40 +225,52 @@ function App({ classes }) {
             const dataPromises = fetchStatsData();
             for (const dataPromise of dataPromises) {
                 dataPromise.then(([key, values]) => {
-                    let data;
+                    const localStorageKey = `belcovid:${key}`;
                     switch (key) {
                         case 'cases': {
-                            data = normalizeData('CASES', values, AGE_GROUPS_CASES);
-                            setCases(data);
+                            setData(
+                                setCases,
+                                normalizeData('CASES', values, AGE_GROUPS_CASES),
+                                localStorageKey,
+                            );
                             break;
                         }
                         case 'hospitalizations': {
-                            data = normalizeData('TOTAL_IN', values);
-                            setTotalHospitalizations(data);
-                            setIntoLocalStorage('belcovid:totalHospitalizations', JSON.stringify(data));
-
-                            data = normalizeData('NEW_IN', values);
-                            setNewHospitalizations(data);
-                            setIntoLocalStorage('belcovid:newHospitalizations', JSON.stringify(data));
-
-                            data = normalizeData('TOTAL_IN_ICU', values);
-                            setTotalICU(data);
-                            setIntoLocalStorage('belcovid:totalICU', JSON.stringify(data));
-                            return;
+                            setData(
+                                setTotalHospitalizations,
+                                normalizeData('TOTAL_IN', values),
+                                'belcovid:totalHospitalizations',
+                            );
+                            setData(
+                                setNewHospitalizations,
+                                normalizeData('NEW_IN', values),
+                                'belcovid:newHospitalizations',
+                            );
+                            setData(
+                                setTotalICU,
+                                normalizeData('TOTAL_IN_ICU', values),
+                                'belcovid:totalICU',
+                            );
+                            break;
                         }
                         case 'mortality': {
-                            data = normalizeData('DEATHS', values, AGE_GROUPS_MORTALITY);
-                            setMortality(data);
+                            setData(
+                                setMortality,
+                                normalizeData('DEATHS', values, AGE_GROUPS_MORTALITY),
+                                localStorageKey,
+                            );
                             break;
                         }
                         case 'tests': {
-                            data = normalizeData('TESTS_ALL', values, AGE_GROUPS_MORTALITY);
-                            setTests(data);
+                            setData(
+                                setTests,
+                                normalizeData('TESTS_ALL', values, AGE_GROUPS_MORTALITY),
+                                localStorageKey,
+                            );
                             break;
                         }
                         default: return;
                     }
-                    setIntoLocalStorage('belcovid:' + key, JSON.stringify(data));
                 });
             }
             Promise.all(dataPromises).then(() => {
@@ -274,8 +290,7 @@ function App({ classes }) {
                     }
                     data.push(formattedItem);
                 }
-                setNewsData(data);
-                setIntoLocalStorage('belcovid:news', JSON.stringify(data));
+                setData(setNewsData, data, 'belcovid:news');
                 });
             }
             Promise.all(dataPromises).then(() => {
