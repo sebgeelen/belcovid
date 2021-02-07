@@ -145,7 +145,7 @@ export const dataInfo = {
         },
     },
 };
-const compareOrder = ['cases', 'hospitalizations', 'icu', 'mortality', 'tests'];
+const compareOrder = ['tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
 
 export default function Charts({
     cases,
