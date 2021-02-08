@@ -312,7 +312,7 @@ export function objectFrom(keys, initialValue) {
         const value = Array.isArray(initialValue)
             ? [...initialValue] :
             (
-                typeof initialeValue === 'object'
+                typeof initialValue === 'object'
                     ? {...initialValue}
                     : initialValue
             );
