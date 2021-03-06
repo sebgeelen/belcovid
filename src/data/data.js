@@ -3,7 +3,7 @@ import { getDateFrom, getIsoDate, normalizeDate } from '../helpers';
 import { populationData } from './populationData';
 
 const parser = new Parser();
-const PROXY = 'https://cors-anywhere.herokuapp.com/';
+const PROXY = 'https://safe-ridge-06878.herokuapp.com/';
 const URLS = {
     stats: {
         hospitalizations: 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json',
