@@ -274,7 +274,7 @@ function App({ classes }) {
                 });
             }
             Promise.all(dataPromises).then(() => {
-                setIntoLocalStorage('belcovid:update:stats', today().toISOString());
+                setIntoLocalStorage('belcovid:update:stats', new Date().toISOString());
             });
         }
         const updateNews = () => {
@@ -294,7 +294,7 @@ function App({ classes }) {
                 });
             }
             Promise.all(dataPromises).then(() => {
-                setIntoLocalStorage('belcovid:update:news', today().toISOString());
+                setIntoLocalStorage('belcovid:update:news', new Date().toISOString());
             });
         }
 
