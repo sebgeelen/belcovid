@@ -135,7 +135,8 @@ const getChangeJsx = (data, limit = lastConsolidatedDataDay(), period = 7, overA
     )
 }
 const getDaysToDoubling = (data, limit = lastConsolidatedDataDay()) => {
-    return betterRound(100 / getChangeRatioOver(data, limit));
+    const changeRatio = getChangeRatioOver(data, limit) || null;
+    return changeRatio && betterRound(100 / changeRatio);
 }
 const getPeak = data => {
     const points = [];
@@ -384,6 +385,7 @@ export default function DataTable() {
                                 cases &&
                                 (() => {
                                     const days = getDaysToDoubling(cases[province]);
+                                    if (days === null) return 'N.A.';
                                     return `${Math.abs(days)} (${(
                                         days > 0
                                             ? 'doubling'
@@ -397,6 +399,7 @@ export default function DataTable() {
                                 incidence &&
                                 (() => {
                                     const days = getDaysToDoubling(incidence);
+                                    if (days === null) return 'N.A.';
                                     return `${Math.abs(days)} (${(
                                         days > 0
                                             ? 'doubling'
@@ -410,6 +413,7 @@ export default function DataTable() {
                                 totalHospitalizations &&
                                 (() => {
                                     const days = getDaysToDoubling(totalHospitalizations[province]);
+                                    if (days === null) return 'N.A.';
                                     return `${Math.abs(days)} (${(
                                         days > 0
                                             ? 'doubling'
@@ -423,6 +427,7 @@ export default function DataTable() {
                                 totalICU &&
                                 (() => {
                                     const days = getDaysToDoubling(totalICU[province]);
+                                    if (days === null) return 'N.A.';
                                     return `${Math.abs(days)} (${(
                                         days > 0
                                             ? 'doubling'
@@ -438,6 +443,7 @@ export default function DataTable() {
                                     mortality &&
                                     (() => {
                                         const days = getDaysToDoubling(mortality[province]);
+                                        if (days === null) return 'N.A.';
                                         return `${Math.abs(days)} (${(
                                             days > 0
                                                 ? 'doubling'
