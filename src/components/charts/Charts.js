@@ -218,26 +218,30 @@ export default function Charts() {
         if (variable2) {
             const data2 = getData(variable2);
             const comparedData = {};
-            let currentTotal1 = 0;
-            let currentTotal2 = 0;
+            let currentValues1 = [];
+            let currentValues2 = [];
             const mustReverse = compareOrder.indexOf(variable1) > compareOrder.indexOf(variable2);
             for (const date of Object.keys(data)) {
-                currentTotal1 += typeof data[date] === 'object'
+                currentValues1.push(typeof data[date] === 'object'
                     ? data[date].total
-                    : data[date];
+                    : data[date]);
                 const today2 = data2[date];
-                currentTotal2 += today2
+                currentValues2.push(today2
                     ? (
                         typeof today2 === 'object'
                             ? today2.total
                             : today2
                         )
-                    : 0;
+                    : 0);
+                if (currentValues1.length > 7) currentValues1.shift();
+                if (currentValues2.length > 7) currentValues2.shift();
+                const currentTotal1 = currentValues1.reduce((a, b) => a + b);
+                const currentTotal2 = currentValues2.reduce((a, b) => a + b);
                 comparedData[date] = 100 * (mustReverse
                     ? currentTotal1 / currentTotal2
                     : currentTotal2 / currentTotal1);
             }
-            title = `Cumulative ${mustReverse ? variable1 : variable2} / cumulative ${mustReverse
+            title = `Cumulative (over 7 days) ${mustReverse ? variable1 : variable2} / cumulative ${mustReverse
                 ? variable2
                 : variable1}`;
             const labelStrings = {
