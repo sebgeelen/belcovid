@@ -14,7 +14,7 @@ const URLS = {
     news: [
         {
             sourceName: 'The Lancet',
-            rss: 'http://www.thelancet.com/rssfeed/lancet_online.xml',
+            rss: 'https://www.thelancet.com/rssfeed/lancet_online.xml',
             icon: 'lancet.jpg',
             language: 'EN',
         },
@@ -32,7 +32,7 @@ const URLS = {
         },
         {
             sourceName: 'RTBF Info',
-            rss: 'http://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml',
+            rss: 'https://rss.rtbf.be/article/rss/rtbfinfo_homepage.xml',
             icon: 'rtbfinfo.png',
             language: 'FR',
         },
