@@ -13,7 +13,7 @@ export default function ListItemLink({ icon, primary, to, exact }) {
         },
         [to],
     );
-    const match = useRouteMatch({ path: to.replace(/\?.*$/, ''), exact });
+    const match = useRouteMatch({ path: to.replace(/(#.*$)|(\?.*$)/, ''), exact });
 
     return (
         <li>

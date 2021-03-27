@@ -9,7 +9,7 @@ import InfoBox from './InfoBox';
 import { getIncidenceData, provinceString } from '../data/data';
 import { MathComponent } from 'mathjax-react';
 import { populationData } from '../data/populationData';
-import { DataContext } from './App';
+import { StatsDataContext } from '../contexts/StatsDataContext';
 
 const dayofMath = (
     <small>
@@ -154,15 +154,14 @@ const getPeak = data => {
     };
 }
 
-export default function DataTable() {
+export default function DataTable({ province }) {
     const {
         cases,
         totalHospitalizations,
         newHospitalizations,
         totalICU,
         mortality,
-        province,
-    } = useContext(DataContext);
+    } = useContext(StatsDataContext);
 
     const incidence = cases && getIncidenceData(cases[province], province);
     const peakCases = cases && getPeak(cases[province]);

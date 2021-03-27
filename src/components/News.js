@@ -1,12 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { Avatar, Link, List, ListItem, ListItemAvatar, ListItemText, SvgIcon } from '@material-ui/core';
+import { Avatar, Link, List, ListItem, ListItemAvatar, ListItemText, SvgIcon, withStyles } from '@material-ui/core';
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Flags from 'country-flag-icons/react/3x2';
 import { getFromLocalStorage, setIntoLocalStorage } from '../helpers';
-import { DataContext } from './App';
+import { NewsDataContext } from '../contexts/NewsDataContext';
+import { styles } from '../styles';
 
-export default function News() {
-    const { classes, newsData } = useContext(DataContext);
+function News({ classes }) {
+    const { newsData } = useContext(NewsDataContext);
     const [languages, setLanguages] = useState((
             getFromLocalStorage('belcovid:news:languages') &&
             JSON.parse(getFromLocalStorage('belcovid:news:languages'))
@@ -65,3 +66,5 @@ export default function News() {
         </React.Fragment>
     );
 }
+
+export default withStyles(styles)(News);

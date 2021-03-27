@@ -182,6 +182,7 @@ export function getWeeklyData(data, weeks = 1) {
 }
 // Caveat: works only for cases because assumes their age groups.
 export function getIncidenceData(casesData, province = 'be', weeks = 2, reference = 100000) {
+    if (!casesData) return;
     const data = {};
     const weeklyCases = getWeeklyData(casesData, weeks);
     const population = populationData.ageGroupsCases[province];

@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import { betterRound, getDateFrom, isMobile, lastConsolidatedDataDay, today } from '../../helpers';
 import 'chartjs-plugin-annotation';
-import { AppBar, CardMedia, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, CardMedia, Dialog, IconButton, Slide, Toolbar, Typography, withStyles } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { DataContext } from '../App';
+import { styles } from '../../styles';
 
 Chart.Tooltip.positioners.custom = (elements, position) => {
     if (!elements.length) {
@@ -295,10 +295,11 @@ const defaultBaseOptions = () => {
 // true when react-chartjs-2 triggers an event to notify that the rendering of
 // the chart is complete.
 let readyToRenderAsImage = false;
-export default function LineChart({
+function LineChart({
     annotations,
     bounds,
     chartName,
+    classes,
     datasets,
     asImage,
     labelStrings,
@@ -309,7 +310,6 @@ export default function LineChart({
     tooltip,
     yAxes,
 }) {
-    const { classes } = useContext(DataContext);
     const [chartImageURI, setChartImageURI] = useState(null);
     const [fullscreen, setFullscreen] = useState(false);
     const [showAsImage, setShowAsImage] = useState(asImage || false);
@@ -465,3 +465,5 @@ export default function LineChart({
         return <div style={{minWidth: 200, minHeight: 200, height: '100%'}}>{contents}</div>;
     }
 }
+
+export default withStyles(styles)(LineChart);

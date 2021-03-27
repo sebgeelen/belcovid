@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import ChartByAge from './ChartByAge';
 import AveragedData from './AveragedData';
 import RateOfChange from './RateOfChange';
-import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip } from '@material-ui/core';
+import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip, withStyles } from '@material-ui/core';
 import Title from '../Title';
 import { Skeleton } from '@material-ui/lab';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data/data';
 import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
-import { Link as RouterLink, Route, Switch } from 'react-router-dom';
-import { DataContext } from '../App';
+import { Route, Switch } from 'react-router-dom';
+import { StatsDataContext } from '../../contexts/StatsDataContext';
+import { styles } from '../../styles';
 
 export const dataInfo = {
     cases: {
@@ -147,11 +148,12 @@ export const dataInfo = {
     },
 };
 const compareOrder = ['tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
+const getSearchParams = () => {
+    return window.location.search.replace('?', '') || window.location.hash.replace(/^.*\??/, '');
+}
 
-export default function Charts() {
-    const context = useContext(DataContext);
-    const classes = context.classes;
-    const province = context.province;
+function Charts({ province, classes }) {
+    const context = useContext(StatsDataContext);
     const cases = context.cases?.[province];
     const newHospitalizations = context.newHospitalizations?.[province]
     const totalHospitalizations = context.totalHospitalizations?.[province];
@@ -159,14 +161,14 @@ export default function Charts() {
     const mortality = context.mortality?.[province];
     const tests = context.tests?.[province];
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(getSearchParams());
     const [variable1, setVariable1] = useState(urlParams.get('var1') || 'cases');
     const [variable2, setVariable2] = useState(urlParams.get('var2') || '');
     const [chartType, setChartType] = useState(urlParams.get('chartType') || 'average');
     const [incidenceDays, setIncidenceDays] = useState(+urlParams.get('incDays') || 14);
     const [incidenceDenominator, setIncidenceDenominator] = useState(+urlParams.get('incDen') || 100000);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (['incidence', 'icu', variable2].includes(variable1)) {
             setVariable2('');
         }
@@ -439,52 +441,27 @@ export default function Charts() {
                             onChange={ev => setVariable1(ev.target.value)}
                         >
                             <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                    />
-                                }
+                                control={<Radio/>}
                                 value="cases"
                                 label="Cases" />
                             <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                    />
-                                }
+                                control={<Radio/>}
                                 value="incidence"
                                 label="Incidence"
                             />
                             <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                    />
-                                }
+                                control={<Radio/>}
                                 value="hospitalizations"
                                 label="Hospitalizations"
                             />
                             <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                    />
-                                }
+                                control={<Radio/>}
                                 value="icu"
                                 label="Intensive Care Units"
                             />
                             <Tooltip title="Mortality data cannot be filtered per province.">
                                 <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                        />
-                                    }
+                                    control={<Radio/>}
                                     value="mortality"
                                     label="Mortality"
                                     disabled={province !== 'be'}
@@ -492,12 +469,7 @@ export default function Charts() {
                             </Tooltip>
                             <Tooltip title="Testing data cannot be filtered per province.">
                                 <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                        />
-                                    }
+                                    control={<Radio/>}
                                     value="tests"
                                     label="Tests"
                                     disabled={province !== 'be'}
@@ -514,54 +486,29 @@ export default function Charts() {
                                 onChange={(ev) => setVariable2(ev.target.value)}
                             >
                                 <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                        />
-                                    }
+                                    control={<Radio/>}
                                     value={''}
                                     label="None" />
                                 <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                        />
-                                    }
+                                    control={<Radio/>}
                                     disabled={['cases', 'incidence', 'icu'].includes(variable1)}
                                     value="cases"
                                     label="Cases" />
                                 <FormControlLabel
-                                    control={
-                                    <Radio
-                                        component={RouterLink}
-                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                        />
-                                    }
+                                    control={<Radio/>}
                                     disabled={['incidence', 'hospitalizations', 'icu'].includes(variable1)}
                                     value="hospitalizations"
                                     label="Hospitalizations"
                                 />
                                 <FormControlLabel
-                                    control={
-                                        <Radio
-                                            component={RouterLink}
-                                            to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                        />
-                                    }
+                                    control={<Radio/>}
                                     disabled={['incidence', 'icu'].includes(variable1)}
                                     value="icu"
                                     label="Intensive Care Units"
                                 />
                                 <Tooltip title="Mortality data cannot be filtered per province.">
                                     <FormControlLabel
-                                        control={
-                                            <Radio
-                                                component={RouterLink}
-                                                to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                            />
-                                        }
+                                        control={<Radio/>}
                                         disabled={province !== 'be' || ['incidence', 'mortality', 'icu'].includes(variable1)}
                                         value="mortality"
                                         label="Mortality"
@@ -569,12 +516,7 @@ export default function Charts() {
                                 </Tooltip>
                                 <Tooltip title="Testing data cannot be filtered per province.">
                                     <FormControlLabel
-                                        control={
-                                            <Radio
-                                                component={RouterLink}
-                                                to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                            />
-                                        }
+                                        control={<Radio/>}
                                         disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}
                                         value="tests"
                                         label="Tests"
@@ -590,22 +532,12 @@ export default function Charts() {
                             onChange={ (ev) => setChartType(ev.target.value) }
                         >
                             <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                    />
-                                }
+                                control={<Radio/>}
                                 value="average"
                                 label={variable2 ? 'Ratio' : 'Rolling average'}
                             />
                             <FormControlLabel
-                                control={
-                                    <Radio
-                                        component={RouterLink}
-                                        to={`/charts${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`}
-                                    />
-                                }
+                                control={<Radio/>}
                                 value="change"
                                 label="Rate of change"
                             />
@@ -623,3 +555,5 @@ export default function Charts() {
         </React.Fragment>
     );
 }
+
+export default withStyles(styles)(Charts);

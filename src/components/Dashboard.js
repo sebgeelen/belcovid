@@ -10,20 +10,19 @@ import News from './News';
 import { provinceString } from '../data/data';
 import { dataInfo } from './charts/Charts';
 import { lastConsolidatedDataDay } from '../helpers';
-import { TableContainer } from '@material-ui/core';
-import { DataContext } from './App';
+import { TableContainer, withStyles } from '@material-ui/core';
+import { StatsDataContext } from '../contexts/StatsDataContext';
+import { NewsDataContextProvider } from '../contexts/NewsDataContext';
+import { styles } from '../styles';
 
-export default function Dashboard() {
+function Dashboard({ province, classes }) {
 	const {
-		classes,
 		cases,
 		totalHospitalizations,
 		newHospitalizations,
 		totalICU,
 		mortality,
-		newsData,
-		province,
-	} = useContext(DataContext);
+	} = useContext(StatsDataContext);
 	const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 	const chartInfo = dataInfo.cases.average;
 	return (
@@ -49,7 +48,9 @@ export default function Dashboard() {
 			<Grid item xs={12} md={5} lg={5}>
 			<Paper className={fixedHeightPaper}>
 				<Title>Latest news</Title>
-				<News data={newsData} classes={classes}/>
+				<NewsDataContextProvider>
+					<News/>
+				</NewsDataContextProvider>
 			</Paper>
 			</Grid>
 			{/* Recent Data */}
@@ -58,7 +59,7 @@ export default function Dashboard() {
 				<Title>Today in {provinceString(province)}</Title>
 				{cases || totalHospitalizations || totalICU || newHospitalizations || mortality ?
 				<TableContainer component={Paper} style={{ border: 0, boxShadow: 'none'}}>
-					<DataTable/>
+					<DataTable province={province}/>
 				</TableContainer> :
 				<Skeleton variant="rect" height={200} />
 				}
@@ -67,3 +68,5 @@ export default function Dashboard() {
 		</Grid>
 	);
 }
+
+export default withStyles(styles)(Dashboard);
