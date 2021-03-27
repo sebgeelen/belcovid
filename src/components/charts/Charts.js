@@ -149,7 +149,7 @@ export const dataInfo = {
 };
 const compareOrder = ['tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
 const getSearchParams = () => {
-    return window.location.search.replace('?', '') || window.location.hash.replace(/^.*\??/, '');
+    return window.location.search.replace('?', '');
 }
 
 function Charts({ province, classes }) {
@@ -176,7 +176,7 @@ function Charts({ province, classes }) {
         variable2 ? urlParams.set('var2', variable2) : urlParams.delete('var2');
         chartType ? urlParams.set('chartType', chartType) : urlParams.delete('chartType');
         if ('?' + urlParams.toString() !== window.location.search) {
-            const newUrl = `${window.location.pathname}${window.location.hash.replace(/\?.*$/, '')}?${urlParams.toString()}`;
+            const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash.replace(/\?.*$/, '')}`;
             window.history.pushState({ path: newUrl }, '', newUrl);
         }
     }, [variable1, variable2, chartType, urlParams]);
