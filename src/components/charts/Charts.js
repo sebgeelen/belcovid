@@ -1,15 +1,26 @@
 import React, { useContext, useState } from 'react';
-import ChartByAge from './ChartByAge';
-import AveragedData from './AveragedData';
-import RateOfChange from './RateOfChange';
-import { Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, Slider, Tooltip, withStyles } from '@material-ui/core';
 import Title from '../Title';
-import { Skeleton } from '@material-ui/lab';
+import Container from '@material-ui/core/Container';
+import Divider from '@material-ui/core/Divider';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Skeleton from '@material-ui/lab/Skeleton';
+import Slider from '@material-ui/core/Slider';
+import Tooltip from '@material-ui/core/Tooltip';
+import withStyles from '@material-ui/core/styles/withStyles';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data/data';
 import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
 import { Route, Switch } from 'react-router-dom';
 import { StatsDataContext } from '../../contexts/StatsDataContext';
 import { styles } from '../../styles';
+const ChartByAge = React.lazy(() => import('./ChartByAge'));
+const AveragedData = React.lazy(() => import('./AveragedData'));
+const RateOfChange = React.lazy(() => import('./RateOfChange'));
 
 export const dataInfo = {
     cases: {
@@ -344,7 +355,7 @@ function Charts({ province, classes }) {
             }
         }
         return (
-            <React.Fragment>
+            <React.Suspense fallback={<Skeleton variant="rect" height={200} />}>
                 <div style={{ marginTop: 20 }} />
                 <Divider variant="middle" />
                 <div style={{ marginTop: 20 }} />
@@ -425,7 +436,7 @@ function Charts({ province, classes }) {
                         }
                     </Container>
                 }
-            </React.Fragment>
+            </React.Suspense>
         );
     };
 

@@ -1,28 +1,25 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import Dashboard from './Dashboard.js';
-import Charts from './charts/Charts.js';
 import {
     PROVINCES,
     provinceString,
 } from '../data/data';
-import {
-    AppBar,
-    Box,
-    Container,
-    CssBaseline,
-    Divider,
-    Drawer,
-    Fab,
-    FormControl,
-    IconButton,
-    List,
-    MenuItem,
-    Select,
-    Toolbar,
-    Typography,
-    withStyles,
-} from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Container from '@material-ui/core/Container';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
+import Fab from '@material-ui/core/Fab';
+import FormControl from '@material-ui/core/FormControl';
+import IconButton from '@material-ui/core/IconButton';
+import List from '@material-ui/core/List';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import withStyles from '@material-ui/core/styles/withStyles';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -35,6 +32,8 @@ import ShareIcon from '@material-ui/icons/Share';
 import Footer from './Footer.js';
 import { StatsDataContextProvider } from '../contexts/StatsDataContext.js';
 import { styles } from '../styles.js';
+const Charts = React.lazy(() => import('./charts/Charts.js'));
+const Dashboard = React.lazy(() => import('./Dashboard.js'));
 
 function App({ classes }) {
     const provinceFromPath = window.location.hash.substring(1).replace(/\?.*$/, '');
@@ -144,12 +143,22 @@ function App({ classes }) {
                         <Switch>
                             <Route path="/charts">
                                 <StatsDataContextProvider>
-                                    <Charts province={province}/>
+                                    <React.Suspense fallback={
+                                        <div className={classes.root}>
+                                            <CircularProgress style={{margin: 'auto'}}/>
+                                        </div>}>
+                                        <Charts province={province}/>
+                                    </React.Suspense>
                                 </StatsDataContextProvider>
                             </Route>
                             <Route path="/">
                                 <StatsDataContextProvider>
-                                    <Dashboard province={province}/>
+                                    <React.Suspense fallback={
+                                        <div className={classes.root}>
+                                            <CircularProgress style={{margin: 'auto'}}/>
+                                        </div>}>
+                                        <Dashboard province={province}/>
+                                    </React.Suspense>
                                 </StatsDataContextProvider>
                             </Route>
                         </Switch>
