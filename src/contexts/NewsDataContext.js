@@ -10,7 +10,7 @@ export function NewsDataContextProvider({children}) {
         setter(data);
         setIntoLocalStorage(localStorageKey, JSON.stringify(data));
     };
-    React.useEffect(() => {
+    React.useMemo(() => {
         const lastSaveNews = getFromLocalStorage('belcovid:update:news');
 
         const updateNews = () => {

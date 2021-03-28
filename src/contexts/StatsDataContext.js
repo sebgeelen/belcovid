@@ -12,7 +12,7 @@ export function StatsDataContextProvider({children}) {
     const [mortality, setMortality] = React.useState();
     const [tests, setTests] = React.useState();
 
-    React.useEffect(() => {
+    React.useMemo(() => {
         const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
 
         const setData = (setter, data, localStorageKey) => {
