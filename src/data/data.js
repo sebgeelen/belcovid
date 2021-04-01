@@ -3,14 +3,16 @@ import { getDateFrom, getIsoDate, normalizeDate } from '../helpers';
 import { populationData } from './populationData';
 
 const parser = new Parser();
-const PROXY = 'https://safe-ridge-06878.herokuapp.com/';
+export const PROXY = 'https://safe-ridge-06878.herokuapp.com/';
 const URLS = {
-    stats: {
-        hospitalizations: 'https://epistat.sciensano.be/Data/COVID19BE_HOSP.json',
-        tests: 'https://epistat.sciensano.be/Data/COVID19BE_tests.json',
-        cases: 'https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.json',
-        mortality: 'https://epistat.sciensano.be/Data/COVID19BE_MORT.json',
-    },
+    stats: [
+        'cases',
+        'mortality',
+        'newHospitalizations',
+        'newICU',
+        'tests',
+        'totalHospitalizations',
+    ],
     news: [
         {
             sourceName: 'The Lancet',
@@ -117,15 +119,9 @@ export function provinceString(provinceKey) {
 export function provinceKey(provinceString) {
     return _PROVINCE_KEYS[provinceString];
 }
-export function fetchData(key) {
-    const url = URLS.stats[key];
-    if (url) {
-        return fetch(url).then(data => {
-            return data.json();
-        }).then(jsonData => {
-            return [key, jsonData];
-        });
-    }
+export async function fetchData(url) {
+    const data = await fetch(url);
+    return await data.json();
 }
 const covidKeywordsRegex = /corona|covid|sars/g;
 export function fetchRssData(url, filtered = true) {
@@ -140,14 +136,6 @@ export function fetchRssData(url, filtered = true) {
             return feed.items;
         }
     });
-}
-export function fetchStatsData() {
-    let dataPromises = [];
-    for (const key of Object.keys(URLS.stats)) {
-        const dataPromise = fetchData(key);
-        dataPromises.push(dataPromise);
-    }
-    return dataPromises;
 }
 export function fetchNewsData() {
     const sources = URLS.news;
