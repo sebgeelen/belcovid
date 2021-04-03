@@ -163,7 +163,9 @@ function App({ classes }) {
                             </Route>
                         </Switch>
                     <Box pt={4}>
-                        <Footer />
+                        <StatsDataContextProvider>
+                            <Footer />
+                        </StatsDataContextProvider>
                     </Box>
                 </Container>
             </main>

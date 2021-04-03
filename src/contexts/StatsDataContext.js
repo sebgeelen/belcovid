@@ -1,7 +1,7 @@
 import React from 'react';
 import diff from 'changeset';
 import { fetchData, PROXY } from '../data/data';
-import { getDaysBetween, getFromLocalStorage, setIntoLocalStorage, today } from '../helpers';
+import { getFromLocalStorage, isExpired, setIntoLocalStorage } from '../helpers';
 
 const API_URL = `${PROXY}https://belcovid-db.herokuapp.com`;
 
@@ -26,15 +26,9 @@ export function StatsDataContextProvider({children}) {
     const [tests, setTests] = React.useState(
         JSON.parse(getFromLocalStorage('belcovid:tests'))
     );
+    const updateDates = {};
 
     React.useMemo(() => {
-        const lastSaveStats = getFromLocalStorage('belcovid:update:stats');
-        let areStatsExpired = false;
-        if (lastSaveStats) {
-            const lastSaveDate = new Date(lastSaveStats);
-            const lastSaveHours = (new Date().getTime() - lastSaveDate.getTime()) / (1000 * 60 * 60);
-            areStatsExpired = getDaysBetween(lastSaveDate, today()) !== 0 || lastSaveHours >= 12;
-        }
         const lastFetchedIds = {
             cases: getFromLocalStorage('belcovid:diffId:cases'),
             totalHospitalizations: getFromLocalStorage('belcovid:diffId:totalHospitalizations'),
@@ -53,8 +47,9 @@ export function StatsDataContextProvider({children}) {
             tests: setTests,
         };
         // Update stats data.
-        if (!lastSaveStats || areStatsExpired) {
-            for (const key of Object.keys(setterMap)) {
+        for (const key of Object.keys(setterMap)) {
+            const lastUpdateTime = getFromLocalStorage(`belcovid:update:${key}`);
+            if (!lastUpdateTime || isExpired(lastUpdateTime)) {
                 const previousData = JSON.parse(getFromLocalStorage('belcovid:' + key));
                 const url = lastFetchedIds[key]
                     ? `${API_URL}/${key}/${lastFetchedIds[key]}`
@@ -62,16 +57,19 @@ export function StatsDataContextProvider({children}) {
                 fetchData(url).then(newDiff => {
                     const data = diff.apply(newDiff.changes, previousData || {});
                     setIntoLocalStorage(`belcovid:${key}`, JSON.stringify(data));
-                    setIntoLocalStorage(`belcovid:diffId:${key}`, newDiff.end);
+                    setIntoLocalStorage(`belcovid:diffId:${key}`, newDiff.end[0]);
+                    setIntoLocalStorage(`belcovid:update:${key}`, newDiff.end[1]);
                     setterMap[key](data);
+                    updateDates[key] = newDiff.end[1];
                 });
+            } else {
+                updateDates[key] = getFromLocalStorage(`belcovid:update:${key}`);
             }
-            setIntoLocalStorage('belcovid:update:stats', new Date().toISOString());
         }
-    }, []);
+    }, [updateDates]);
     return (
         <StatsDataContext.Provider value={{
-            cases, totalHospitalizations, newHospitalizations, totalICU, mortality, tests
+            cases, totalHospitalizations, newHospitalizations, totalICU, mortality, tests, updateDates,
         }}>
             {children}
         </StatsDataContext.Provider>

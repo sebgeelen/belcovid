@@ -320,3 +320,23 @@ export function objectFrom(keys, initialValue) {
         return object;
     }, {});
 }
+/**
+ * Take a datetime string representing the time of fetching Sciensano data, and
+ * return true if that data is expired.
+ *
+ * @param {string} lastUpdateTime
+ * @returns {boolean}
+ */
+export function isExpired(lastUpdateTime) {
+    let isExpired = false;
+    if (lastUpdateTime) {
+        const daysSinceLastUpdate = getDaysBetween(new Date(lastUpdateTime), today());
+        const lastUpdateHour = new Date(lastUpdateTime).getHours();
+        const currentHour = new Date().getHours();
+        // belcovid-db updates every day at 6am and 6pm.
+        isExpired = daysSinceLastUpdate !== 0 ||
+            (currentHour >= 6 && lastUpdateHour < 6) ||
+            (currentHour >= 18 && lastUpdateHour < 18);
+    }
+    return isExpired;
+}
