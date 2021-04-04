@@ -48,6 +48,14 @@ export default function Footer() {
                 <br/>
                 <small>Most data is truncated to exclude the last 4 days because that data is not yet consolidated.</small>
             </Typography>
+            <Box style={{position: 'absolute', left: 0, top: 0, padding: 0}}>
+                {/* PayPal donate button */}
+                <form action="https://www.paypal.com/donate" method="post" target="_blank">
+                    <input type="hidden" name="hosted_button_id" value="VNJGDNN6552YE" />
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                    <img alt="" border="0" src="https://www.paypal.com/en_BE/i/scr/pixel.gif" width="1" height="1" />
+                </form>
+            </Box>
             <Box style={{position: 'absolute', right: 0, top: 0, padding: 0}}>
                 {<InfoBox icon={updateIcon}>
                     Last updates:<br/><br/>
