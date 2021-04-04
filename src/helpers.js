@@ -240,11 +240,17 @@ const months = [
     'Nov',
     'Dec',
 ];
-export function prettyDate(date) {
+export function prettyDate(date, withTime = false) {
     if (typeof date === 'string') {
         date = new Date(date);
     }
-    return `${months[date.getMonth()]} ${date.getDate()}`;
+    return `${months[date.getMonth()]} ${date.getDate()}${
+        withTime
+            ? ` at ${(date.getHours() + '').length === 1 ? `0${date.getHours()}` : date.getHours()}:${
+                (date.getMinutes() + '').length === 1 ? `0${date.getMinutes()}` : date.getMinutes()}:${
+                (date.getSeconds() + '').length === 1 ? `0${date.getSeconds()}` : date.getSeconds()}`
+            : ''
+    }`;
 }
 export function betterRound(n) {
     let absN = Math.abs(n);

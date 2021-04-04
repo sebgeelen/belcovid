@@ -3,7 +3,7 @@ import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { Box, IconButton, Popover, Typography } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/Info';
 
-export default function InfoBox({ children }) {
+export default function InfoBox({ children, icon }) {
     return (
         <PopupState variant="popover" popupId="demo-popup-popover">
             {(popupState) => (
@@ -12,7 +12,7 @@ export default function InfoBox({ children }) {
                         style={{verticalAlign: 'super', padding: 0, color: 'grey'}}
                         {...bindTrigger(popupState)}
                     >
-                        <InfoIcon style={{fontSize: 13 }} />
+                        { icon || <InfoIcon style={{fontSize: 13 }} /> }
                     </IconButton>
                     <Popover
                         {...bindPopover(popupState)}
