@@ -320,7 +320,11 @@ export function objectFrom(keys, initialValue) {
             (
                 typeof initialValue === 'object'
                     ? {...initialValue}
-                    : initialValue
+                    : (
+                        typeof initialValue === 'function'
+                            ? initialValue(key)
+                            : initialValue
+                    )
             );
         object[key] = value;
         return object;
@@ -333,16 +337,12 @@ export function objectFrom(keys, initialValue) {
  * @param {string} lastUpdateTime
  * @returns {boolean}
  */
-export function isExpired(lastUpdateTime) {
-    let isExpired = false;
-    if (lastUpdateTime) {
-        const daysSinceLastUpdate = getDaysBetween(new Date(lastUpdateTime), today());
-        const lastUpdateHour = new Date(lastUpdateTime).getHours();
-        const currentHour = new Date().getHours();
-        // belcovid-db updates every day at 6am and 6pm.
-        isExpired = daysSinceLastUpdate !== 0 ||
-            (currentHour >= 6 && lastUpdateHour < 6) ||
-            (currentHour >= 18 && lastUpdateHour < 18);
+export function isExpired(lastUpdateTime, lastServerUpdateTime) {
+    let isExpired = true;
+    if (lastUpdateTime && lastServerUpdateTime) {
+        const lastUpdateDate = new Date(lastUpdateTime);
+        const lastServerUpdateDate = new Date(lastServerUpdateTime);
+        isExpired = lastUpdateDate < lastServerUpdateDate;
     }
     return isExpired;
 }

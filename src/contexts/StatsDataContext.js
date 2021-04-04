@@ -1,83 +1,69 @@
 import React from 'react';
 import diff from 'changeset';
 import { fetchData, PROXY } from '../data/data';
-import { getFromLocalStorage, isExpired, setIntoLocalStorage } from '../helpers';
+import { getFromLocalStorage, isExpired, objectFrom, setIntoLocalStorage } from '../helpers';
 
 const API_URL = `${PROXY}https://belcovid-db.herokuapp.com`;
+const KEYS = [
+    'cases',
+    'totalHospitalizations',
+    'newHospitalizations',
+    'totalICU',
+    'mortality',
+    'tests',
+];
+export const UpdateStatus = {
+    UNKNOWN: 'unknown',
+    OUT_OF_SYNC: 'out of sync',
+    UPDATING: 'updating',
+    DONE: 'done',
+};
 
 export const StatsDataContext = React.createContext({});
 
 export function StatsDataContextProvider({children}) {
-    const [cases, setCases] = React.useState(
-        JSON.parse(getFromLocalStorage('belcovid:cases'))
-    );
-    const [totalHospitalizations, setTotalHospitalizations] = React.useState(
-        JSON.parse(getFromLocalStorage('belcovid:totalHospitalizations'))
-    );
-    const [newHospitalizations, setNewHospitalizations] = React.useState(
-        JSON.parse(getFromLocalStorage('belcovid:newHospitalizations'))
-    );
-    const [totalICU, setTotalICU] = React.useState(
-        JSON.parse(getFromLocalStorage('belcovid:totalICU'))
-    );
-    const [mortality, setMortality] = React.useState(
-        JSON.parse(getFromLocalStorage('belcovid:mortality'))
-    );
-    const [tests, setTests] = React.useState(
-        JSON.parse(getFromLocalStorage('belcovid:tests'))
-    );
-    const updateDates = {
-        cases: undefined,
-        totalHospitalizations: undefined,
-        newHospitalizations: undefined,
-        totalICU: undefined,
-        mortality: undefined,
-        tests: undefined,
-    };
+    const [values, setValues] = React.useState(objectFrom(KEYS, key => JSON.parse(getFromLocalStorage(`belcovid:${key}`))));
+    const [updateStatus, setUpdateStatus] = React.useState(UpdateStatus.UNKNOWN);
+    const [updateDates, setUpdateDates] = React.useState(objectFrom(KEYS, key => getFromLocalStorage(`belcovid:update:${key}`)));
 
-    React.useMemo(() => {
-        const lastFetchedIds = {
-            cases: getFromLocalStorage('belcovid:diffId:cases'),
-            totalHospitalizations: getFromLocalStorage('belcovid:diffId:totalHospitalizations'),
-            newHospitalizations: getFromLocalStorage('belcovid:diffId:newHospitalizations'),
-            totalICU: getFromLocalStorage('belcovid:diffId:totalICU'),
-            mortality: getFromLocalStorage('belcovid:diffId:mortality'),
-            tests: getFromLocalStorage('belcovid:diffId:tests'),
-        };
+    const lastFetchedIds = objectFrom(KEYS, key => getFromLocalStorage(`belcovid:diffId:${key}`));
 
-        const setterMap = {
-            cases: setCases,
-            totalHospitalizations: setTotalHospitalizations,
-            newHospitalizations: setNewHospitalizations,
-            totalICU: setTotalICU,
-            mortality: setMortality,
-            tests: setTests,
-        };
-        // Update stats data.
-        for (const key of Object.keys(setterMap)) {
-            const lastUpdateTime = getFromLocalStorage(`belcovid:update:${key}`);
-            if (!lastUpdateTime || isExpired(lastUpdateTime)) {
-                const previousData = JSON.parse(getFromLocalStorage('belcovid:' + key));
-                const url = lastFetchedIds[key]
-                    ? `${API_URL}/${key}/${lastFetchedIds[key]}`
-                    : `${API_URL}/${key}`;
-                fetchData(url).then(newDiff => {
+    // Update stats data.
+    React.useEffect(() => {
+        async function fetchAllData () {
+            const res = await fetch(`${API_URL}/update-time`);
+            const jsonRes = await res.json();
+            const lastServerUpdateTime = jsonRes.datetime;
+            let newValues = {...values};
+            let newUpdateDates = {...updateDates};
+            for (const key of KEYS) {
+                const lastUpdateTime = getFromLocalStorage(`belcovid:update:${key}`);
+                if (!lastUpdateTime || isExpired(lastUpdateTime, lastServerUpdateTime)) {
+                    if (updateStatus !== UpdateStatus.UPDATING) {
+                        setUpdateStatus(UpdateStatus.UPDATING);
+                    }
+                    const previousData = JSON.parse(getFromLocalStorage('belcovid:' + key));
+                    const url = lastFetchedIds[key]
+                        ? `${API_URL}/${key}/${lastFetchedIds[key]}`
+                        : `${API_URL}/${key}`;
+                    const newDiff = await fetchData(url);
                     const data = diff.apply(newDiff.changes, previousData || {});
                     setIntoLocalStorage(`belcovid:${key}`, JSON.stringify(data));
                     setIntoLocalStorage(`belcovid:diffId:${key}`, newDiff.end[0]);
                     setIntoLocalStorage(`belcovid:update:${key}`, newDiff.end[1]);
-                    setterMap[key](data);
-                    updateDates[key] = newDiff.end[1];
-                });
-            } else {
-                updateDates[key] = getFromLocalStorage(`belcovid:update:${key}`);
+                    newValues = {...newValues, [key]: data};
+                    newUpdateDates = {...newUpdateDates, [key]: newDiff.end[1]};
+                    setValues(newValues);
+                    setUpdateDates(newUpdateDates);
+                }
             }
-        }
-    }, [updateDates]);
+            setUpdateStatus(UpdateStatus.DONE);
+        };
+        fetchAllData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     return (
-        <StatsDataContext.Provider value={{
-            cases, totalHospitalizations, newHospitalizations, totalICU, mortality, tests, updateDates,
-        }}>
+        <StatsDataContext.Provider value={{...values, updateDates, updateStatus}}>
             {children}
         </StatsDataContext.Provider>
     );
