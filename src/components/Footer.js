@@ -4,16 +4,20 @@ import Link from "@material-ui/core/Link";
 import { StatsDataContext } from '../contexts/StatsDataContext';
 import { isExpired, prettyDate } from '../helpers';
 import DoneIcon from '@material-ui/icons/Done';
-import ClearIcon from '@material-ui/icons/Clear';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
 import InfoBox from './InfoBox';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 
 export default function Footer() {
     const {updateDates} = React.useContext(StatsDataContext);
-    const isUpToDate = Object.keys(updateDates).every(key => !isExpired(updateDates[key]));
-    const dates = Object.keys(updateDates).map(key => (
-        <small key={key} style={{display: 'block'}}>{key}: {prettyDate(updateDates[key], true)}</small>
+    const updateKeys = Object.keys(updateDates);
+    const isUpToDate = updateKeys.every(key => updateDates[key] && !isExpired(updateDates[key]));
+    const dates = updateKeys.map(key => (
+        <small key={key} style={{display: 'block'}}>{key}: {
+            updateDates[key]
+                ? prettyDate(updateDates[key], true)
+                : 'Loading...'}</small>
     ));
     return (
         <Container style={{position: 'relative'}}>
@@ -31,7 +35,7 @@ export default function Footer() {
             <Box style={{position: 'absolute', right: 0, top: 0, padding: 0}}>
                 {<InfoBox icon={isUpToDate
                     ? <DoneIcon style={{color: 'green'}}/>
-                    : <ClearIcon style={{color: 'red'}}/>}>
+                    : <AutorenewIcon style={{color: 'orange'}}/>}>
                     Last updates:<br/><br/>
                     {dates}
                 </InfoBox>}

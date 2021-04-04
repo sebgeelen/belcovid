@@ -26,7 +26,14 @@ export function StatsDataContextProvider({children}) {
     const [tests, setTests] = React.useState(
         JSON.parse(getFromLocalStorage('belcovid:tests'))
     );
-    const updateDates = {};
+    const updateDates = {
+        cases: undefined,
+        totalHospitalizations: undefined,
+        newHospitalizations: undefined,
+        totalICU: undefined,
+        mortality: undefined,
+        tests: undefined,
+    };
 
     React.useMemo(() => {
         const lastFetchedIds = {
