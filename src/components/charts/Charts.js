@@ -12,6 +12,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Skeleton from '@material-ui/lab/Skeleton';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
+import Box from '@material-ui/core/Box';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data/data';
 import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
@@ -161,12 +165,12 @@ export const dataInfo = {
 const compareOrder = ['tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
 const getSearchParams = () => {
     return window.location.search.replace('?', '');
-}
+};
 
 function Charts({ province, classes }) {
     const context = useContext(StatsDataContext);
     const cases = context.cases?.[province];
-    const newHospitalizations = context.newHospitalizations?.[province]
+    const newHospitalizations = context.newHospitalizations?.[province];
     const totalHospitalizations = context.totalHospitalizations?.[province];
     const totalICU = context.totalICU?.[province];
     const mortality = context.mortality?.[province];
@@ -216,7 +220,7 @@ function Charts({ province, classes }) {
             default:
                 return null;
         }
-    }
+    };
     const getChart = () => {
         const variableInfo = dataInfo[variable1];
         if (!variableInfo) return;
@@ -357,8 +361,10 @@ function Charts({ province, classes }) {
         return (
             <React.Suspense fallback={<Skeleton variant="rect" height={200} />}>
                 <div style={{ marginTop: 20 }} />
-                <Divider variant="middle" />
-                <div style={{ marginTop: 20 }} />
+                <Box display={{xs: 'none', sm: 'block'}}>
+                    <Divider variant="middle" />
+                    <div style={{ marginTop: 20 }} />
+                </Box>
                 <Title id="icu">{title}</Title>
                 {
                     !variable2 && variableInfo.description &&
@@ -443,119 +449,205 @@ function Charts({ province, classes }) {
     return (
         <React.Fragment>
             <Title>Charts for {provinceString(province)}</Title>
-            <FormControl component="fieldset" className={classes.formControl} style={{width: "100%"}}>
-                <Grid container spacing={4} justify="center">
-                    <Grid item xs>
-                        <FormLabel component="legend">Variable</FormLabel>
-                        <RadioGroup
-                            value={variable1}
-                            onChange={ev => setVariable1(ev.target.value)}
-                        >
-                            <FormControlLabel
-                                control={<Radio/>}
-                                value="cases"
-                                label="Cases" />
-                            <FormControlLabel
-                                control={<Radio/>}
-                                value="incidence"
-                                label="Incidence"
-                            />
-                            <FormControlLabel
-                                control={<Radio/>}
-                                value="hospitalizations"
-                                label="Hospitalizations"
-                            />
-                            <FormControlLabel
-                                control={<Radio/>}
-                                value="icu"
-                                label="Intensive Care Units"
-                            />
-                            <Tooltip title="Mortality data cannot be filtered per province.">
-                                <FormControlLabel
-                                    control={<Radio/>}
-                                    value="mortality"
-                                    label="Mortality"
-                                    disabled={province !== 'be'}
-                                />
-                            </Tooltip>
-                            <Tooltip title="Testing data cannot be filtered per province.">
-                                <FormControlLabel
-                                    control={<Radio/>}
-                                    value="tests"
-                                    label="Tests"
-                                    disabled={province !== 'be'}
-                                />
-                            </Tooltip>
-                        </RadioGroup>
-                    </Grid>
-                    {
-                        !['incidence', 'icu'].includes(variable1) &&
+            <Box display={{xs: 'none', sm: 'block'}}>
+                <FormControl component="fieldset" className={classes.formControl} style={{width: "100%"}}>
+                    <Grid container spacing={4} justify="center">
                         <Grid item xs>
-                            <FormLabel component="legend">Compare with</FormLabel>
+                            <FormLabel component="legend">Variable</FormLabel>
                             <RadioGroup
-                                value={variable2}
-                                onChange={(ev) => setVariable2(ev.target.value)}
+                                value={variable1}
+                                onChange={ev => setVariable1(ev.target.value)}
                             >
                                 <FormControlLabel
                                     control={<Radio/>}
-                                    value={''}
-                                    label="None" />
-                                <FormControlLabel
-                                    control={<Radio/>}
-                                    disabled={['cases', 'incidence', 'icu'].includes(variable1)}
                                     value="cases"
                                     label="Cases" />
                                 <FormControlLabel
                                     control={<Radio/>}
-                                    disabled={['incidence', 'hospitalizations', 'icu'].includes(variable1)}
+                                    value="incidence"
+                                    label="Incidence"
+                                />
+                                <FormControlLabel
+                                    control={<Radio/>}
                                     value="hospitalizations"
                                     label="Hospitalizations"
                                 />
                                 <FormControlLabel
                                     control={<Radio/>}
-                                    disabled={['incidence', 'icu'].includes(variable1)}
                                     value="icu"
-                                    label="Intensive Care Units"
+                                    label="Intensive Care"
                                 />
                                 <Tooltip title="Mortality data cannot be filtered per province.">
                                     <FormControlLabel
                                         control={<Radio/>}
-                                        disabled={province !== 'be' || ['incidence', 'mortality', 'icu'].includes(variable1)}
                                         value="mortality"
                                         label="Mortality"
+                                        disabled={province !== 'be'}
                                     />
                                 </Tooltip>
                                 <Tooltip title="Testing data cannot be filtered per province.">
                                     <FormControlLabel
                                         control={<Radio/>}
-                                        disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}
                                         value="tests"
                                         label="Tests"
+                                        disabled={province !== 'be'}
                                     />
                                 </Tooltip>
                             </RadioGroup>
                         </Grid>
-                    }
-                    <Grid item xs>
-                        <FormLabel component="legend">Chart type</FormLabel>
-                        <RadioGroup
-                            value={chartType}
-                            onChange={ (ev) => setChartType(ev.target.value) }
-                        >
-                            <FormControlLabel
-                                control={<Radio/>}
-                                value="average"
-                                label={variable2 ? 'Ratio' : 'Rolling average'}
-                            />
-                            <FormControlLabel
-                                control={<Radio/>}
-                                value="change"
-                                label="Rate of change"
-                            />
-                        </RadioGroup>
+                        {
+                            !['incidence', 'icu'].includes(variable1) &&
+                            <Grid item xs>
+                                <FormLabel component="legend">Compare with</FormLabel>
+                                <RadioGroup
+                                    value={variable2}
+                                    onChange={(ev) => setVariable2(ev.target.value)}
+                                >
+                                    <FormControlLabel
+                                        control={<Radio/>}
+                                        value={''}
+                                        label="None" />
+                                    <FormControlLabel
+                                        control={<Radio/>}
+                                        disabled={['cases', 'incidence', 'icu'].includes(variable1)}
+                                        value="cases"
+                                        label="Cases" />
+                                    <FormControlLabel
+                                        control={<Radio/>}
+                                        disabled={['incidence', 'hospitalizations', 'icu'].includes(variable1)}
+                                        value="hospitalizations"
+                                        label="Hospitalizations"
+                                    />
+                                    <FormControlLabel
+                                        control={<Radio/>}
+                                        disabled={['incidence', 'icu'].includes(variable1)}
+                                        value="icu"
+                                        label="Intensive Care"
+                                    />
+                                    <Tooltip title="Mortality data cannot be filtered per province.">
+                                        <FormControlLabel
+                                            control={<Radio/>}
+                                            disabled={province !== 'be' || ['incidence', 'mortality', 'icu'].includes(variable1)}
+                                            value="mortality"
+                                            label="Mortality"
+                                        />
+                                    </Tooltip>
+                                    <Tooltip title="Testing data cannot be filtered per province.">
+                                        <FormControlLabel
+                                            control={<Radio/>}
+                                            disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}
+                                            value="tests"
+                                            label="Tests"
+                                        />
+                                    </Tooltip>
+                                </RadioGroup>
+                            </Grid>
+                        }
+                        <Grid item xs>
+                            <FormLabel component="legend">Chart type</FormLabel>
+                            <RadioGroup
+                                value={chartType}
+                                onChange={ (ev) => setChartType(ev.target.value) }
+                            >
+                                <FormControlLabel
+                                    control={<Radio/>}
+                                    value="average"
+                                    label={variable2 ? 'Ratio' : 'Rolling average'}
+                                />
+                                <FormControlLabel
+                                    control={<Radio/>}
+                                    value="change"
+                                    label="Rate of change"
+                                />
+                            </RadioGroup>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </FormControl>
+                </FormControl>
+            </Box>
+            <Box display={{xs: 'block', sm: 'none'}}>
+                <FormControl className={classes.formControl}>
+                    <InputLabel shrink id="variable1-select-label">
+                        Variable
+                    </InputLabel>
+                    <Select
+                        labelId="variable1-select-label"
+                        id="variable1-select"
+                        value={variable1}
+                        onChange={ev => setVariable1(ev.target.value)}
+                        displayEmpty
+                        className={classes.selectEmpty}
+                    >
+                        <MenuItem value='cases'>Cases</MenuItem>
+                        <MenuItem value='incidence'>Incidence</MenuItem>
+                        <MenuItem value='hospitalizations'>Hospitalizations</MenuItem>
+                        <MenuItem value='icu'>Intensive Care</MenuItem>
+                        <MenuItem value='mortality'>Mortality</MenuItem>
+                        <MenuItem value='tests'>Tests</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                    {
+                        !['incidence', 'icu'].includes(variable1) &&
+                        <React.Fragment>
+                            <InputLabel shrink id="variable2-select-label">
+                                Compare with
+                            </InputLabel>
+                            <Select
+                                labelId="variable2-select-label"
+                                id="variable2-select"
+                                value={variable2}
+                                onChange={ev => setVariable2(ev.target.value)}
+                                displayEmpty
+                                className={classes.selectEmpty}
+                            >
+                                <MenuItem value=''>None</MenuItem>
+                                <MenuItem
+                                    value='cases'
+                                    disabled={['cases', 'incidence', 'icu'].includes(variable1)}>
+                                    Cases
+                                </MenuItem>
+                                <MenuItem
+                                    value='hospitalizations'
+                                    disabled={['incidence', 'hospitalizations', 'icu'].includes(variable1)}>
+                                    Hospitalizations
+                                </MenuItem>
+                                <MenuItem
+                                    value='icu'
+                                    disabled={['incidence', 'icu'].includes(variable1)}>
+                                    Intensive Care
+                                </MenuItem>
+                                <MenuItem 
+                                    value='mortality'
+                                    disabled={province !== 'be' || ['incidence', 'mortality', 'icu'].includes(variable1)}>
+                                    Mortality
+                                </MenuItem>
+                                <MenuItem value='tests'
+                                    disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}>
+                                    Tests
+                                </MenuItem>
+                            </Select>
+                        </React.Fragment>
+                    }
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                    <InputLabel shrink id="chart-type-select-label">
+                        Chart type
+                    </InputLabel>
+                    <Select
+                        labelId="chart-type-select-label"
+                        id="chart-type-select"
+                        value={chartType}
+                        onChange={ev => setChartType(ev.target.value)}
+                        displayEmpty
+                        className={classes.selectEmpty}
+                    >
+                        <MenuItem value='average'>
+                            {variable2 ? 'Ratio' : 'Rolling average'}
+                        </MenuItem>
+                        <MenuItem value='change'>Rate of change</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
             <section id="chart">
                 <Switch>
                     <Route path="/charts">
