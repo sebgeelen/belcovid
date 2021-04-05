@@ -176,7 +176,7 @@ function Charts({ province, classes }) {
     const mortality = context.mortality?.[province];
     const tests = context.tests?.[province];
 
-    const urlParams = new URLSearchParams(getSearchParams());
+    const urlParams = React.useMemo(() => new URLSearchParams(getSearchParams()), []);
     const [variable1, setVariable1] = useState(urlParams.get('var1') || 'cases');
     const [variable2, setVariable2] = useState(urlParams.get('var2') || '');
     const [chartType, setChartType] = useState(urlParams.get('chartType') || 'average');
