@@ -10,6 +10,8 @@ import InfoBox from './InfoBox';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 
+import './footer.css';
+
 export default function Footer() {
     const {updateDates, updateStatus} = React.useContext(StatsDataContext);
     const updateKeys = Object.keys(updateDates);
@@ -48,7 +50,7 @@ export default function Footer() {
                 <br/>
                 <small>Most data is truncated to exclude the last 4 days because that data is not yet consolidated.</small>
             </Typography>
-            <Box style={{position: 'absolute', left: 0, top: 0, padding: 0}}>
+            <Box className="paypal-button">
                 {/* PayPal donate button */}
                 <form action="https://www.paypal.com/donate" method="post" target="_blank">
                     <input type="hidden" name="hosted_button_id" value="VNJGDNN6552YE" />
