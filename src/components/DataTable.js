@@ -123,9 +123,11 @@ const getChangeRatioOver = (data, limit = lastConsolidatedDataDay(), period = 7,
     }
     return getChangeRatio(newValue, oldValue);
 }
-const getChangeJsx = (data, limit = lastConsolidatedDataDay(), period = 7, overAverage = true) => {
+const getChangeJsx = (data, limit = lastConsolidatedDataDay(), period = 7, overAverage = true, reverseColors = false) => {
     const change = getChangeRatioOver(data, limit, period, overAverage);
-    const style = { color: (change > 0 ? 'red' : 'green') };
+    const style = { color: (change > 0 ? (
+        reverseColors ? 'green' : 'red'
+    ) : (reverseColors ? 'red': 'green')) };
     return (
         <small style={style}>
             <sup><strong>
@@ -161,6 +163,8 @@ export default function DataTable({ province }) {
         newHospitalizations,
         totalICU,
         mortality,
+        vaccinationPartial,
+        vaccinationFull,
     } = useContext(StatsDataContext);
 
     const incidence = cases && getIncidenceData(cases[province], province);
@@ -175,6 +179,8 @@ export default function DataTable({ province }) {
                 <TableHead>
                     <TableRow>
                         <TableCell/>
+                        <TableCell>Partial Vaccination</TableCell>
+                        <TableCell>Total Vaccination</TableCell>
                         <TableCell>Cases</TableCell>
                         <TableCell>Incidence (14d)</TableCell>
                         <TableCell>Total in Hospital</TableCell>
@@ -193,6 +199,52 @@ export default function DataTable({ province }) {
                                 consolidated.<br/>
                                 Change is shown over a period of 7 days.
                             </InfoBox>
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                    (
+                                        vaccinationPartial &&
+                                        Math.round(getAverageOver(
+                                            vaccinationPartial[province],
+                                            lastConsolidatedDataDay(),
+                                            -7,
+                                        ))
+                                    ) :
+                                    '-'
+                            }
+                            {
+                                province === 'be' &&
+                                vaccinationPartial &&
+                                getChangeJsx(vaccinationPartial[province],
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    true)
+                            }
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                    (
+                                        vaccinationFull &&
+                                        Math.round(getAverageOver(
+                                            vaccinationFull[province],
+                                            lastConsolidatedDataDay(),
+                                            -7,
+                                        ))
+                                    ) :
+                                    '-'
+                            }
+                            {
+                                province === 'be' &&
+                                vaccinationFull &&
+                                getChangeJsx(vaccinationFull[province],
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    true)
+                            }
                         </TableCell>
                         <TableCell>
                             {
@@ -273,6 +325,56 @@ export default function DataTable({ province }) {
                                 Change is shown as compared to the day
                                 before.
                             </InfoBox>
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                (
+                                    vaccinationPartial &&
+                                    Math.round(getAverageOver(
+                                        vaccinationPartial[province],
+                                        yesterday(),
+                                        1,
+                                    ))
+                                ) :
+                                '-'
+                            }
+                            {
+                                province === 'be' &&
+                                vaccinationPartial &&
+                                getChangeJsx(
+                                    vaccinationPartial[province],
+                                    yesterday(),
+                                    1,
+                                    false,
+                                    true,
+                                )
+                            }
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                (
+                                    vaccinationFull &&
+                                    Math.round(getAverageOver(
+                                        vaccinationFull[province],
+                                        yesterday(),
+                                        1,
+                                    ))
+                                ) :
+                                '-'
+                            }
+                            {
+                                province === 'be' &&
+                                vaccinationFull &&
+                                getChangeJsx(
+                                    vaccinationFull[province],
+                                    yesterday(),
+                                    1,
+                                    false,
+                                    true,
+                                )
+                            }
                         </TableCell>
                         <TableCell>
                             -&nbsp;<InfoBox>
@@ -379,6 +481,8 @@ export default function DataTable({ province }) {
                                 that of the week before.
                             </InfoBox>
                         </TableCell>
+                        <TableCell>-</TableCell>
+                        <TableCell>-</TableCell>
                         <TableCell>
                             {
                                 cases &&
@@ -461,6 +565,26 @@ export default function DataTable({ province }) {
                         </TableCell>
                         <TableCell>
                             {
+                                province === 'be' ?
+                                (
+                                    vaccinationPartial &&
+                                    getTotal(vaccinationPartial[province])
+                                ) :
+                                '-'
+                            }
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                (
+                                    vaccinationFull &&
+                                    getTotal(vaccinationFull[province])
+                                ) :
+                                '-'
+                            }
+                        </TableCell>
+                        <TableCell>
+                            {
                                 cases && getTotal(cases[province])
                             }
                         </TableCell>
@@ -493,6 +617,26 @@ export default function DataTable({ province }) {
                             &nbsp;<InfoBox>
                                 1 person out of n inhabitants of {provinceString(province)}.
                             </InfoBox>
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                (
+                                    vaccinationPartial &&
+                                    `${Math.round(100 * getTotal(vaccinationPartial[province]) / populationData.totals[province])}%`
+                                ) :
+                                '-'
+                            }
+                        </TableCell>
+                        <TableCell>
+                            {
+                                province === 'be' ?
+                                (
+                                    vaccinationFull &&
+                                    `${Math.round(100* getTotal(vaccinationFull[province]) / populationData.totals[province])}%`
+                                ) :
+                                '-'
+                            }
                         </TableCell>
                         <TableCell>
                             {
@@ -536,6 +680,8 @@ export default function DataTable({ province }) {
                             <TableCell variant="head">
                                 Day of next peak (at current rate)
                             </TableCell>
+                            <TableCell>-</TableCell>
+                            <TableCell>-</TableCell>
                             <TableCell>
                                 {
                                     cases &&
@@ -652,6 +798,8 @@ export default function DataTable({ province }) {
                             <TableCell variant="head">
                                 Day of saturation (national, at current rate)
                             </TableCell>
+                            <TableCell>-</TableCell>
+                            <TableCell>-</TableCell>
                             <TableCell>-</TableCell>
                             <TableCell>-</TableCell>
                             <TableCell>

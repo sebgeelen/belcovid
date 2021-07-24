@@ -11,6 +11,8 @@ const KEYS = [
     'totalICU',
     'mortality',
     'tests',
+    'vaccinationPartial',
+    'vaccinationFull',
 ];
 export const UpdateStatus = {
     UNKNOWN: 'unknown',

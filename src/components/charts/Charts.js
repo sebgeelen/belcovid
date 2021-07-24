@@ -161,8 +161,47 @@ export const dataInfo = {
             ),
         },
     },
+    vaccinationPartial: {
+        average: {
+            title: 'First dose of 2-dose vaccine administered (7-day rolling average)',
+            labelStrings: {
+                y: 'new 1st dose vaccinations',
+            },
+        },
+        change: {
+            title: 'Week by week change of 1st dose vaccination',
+            description: (
+                <React.Fragment>
+                    How fast is the administration of the first dose of 2-dose
+                    vaccines rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of 1st doses between the
+                        last 7 days and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+        },
+    },
+    vaccinationFull: {
+        average: {
+            title: 'Full vaccine administered (7-day rolling average)',
+            labelStrings: {
+                y: 'new full vaccinations',
+            },
+        },
+        change: {
+            title: 'Week by week change of full vaccination',
+            description: (
+                <React.Fragment>
+                    How fast is the administration of full vaccines (second dose
+                    of a two-dose vaccine or single dose of a single dose
+                    vaccine) rising/falling (in %) ?<br/>
+                    <i>(The percentage change in number of full vaccinations
+                        between the last 7 days and the 7 days before that).</i>
+                </React.Fragment>
+            ),
+        },
+    },
 };
-const compareOrder = ['tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
+const compareOrder = ['vaccinationFull', 'vaccinationPartial', 'tests', 'cases', 'hospitalizations', 'icu', 'mortality'];
 const getSearchParams = () => {
     return window.location.search.replace('?', '');
 };
@@ -175,6 +214,8 @@ function Charts({ province, classes }) {
     const totalICU = context.totalICU?.[province];
     const mortality = context.mortality?.[province];
     const tests = context.tests?.[province];
+    const vaccinationPartial = context.vaccinationPartial?.[province];
+    const vaccinationFull = context.vaccinationFull?.[province];
 
     const urlParams = React.useMemo(() => new URLSearchParams(getSearchParams()), []);
     const [variable1, setVariable1] = useState(urlParams.get('var1') || 'cases');
@@ -217,6 +258,10 @@ function Charts({ province, classes }) {
                 return mortality;
             case 'tests':
                 return tests;
+            case 'vaccinationPartial':
+                return vaccinationPartial;
+            case 'vaccinationFull':
+                return vaccinationFull;
             default:
                 return null;
         }
@@ -493,6 +538,22 @@ function Charts({ province, classes }) {
                                         disabled={province !== 'be'}
                                     />
                                 </Tooltip>
+                                <Tooltip title="Vaccination data cannot be filtered per province.">
+                                    <FormControlLabel
+                                        control={<Radio/>}
+                                        value="vaccinationPartial"
+                                        label="Partial Vaccination"
+                                        disabled={province !== 'be'}
+                                    />
+                                </Tooltip>
+                                <Tooltip title="Vaccination data cannot be filtered per province.">
+                                    <FormControlLabel
+                                        control={<Radio/>}
+                                        value="vaccinationFull"
+                                        label="Full Vaccination"
+                                        disabled={province !== 'be'}
+                                    />
+                                </Tooltip>
                             </RadioGroup>
                         </Grid>
                         {
@@ -535,9 +596,25 @@ function Charts({ province, classes }) {
                                     <Tooltip title="Testing data cannot be filtered per province.">
                                         <FormControlLabel
                                             control={<Radio/>}
-                                            disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}
+                                            disabled={province !== 'be' || ['tests', 'incidence', 'icu', 'vaccinationPartial', 'vaccinationFull'].includes(variable1)}
                                             value="tests"
                                             label="Tests"
+                                        />
+                                    </Tooltip>
+                                    <Tooltip title="Vaccination data cannot be filtered per province.">
+                                        <FormControlLabel
+                                            control={<Radio/>}
+                                            disabled={province !== 'be' || ['tests', 'vaccinationPartial', 'vaccinationFull'].includes(variable1)}
+                                            value="vaccinationPartial"
+                                            label="Partial Vaccination"
+                                        />
+                                    </Tooltip>
+                                    <Tooltip title="Vaccination data cannot be filtered per province.">
+                                        <FormControlLabel
+                                            control={<Radio/>}
+                                            disabled={province !== 'be' || ['tests', 'vaccinationPartial', 'vaccinationFull'].includes(variable1)}
+                                            value="vaccinationFull"
+                                            label="Full Vaccination"
                                         />
                                     </Tooltip>
                                 </RadioGroup>
@@ -583,6 +660,8 @@ function Charts({ province, classes }) {
                         <MenuItem value='icu'>Intensive Care</MenuItem>
                         <MenuItem value='mortality'>Mortality</MenuItem>
                         <MenuItem value='tests'>Tests</MenuItem>
+                        <MenuItem value='vaccinationPartial'>Partial Vaccination</MenuItem>
+                        <MenuItem value='vaccinationFull'>Full Vaccination</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControl className={classes.formControl}>
@@ -622,8 +701,16 @@ function Charts({ province, classes }) {
                                     Mortality
                                 </MenuItem>
                                 <MenuItem value='tests'
-                                    disabled={province !== 'be' || ['tests', 'incidence', 'icu'].includes(variable1)}>
+                                    disabled={province !== 'be' || ['tests', 'incidence', 'icu', 'vaccinationPartial', 'vaccinationFull'].includes(variable1)}>
                                     Tests
+                                </MenuItem>
+                                <MenuItem value='vaccinationPartial'
+                                    disabled={province !== 'be' || ['tests', 'vaccinationPartial', 'vaccinationFull'].includes(variable1)}>
+                                    Partial Vaccination
+                                </MenuItem>
+                                <MenuItem value='vaccinationFull'
+                                    disabled={province !== 'be' || ['tests', 'vaccinationPartial', 'vaccinationFull'].includes(variable1)}>
+                                    Full Vaccination
                                 </MenuItem>
                             </Select>
                         </React.Fragment>

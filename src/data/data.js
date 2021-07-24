@@ -12,6 +12,8 @@ const URLS = {
         'newICU',
         'tests',
         'totalHospitalizations',
+        'vaccinationPartial',
+        'vaccinationFull',
     ],
     news: [
         {
