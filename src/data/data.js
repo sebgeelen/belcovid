@@ -114,6 +114,17 @@ export const AGE_GROUPS_MORTALITY = [
     '85+',
     'Age unknown'
 ];
+export const AGE_GROUPS_VACCINATION = [
+    '0-17',
+    '18-34',
+    '35-44',
+    '45-54',
+    '55-64',
+    '65-74',
+    '75-84',
+    '85+',
+    'Age unknown',
+];
 
 export function provinceString(provinceKey) {
     return PROVINCES[provinceKey].replace(/([A-Z])/g, ' $1').trim();
@@ -122,8 +133,7 @@ export function provinceKey(provinceString) {
     return _PROVINCE_KEYS[provinceString];
 }
 export async function fetchData(url) {
-    const data = await fetch(url);
-    return await data.json();
+    return fetch(url).then(data => data.json());
 }
 const covidKeywordsRegex = /corona|covid|sars/g;
 export function fetchRssData(url, filtered = true) {

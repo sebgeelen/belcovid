@@ -1,18 +1,18 @@
 import React from 'react';
 import diff from 'changeset';
-import { fetchData, PROXY } from '../data/data';
+import { fetchData } from '../data/data';
 import { getFromLocalStorage, isExpired, objectFrom, setIntoLocalStorage } from '../helpers';
 
-const API_URL = `${PROXY}https://belcovid-db.herokuapp.com`;
+const API_URL = `https://belcovid-db.herokuapp.com`;
 const KEYS = [
     'cases',
+    'vaccinationPartial',
+    'vaccinationFull',
     'totalHospitalizations',
     'newHospitalizations',
     'totalICU',
     'mortality',
     'tests',
-    'vaccinationPartial',
-    'vaccinationFull',
 ];
 export const UpdateStatus = {
     UNKNOWN: 'unknown',
@@ -48,16 +48,18 @@ export function StatsDataContextProvider({children}) {
                     const url = lastFetchedIds[key]
                         ? `${API_URL}/${key}/${lastFetchedIds[key]}`
                         : `${API_URL}/${key}`;
-                    const newDiff = await fetchData(url);
-                    const data = diff.apply(newDiff.changes, previousData || {});
-                    setIntoLocalStorage(`belcovid:${key}`, JSON.stringify(data));
-                    setIntoLocalStorage(`belcovid:diffId:${key}`, newDiff.end[0]);
-                    setIntoLocalStorage(`belcovid:update:${key}`, newDiff.end[1]);
-                    newValues = {...newValues, [key]: data};
-                    newUpdateDates = {...newUpdateDates, [key]: newDiff.end[1]};
-                    setValues(newValues);
-                    setUpdateDates(newUpdateDates);
-                }
+                    // eslint-disable-next-line no-loop-func
+                    fetchData(url).then(newDiff => {
+                        const data = diff.apply(newDiff.changes, previousData || {});
+                        setIntoLocalStorage(`belcovid:${key}`, JSON.stringify(data));
+                        setIntoLocalStorage(`belcovid:diffId:${key}`, newDiff.end[0]);
+                        setIntoLocalStorage(`belcovid:update:${key}`, newDiff.end[1]);
+                        newValues = {...newValues, [key]: data};
+                        newUpdateDates = {...newUpdateDates, [key]: newDiff.end[1]};
+                        setValues(newValues);
+                        setUpdateDates(newUpdateDates);
+                    });
+            }
             }
             setUpdateStatus(UpdateStatus.DONE);
         };

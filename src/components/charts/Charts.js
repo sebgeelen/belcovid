@@ -17,7 +17,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import withStyles from '@material-ui/core/styles/withStyles';
-import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, getIncidenceData, provinceString } from '../../data/data';
+import { AGE_GROUPS_CASES, AGE_GROUPS_MORTALITY, AGE_GROUPS_VACCINATION, getIncidenceData, provinceString } from '../../data/data';
 import { testingAnnotations, lastConsolidatedDataDay } from '../../helpers';
 import { Route, Switch } from 'react-router-dom';
 import { StatsDataContext } from '../../contexts/StatsDataContext';
@@ -163,6 +163,7 @@ export const dataInfo = {
     },
     vaccinationPartial: {
         average: {
+            ageGroups: AGE_GROUPS_VACCINATION,
             title: 'First dose of 2-dose vaccine administered (7-day rolling average)',
             labelStrings: {
                 y: 'new 1st dose vaccinations',
@@ -182,6 +183,7 @@ export const dataInfo = {
     },
     vaccinationFull: {
         average: {
+            ageGroups: AGE_GROUPS_VACCINATION,
             title: 'Full vaccine administered (7-day rolling average)',
             labelStrings: {
                 y: 'new full vaccinations',
