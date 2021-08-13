@@ -125,6 +125,9 @@ const getChangeRatioOver = (data, limit = lastConsolidatedDataDay(), period = 7,
 }
 const getChangeJsx = (data, limit = lastConsolidatedDataDay(), period = 7, overAverage = true, reverseColors = false) => {
     const change = getChangeRatioOver(data, limit, period, overAverage);
+    if (!change) {
+        return null;
+    }
     const style = { color: (change > 0 ? (
         reverseColors ? 'green' : 'red'
     ) : (reverseColors ? 'red': 'green')) };
