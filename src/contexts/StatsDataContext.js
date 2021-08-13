@@ -38,6 +38,7 @@ export function StatsDataContextProvider({children}) {
             const lastServerUpdateTime = jsonRes.datetime;
             let newValues = {...values};
             let newUpdateDates = {...updateDates};
+            const promises = [];
             for (const key of KEYS) {
                 const lastUpdateTime = getFromLocalStorage(`belcovid:update:${key}`);
                 if (!lastUpdateTime || isExpired(lastUpdateTime, lastServerUpdateTime)) {
@@ -49,7 +50,7 @@ export function StatsDataContextProvider({children}) {
                         ? `${API_URL}/${key}/${lastFetchedIds[key]}`
                         : `${API_URL}/${key}`;
                     // eslint-disable-next-line no-loop-func
-                    fetchData(url).then(newDiff => {
+                    const promise = fetchData(url).then(newDiff => {
                         const data = diff.apply(newDiff.changes, previousData || {});
                         setIntoLocalStorage(`belcovid:${key}`, JSON.stringify(data));
                         setIntoLocalStorage(`belcovid:diffId:${key}`, newDiff.end[0]);
@@ -59,9 +60,12 @@ export function StatsDataContextProvider({children}) {
                         setValues(newValues);
                         setUpdateDates(newUpdateDates);
                     });
+                    promises.push(promise);
+                }
             }
-            }
-            setUpdateStatus(UpdateStatus.DONE);
+            Promise.all(promises)
+                .then(() => setUpdateStatus(UpdateStatus.DONE))
+                .catch(() => setUpdateStatus(UpdateStatus.OUT_OF_SYNC));
         };
         fetchAllData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
