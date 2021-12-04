@@ -17,6 +17,7 @@
     "country-flag-icons": "^1.2.5",
     "js-polynomial-regression": "^0.9.1",
     "material-ui-popup-state": "^1.7.0",
+    "mathjax-full": "^3.2.0",
     "mathjax-react": "^1.0.6",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.10.0",
