@@ -47,8 +47,8 @@ export function StatsDataContextProvider({children}) {
                     }
                     const previousData = JSON.parse(getFromLocalStorage('belcovid:' + key));
                     const url = lastFetchedIds[key]
-                        ? `${API_URL}/${key}/${lastFetchedIds[key]}`
-                        : `${API_URL}/${key}`;
+                        ? `${API_URL}/get/${key}/${lastFetchedIds[key]}`
+                        : `${API_URL}/get/${key}`;
                     // eslint-disable-next-line no-loop-func
                     const promise = fetchData(url).then(newDiff => {
                         const data = diff.apply(newDiff.changes, previousData || {});
