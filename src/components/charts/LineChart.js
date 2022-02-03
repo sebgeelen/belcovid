@@ -283,6 +283,38 @@ const defaultBaseOptions = () => {
                         position: 'top',
                     },
                 },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2021-12-27'),
+                    borderColor: 'grey',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Omicron variant is predominant',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
+                {
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x-axis-0',
+                    value: new Date('2021-12-27'),
+                    borderColor: 'grey',
+                    borderDash: [10, 10],
+                    borderWidth: 1,
+                    label: {
+                        content: 'Omicron variant is predominant',
+                        enabled: true,
+                        fontSize: 10,
+                        fontStyle: 'normal',
+                        position: 'top',
+                    },
+                },
             ]
         },
     }
